@@ -275,6 +275,7 @@ zoom = Vector2(2, 2)
 [node name="Enemy" parent="Enemies" instance=ExtResource("2_8gbba")]
 max_health = 100000
 health = 100000
+wander_speed = 0.0
 
 [node name="PlayerSpawn" type="Node2D" parent="."]
 script = ExtResource("3_jjvhh")

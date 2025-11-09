@@ -54,5 +54,5 @@ func get_distance_to_player() -> float:
 # 2. Override the on_damaged() function to do nothing
 # 3. Override the _ready() function
 # This is the order I would recommend personally
-func on_damaged(attack: Attack):
+func on_damaged(damage: Damage):
 	transitioned.emit(self, "stun")

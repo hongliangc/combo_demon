@@ -1,0 +1,41 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "e:\\workspace\\4.godot\\combo_demon\\Art",
+        "e:\\workspace\\4.godot\\combo_demon\\Scenes",
+        "e:\\workspace\\4.godot\\combo_demon\\Util"
+      ],
+      "env": {}
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "godot": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\ivan\\.mcp\\godot-mcp\\build\\index.js"
+      ],
+      "env": {
+        "GODOT_PATH": "D:\\devtool\\godot\\Godot_v4.4.1-stable_win64.exe\\Godot_v4.4.1-stable_win64.exe"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "launch_editor",
+        "run_project",
+        "get_debug_output",
+        "stop_project"
+      ]
+    }
+  }
+}

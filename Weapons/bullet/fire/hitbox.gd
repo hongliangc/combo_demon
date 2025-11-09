@@ -3,15 +3,15 @@ extends Hitbox
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 func _ready() -> void:
-	attack.max_damage = 50
-	attack.min_damage = 10
-	attack.knockback = 10
+	damage.max_amount = 50
+	damage.min_amount = 10
+	# Note: Damage class doesn't have knockback property
 	rng.randomize()
 	#print("fire bullet self:{0} groups:{1}".format([self, str(get_groups())]))
 	super._ready()
 
 func update_attack():
-	attack.damage = rng.randi_range(attack.min_damage, attack.max_damage)
+	damage.amount = rng.randi_range(damage.min_amount, damage.max_amount)
 
 func _on_hitbox_area_entered_(area: Area2D):
 	# player自动碰撞直接返回
@@ -20,6 +20,6 @@ func _on_hitbox_area_entered_(area: Area2D):
 	# 更新子类的攻击、伤害等属性
 	update_attack()
 	if area is Hurtbox:
-		area.damage(attack)
+		area.take_damage(damage)
 	# print("_on_hitbox_area_entered_ name:{0}".format([area.name]))
 	get_owner().queue_free()

@@ -2,7 +2,7 @@ extends CharacterBody2D
 class_name Enemy
 
 # 发送信号给StunState
-signal damaged(attack: Attack)
+signal damaged(damage: Damage)
 
 @export_group("Textures")
 @export var textures: Array[Texture2D] = []
@@ -39,14 +39,14 @@ func on_death() -> void:
 	pass # 用于爆装备
 
 
-func dislay_damage_number(attack: Attack) -> void:
+func dislay_damage_number(damage: Damage) -> void:
 	var is_critical = false
-	if attack.damage > attack.max_damage *0.8:
+	if damage.amount > damage.max_amount *0.8:
 		is_critical = true
-	DamageNumbers.display_number(attack.damage, damage_numbers_anchor.global_position, is_critical)
+	DamageNumbers.display_number(damage.amount, damage_numbers_anchor.global_position, is_critical)
 
 
-func on_damaged(attack: Attack) -> void:
+func on_damaged(damage: Damage) -> void:
 	# 通知状态StunState机切换
-	damaged.emit(attack)
-	dislay_damage_number(attack)
+	damaged.emit(damage)
+	dislay_damage_number(damage)

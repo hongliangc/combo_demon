@@ -1,12 +1,15 @@
-[gd_scene load_steps=150 format=3 uid="uid://bxttk2162m4p4"]
+[gd_scene load_steps=153 format=3 uid="uid://bxttk2162m4p4"]
 
 [ext_resource type="Texture2D" uid="uid://ci2uaxeklamvi" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_1.png" id="1_c3kl5"]
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
 [ext_resource type="Script" uid="uid://b1ex62f8uy81b" path="res://Scenes/charaters/hahashin.gd" id="1_mom7b"]
 [ext_resource type="Texture2D" uid="uid://ba0pir88bptb0" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_2.png" id="2_d5iwh"]
+[ext_resource type="Script" uid="uid://dhptij5yeksrr" path="res://Util/Classes/Damage.gd" id="2_p3ltc"]
 [ext_resource type="Texture2D" uid="uid://cn3wk5j44t4d7" path="res://Art/Wind_Hashashin/PNG/idle/idle_2.png" id="2_yb066"]
 [ext_resource type="Texture2D" uid="uid://du2hlv87q7fvn" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_3.png" id="3_2ttqx"]
+[ext_resource type="Resource" uid="uid://o7affn3td02p" path="res://Util/Data/SkillBook/Physical.tres" id="3_vqspa"]
 [ext_resource type="Texture2D" uid="uid://dihtk8wqiihjl" path="res://Art/Wind_Hashashin/PNG/idle/idle_3.png" id="3_xk8kn"]
+[ext_resource type="Resource" uid="uid://bjhtsxp31ycfw" path="res://Util/Data/SkillBook/KnockUp.tres" id="4_3aexr"]
 [ext_resource type="Texture2D" uid="uid://byxwlodyme57h" path="res://Art/Wind_Hashashin/PNG/idle/idle_4.png" id="4_g73ga"]
 [ext_resource type="Texture2D" uid="uid://dkdb6ji0xhxph" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_4.png" id="4_q1taa"]
 [ext_resource type="Texture2D" uid="uid://by5c28sgtesto" path="res://Art/Wind_Hashashin/PNG/idle/idle_5.png" id="5_ktvv7"]
@@ -111,11 +114,11 @@
 [ext_resource type="Texture2D" uid="uid://big7bubsbaeju" path="res://Art/Wind_Hashashin/PNG/run/run_6.png" id="102_mnt5w"]
 [ext_resource type="Texture2D" uid="uid://c740wr4806us7" path="res://Art/Wind_Hashashin/PNG/run/run_7.png" id="103_ltrpv"]
 [ext_resource type="Texture2D" uid="uid://dbp1mcg73nxu3" path="res://Art/Wind_Hashashin/PNG/run/run_8.png" id="104_246et"]
-[ext_resource type="Script" uid="uid://c8wsmfs0k6c64" path="res://Util/Components/hitbox.gd" id="112_2s434"]
 [ext_resource type="AudioStream" uid="uid://darf54p1hw7ug" path="res://Sound/sword_slash.mp3" id="112_mydql"]
 [ext_resource type="AudioStream" uid="uid://dbmjdalwoup22" path="res://Sound/running-in-grass.mp3" id="113_fp3de"]
 [ext_resource type="Script" uid="uid://ewlu4e5khm1k" path="res://Scenes/charaters/movement_hander.gd" id="113_mnt5w"]
 [ext_resource type="Script" uid="uid://b1tau21465081" path="res://Scenes/charaters/animation_hander.gd" id="114_ltrpv"]
+[ext_resource type="Script" uid="uid://cdjkxgdwhu0en" path="res://Scenes/charaters/hitbox.gd" id="117_p3ltc"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hrca3"]
 radius = 23.0217
@@ -558,7 +561,7 @@ tracks/4/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_fqjf3"]
-length = 0.8
+length = 0.533334
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -566,7 +569,7 @@ tracks/0/path = NodePath("AnimatedSprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"times": PackedFloat32Array(0, 0.0667, 0.1333, 0.2, 0.2667, 0.3333, 0.4, 0.4667),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3, 4, 5, 6, 7]
@@ -590,7 +593,7 @@ tracks/2/path = NodePath("Hitbox/CollisionShape2D:disabled")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"times": PackedFloat32Array(0, 0.0667, 0.1333, 0.2),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [false, true, false, true]
@@ -602,7 +605,7 @@ tracks/3/path = NodePath("Hitbox/CollisionShape2D:position")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.1333),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [Vector2(20.5, -9.5), Vector2(0, -2.5)]
@@ -614,7 +617,7 @@ tracks/4/path = NodePath("Hitbox/CollisionShape2D:shape:size")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.1333),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [Vector2(42, 19), Vector2(60, 27)]
@@ -643,7 +646,7 @@ tracks/5/keys = {
 "start_offset": 0.0,
 "stream": null
 }],
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3)
+"times": PackedFloat32Array(0, 0.0667, 0.1333, 0.2)
 }
 tracks/5/use_blend = true
 
@@ -700,6 +703,53 @@ tracks/1/keys = {
 "update": 1,
 "values": ["atk_3"]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Hitbox/CollisionShape2D:disabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [false, true, false, true, false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Hitbox/CollisionShape2D:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [Vector2(20.5, -9.5), Vector2(0, -2.5), Vector2(25.5, -14)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Hitbox/CollisionShape2D:shape:size")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [Vector2(42, 19), Vector2(60, 27), Vector2(51, 36)]
+}
+tracks/5/type = "audio"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("AudioStreamPlayer")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"clips": [],
+"times": PackedFloat32Array()
+}
+tracks/5/use_blend = true
 
 [sub_resource type="Animation" id="Animation_mshhv"]
 length = 3.0
@@ -948,7 +998,7 @@ graph_offset = Vector2(-202, -57)
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_c61cn"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bu1c3"]
-graph_offset = Vector2(-56.5016, 0)
+graph_offset = Vector2(-219.408, 0)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_8j6ec")
 nodes/StateMachine/position = Vector2(-56.5016, 64.9001)
 nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_c61cn")
@@ -962,8 +1012,11 @@ size = Vector2(0, 0)
 [node name="Hahashin" type="CharacterBody2D"]
 collision_mask = 136
 script = ExtResource("1_mom7b")
+damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr")])
+current_damage = ExtResource("3_vqspa")
 
 [node name="FloorCollision" type="CollisionShape2D" parent="."]
+visible = false
 shape = SubResource("CircleShape2D_hrca3")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -984,7 +1037,7 @@ parameters/TimeScale/scale = 1.0
 
 [node name="Hitbox" type="Area2D" parent="."]
 unique_name_in_owner = true
-script = ExtResource("112_2s434")
+script = ExtResource("117_p3ltc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("RectangleShape2D_246et")

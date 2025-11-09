@@ -9,8 +9,8 @@ class_name Hurtbox
 
 # 如果关联了health, 可以进行通知收到攻击。
 # 实际使用例子是enemy的子节点helath会导入Hurtbox 继承类。并关联该信号到health.on_damaged
-signal damaged(attack: Attack)
+signal damaged(damage: Damage)
 
 # hurtbox 会通过碰撞的area，判断如果是Hitbox就会调用damage告知受到的伤害
-func damage(attack: Attack):
-	damaged.emit(attack)
+func take_damage(damage: Damage):
+	damaged.emit(damage)

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(choco --version:*)",
+      "Bash(bash:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "enabledMcpjsonServers": [
+    "filesystem",
+    "github",
+    "godot"
+  ]
+}

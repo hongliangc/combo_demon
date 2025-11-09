@@ -33,8 +33,8 @@ func _ready() -> void:
 	max_health_changed.emit(max_health)
 	health_changed.emit(health)
 		
-func on_damaged(attack: Attack):
-	health -= attack.damage
+func on_damaged(damage: Damage):
+	health -= damage.amount
 	health = max(0, health)
 	if health <= 0:
 		died.emit()

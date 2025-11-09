@@ -1,19 +1,17 @@
 extends Hitbox
 
-var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+@onready var player : Hahashin = get_owner()
 
 func _ready() -> void:
-	damage.min_amount = 1
-	damage.min_amount = 5
-	rng.randomize()
-	super._ready()
+	# 使用Area节点自带的区域area_entered signal连接回调接口，检测碰撞
+	area_entered.connect(_on_hitbox_area_entered_)
 
 func update_attack():
-	damage.amount = rng.randi_range(damage.min_amount, damage.min_amount)
+	pass
 
 # 建议子类覆盖该方法，然后get_owner().queue_free()
 func _on_hitbox_area_entered_(area: Area2D):
 	# 更新子类的攻击、伤害等属性
 	update_attack()
 	if area is Hurtbox:
-		area.damage(damage)
+		area.take_damage(player.current_damage)

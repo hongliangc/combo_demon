@@ -2,11 +2,6 @@ extends Node
 class_name BulletPool
 
 @export var bullet_selection := {
-	"normal_bullet": {
-		"bullet_scene": preload("res://Object/Scenes/bullet.tscn"),
-		"sound_effect": preload("res://Sound/hitHurt.wav"),
-		"bullet_count": 10,
-	},
 	"fire_bullet": {
 		"bullet_scene": preload("res://Weapons/bullet/fire/fire_bullet.tscn"),
 		"sound_effect": preload("res://Sound/hitHurt.wav"),

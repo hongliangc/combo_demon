@@ -6,11 +6,15 @@ var last_face_direction:Vector2 = Vector2.RIGHT
 var input_direction: Vector2 = Vector2.RIGHT
 
 @export_group("Speed")
-var max_speed: float = 100
+@export var max_speed: float = 100
 
 @export_group("Health")
-var max_health:float
-var health:float
+@export var max_health:float
+@export var health:float
+
+@export_group("Damage")
+@export var damage_types : Array[Damage]
+@export var current_damage: Damage
 
 
 var can_move: bool = true
@@ -31,3 +35,10 @@ func _physics_process(delta: float) -> void:
 			last_face_direction = velocity.normalized()
 		if can_move:
 			move_and_slide()
+
+func switch_to_physical() -> void:
+	current_damage = damage_types[0]
+	
+func switch_to_knockup() -> void:
+	current_damage = damage_types[1]
+	

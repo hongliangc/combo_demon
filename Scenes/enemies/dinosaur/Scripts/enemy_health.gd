@@ -17,11 +17,11 @@ func _ready() -> void:
 	super()
 
 
-func on_damaged(attack: Attack):
+func on_damaged(damage: Damage):
 	if !enemy.alive:
 		return
 	# 调用基类方法Health.on_damaged
-	super(attack)
+	super(damage)
 	if health <= 0:
 		died.emit()
 		enemy.alive = false

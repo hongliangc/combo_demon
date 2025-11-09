@@ -7,7 +7,7 @@ class_name Hitbox
 # the other party.
 ############################################################
 
-var attack: Attack = Attack.new()
+var damage: Damage = Damage.new()
 
 func _ready() -> void:
 	# 使用Area节点自带的区域area_entered signal连接回调接口，检测碰撞
@@ -21,4 +21,4 @@ func _on_hitbox_area_entered_(area: Area2D):
 	# 更新子类的攻击、伤害等属性
 	update_attack()
 	if area is Hurtbox:
-		area.damage(attack)
+		area.take_damage(damage)
