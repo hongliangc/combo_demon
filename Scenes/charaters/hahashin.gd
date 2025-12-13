@@ -21,6 +21,9 @@ var can_move: bool = true
 
 func _ready() -> void:
 	velocity = input_direction* max_speed
+	# 初始化为默认物理伤害
+	if damage_types.size() > 0:
+		current_damage = damage_types[0]
 	
 # 获取用户输入，控制方向
 func _process(delta: float) -> void:
@@ -41,4 +44,18 @@ func switch_to_physical() -> void:
 	
 func switch_to_knockup() -> void:
 	current_damage = damage_types[1]
-	
+
+## 调试打印玩家状态信息
+func debug_print() -> void:
+	print("========== Player 状态信息 ==========")
+	print("存活状态: ", alive)
+	print("生命值: ", health, "/", max_health)
+	print("可移动: ", can_move)
+	print("速度: ", velocity, " (最大速度: ", max_speed, ")")
+	print("面对方向: ", last_face_direction)
+	print("输入方向: ", input_direction)
+	if current_damage:
+		current_damage.debug_print()
+	else:
+		print("当前伤害: null")
+	print("====================================")

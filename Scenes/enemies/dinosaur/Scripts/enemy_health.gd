@@ -17,11 +17,13 @@ func _ready() -> void:
 	super()
 
 
-func on_damaged(damage: Damage):
+func on_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
 	if !enemy.alive:
 		return
-	# 调用基类方法Health.on_damaged
-	super(damage)
+	# 调用基类方法Health.on_damaged（扣血）
+	super(damage, attacker_position)
+	# 调用 Enemy 的 on_damaged 方法（应用特效、发送信号到状态机）
+	enemy.on_damaged(damage, attacker_position)
 	if health <= 0:
 		died.emit()
 		enemy.alive = false

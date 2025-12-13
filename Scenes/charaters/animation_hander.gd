@@ -5,7 +5,7 @@ var playback: AnimationNodeStateMachinePlayback
 
 
 var skill_config = {
-	"atk_sp" :{	
+	"atk_sp" :{
 		"sound_effect": preload("res://Sound/face_the_wind.mp3"),
 		"time_scale": 2
 	},
@@ -43,16 +43,26 @@ func _ready():
 func play_animation(animation_name: String):
 	var config = skill_config.get(animation_name)
 	if playback and config:
+		# 调用自定义函数（如roll的速度设置）
 		if config.get("func"):
 			config["func"].call(400)
-		playback.travel(animation_name)  # 切换状态
-		animation_tree.set("parameters/TimeScale/scale", config.get("time_scale", 1))  # 设置播放速度
-		if config["sound_effect"]:
+
+		# 切换动画状态
+		playback.travel(animation_name)
+
+		# 设置播放速度
+		animation_tree.set("parameters/TimeScale/scale", config.get("time_scale", 1))
+
+		# 播放音效
+		if config.get("sound_effect"):
 			SoundManager.play_sound(config["sound_effect"])
 
 func on_animation_finished(animation_name: String):
-	animation_tree.set("parameters/TimeScale/scale", 1)  # 设置播放速度
+	# 恢复播放速度
+	animation_tree.set("parameters/TimeScale/scale", 1)
+
 	if animation_name in skill_config.keys():  # 检查是否是技能动画
+		# 通知移动处理器动画结束
 		var movement_handler = get_parent().get_node("MovementHandler")
 		if movement_handler:
 			movement_handler.on_animation_finished()

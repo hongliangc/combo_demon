@@ -33,7 +33,7 @@ func _ready() -> void:
 	max_health_changed.emit(max_health)
 	health_changed.emit(health)
 		
-func on_damaged(damage: Damage):
+func on_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
 	health -= damage.amount
 	health = max(0, health)
 	if health <= 0:

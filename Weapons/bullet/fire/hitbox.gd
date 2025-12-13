@@ -1,17 +1,7 @@
 extends Hitbox
 
-var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-
-func _ready() -> void:
-	damage.max_amount = 50
-	damage.min_amount = 10
-	# Note: Damage class doesn't have knockback property
-	rng.randomize()
-	#print("fire bullet self:{0} groups:{1}".format([self, str(get_groups())]))
-	super._ready()
-
-func update_attack():
-	damage.amount = rng.randi_range(damage.min_amount, damage.max_amount)
+## 火焰子弹的碰撞处理
+## 在编辑器中配置 min_damage=10, max_damage=50
 
 func _on_hitbox_area_entered_(area: Area2D):
 	# player自动碰撞直接返回

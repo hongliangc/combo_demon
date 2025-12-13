@@ -559,6 +559,20 @@ tracks/4/keys = {
 "update": 0,
 "values": [Vector2(0, 0)]
 }
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"switch_to_physical"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_fqjf3"]
 length = 0.533334
@@ -710,10 +724,10 @@ tracks/2/path = NodePath("Hitbox/CollisionShape2D:disabled")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.7, 1.1, 1.5, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [false, true, false, true, false]
+"values": [false, true, false, true, false, true, false, true]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -722,10 +736,10 @@ tracks/3/path = NodePath("Hitbox/CollisionShape2D:position")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.6993, 1.5, 1.6, 1.7, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [Vector2(20.5, -9.5), Vector2(0, -2.5), Vector2(25.5, -14)]
+"values": [Vector2(20.5, -9.5), Vector2(0, -2.5), Vector2(25.5, -9.5), Vector2(17, -5.5), Vector2(33, -3.125), Vector2(52.5625, -1.5625), Vector2(83, 0)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -734,10 +748,10 @@ tracks/4/path = NodePath("Hitbox/CollisionShape2D:shape:size")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.6993, 1.5, 1.6, 1.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [Vector2(42, 19), Vector2(60, 27), Vector2(51, 36)]
+"values": [Vector2(42, 19), Vector2(60, 27), Vector2(51, 45), Vector2(36.25, 49.5), Vector2(36.25, 45.75), Vector2(29.125, 44.875)]
 }
 tracks/5/type = "audio"
 tracks/5/imported = false
@@ -750,6 +764,23 @@ tracks/5/keys = {
 "times": PackedFloat32Array()
 }
 tracks/5/use_blend = true
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(1.4985, 1.998),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"switch_to_knockup"
+}, {
+"args": [],
+"method": &"switch_to_physical"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_mshhv"]
 length = 3.0
@@ -998,7 +1029,6 @@ graph_offset = Vector2(-202, -57)
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_c61cn"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_bu1c3"]
-graph_offset = Vector2(-219.408, 0)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_8j6ec")
 nodes/StateMachine/position = Vector2(-56.5016, 64.9001)
 nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_c61cn")
@@ -1016,7 +1046,6 @@ damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResourc
 current_damage = ExtResource("3_vqspa")
 
 [node name="FloorCollision" type="CollisionShape2D" parent="."]
-visible = false
 shape = SubResource("CircleShape2D_hrca3")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

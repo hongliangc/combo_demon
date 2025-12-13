@@ -7,10 +7,13 @@ class_name Hurtbox
 # health components to receive damage
 ############################################################
 
-# 如果关联了health, 可以进行通知收到攻击。
-# 实际使用例子是enemy的子节点helath会导入Hurtbox 继承类。并关联该信号到health.on_damaged
-signal damaged(damage: Damage)
+# 受到伤害时发出的信号
+# @param damage: 伤害数据
+# @param attacker_position: 攻击者位置（用于计算击飞/击退方向）
+signal damaged(damage: Damage, attacker_position: Vector2)
 
-# hurtbox 会通过碰撞的area，判断如果是Hitbox就会调用damage告知受到的伤害
-func take_damage(damage: Damage):
-	damaged.emit(damage)
+# 接收伤害并发出信号
+# @param damage: 伤害数据
+# @param attacker_position: 攻击者位置（可选，默认为Vector2.ZERO）
+func take_damage(damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
+	damaged.emit(damage, attacker_position)

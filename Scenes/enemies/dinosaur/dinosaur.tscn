@@ -425,7 +425,6 @@ position = Vector2(0, -11)
 
 [node name="AttackAnchor" type="Node2D" parent="."]
 
-[connection signal="damaged" from="Hurtbox" to="." method="on_damaged"]
 [connection signal="died" from="HealthHandler" to="." method="on_death"]
 [connection signal="health_changed" from="HealthHandler" to="HealthBar" method="on_health_changed"]
 [connection signal="max_health_changed" from="HealthHandler" to="HealthBar" method="on_max_health_changed"]

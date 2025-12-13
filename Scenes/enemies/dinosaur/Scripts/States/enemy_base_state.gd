@@ -4,13 +4,9 @@ class_name EnemyStates
 # 状态结束通过signal通知进入下一个状态
 signal transitioned(state: EnemyStates, new_state_name: String)
 
-@onready var enemy : Enemy = get_owner()
-var player : Hahashin
-
-
-func _ready():
-	player = get_tree().get_first_node_in_group("player")
-	enemy.damaged.connect(on_damaged)
+# 这些引用由状态机统一注入，不再在 _ready() 中获取
+var enemy: Enemy
+var player: Hahashin
 
 # Useful for setting up the state to be used
 # In Idle, we use this function to decide how long we will idle for
@@ -49,10 +45,8 @@ func get_distance_to_player() -> float:
 	return player.global_position.distance_to(enemy.global_position)
 
 
-# If you wanted to replace this functionality in a state you can either:
-# 1. Disconnect the signal by doing enemy.damaged.disconnect(on_damaged)
-# 2. Override the on_damaged() function to do nothing
-# 3. Override the _ready() function
-# This is the order I would recommend personally
-func on_damaged(damage: Damage):
+# 基类的默认 on_damaged 实现：切换到 stun 状态
+# Stun 状态会覆盖此方法来处理眩晕中再次受伤的情况
+func on_damaged(_damage: Damage):
+	# 切换到 stun 状态（Stun 状态自己不会调用这个基类方法）
 	transitioned.emit(self, "stun")

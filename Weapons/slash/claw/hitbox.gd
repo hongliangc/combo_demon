@@ -1,19 +1,4 @@
 extends Hitbox
 
-var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-
-func _ready() -> void:
-	damage.min_amount = 1
-	damage.min_amount = 5
-	rng.randomize()
-	super._ready()
-
-func update_attack():
-	damage.amount = rng.randi_range(damage.min_amount, damage.min_amount)
-
-# 建议子类覆盖该方法，然后get_owner().queue_free()
-func _on_hitbox_area_entered_(area: Area2D):
-	# 更新子类的攻击、伤害等属性
-	update_attack()
-	if area is Hurtbox:
-		area.damage(damage)
+## 爪击的碰撞处理
+## 在编辑器中配置 min_damage=1, max_damage=5

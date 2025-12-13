@@ -1,9 +1,22 @@
-[gd_resource type="Resource" script_class="Damage" load_steps=2 format=3 uid="uid://bjhtsxp31ycfw"]
+[gd_resource type="Resource" script_class="Damage" load_steps=5 format=3 uid="uid://bjhtsxp31ycfw"]
 
+[ext_resource type="Script" uid="uid://bngu63cnq7ltu" path="res://Util/Classes/AttackEffect.gd" id="1_f6w6l"]
 [ext_resource type="Script" uid="uid://dhptij5yeksrr" path="res://Util/Classes/Damage.gd" id="1_r3ije"]
+[ext_resource type="Script" uid="uid://c67evqw3u5px6" path="res://Util/Classes/KnockUpEffect.gd" id="2_knockup"]
+
+[sub_resource type="Resource" id="KnockUpEffect_1"]
+script = ExtResource("2_knockup")
+knockup_force = 300.0
+horizontal_force = 0.0
+effect_name = "击飞"
+duration = 1.0
+show_debug_info = false
 
 [resource]
 script = ExtResource("1_r3ije")
+max_amount = 80.0
+min_amount = 50.0
 amount = 60.0
 type = "KnockUp"
+effects = Array[ExtResource("1_f6w6l")]([SubResource("KnockUpEffect_1")])
 metadata/_custom_type_script = "uid://dhptij5yeksrr"

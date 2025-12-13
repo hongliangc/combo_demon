@@ -35,7 +35,17 @@
         "launch_editor",
         "run_project",
         "get_debug_output",
-        "stop_project"
+        "stop_project",
+        "get_godot_version",
+        "list_projects",
+        "get_project_info",
+        "create_scene",
+        "add_node",
+        "load_sprite",
+        "export_mesh_library",
+        "save_scene",
+        "get_uid",
+        "update_project_uids"
       ]
     }
   }
