@@ -1,4 +1,4 @@
-[gd_scene load_steps=153 format=3 uid="uid://bxttk2162m4p4"]
+[gd_scene load_steps=154 format=3 uid="uid://bxttk2162m4p4"]
 
 [ext_resource type="Texture2D" uid="uid://ci2uaxeklamvi" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_1.png" id="1_c3kl5"]
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://deb0nbib5dksa" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_5.png" id="5_o2kwx"]
 [ext_resource type="Texture2D" uid="uid://bfty6xjyj1ly1" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_6.png" id="6_6s4sr"]
 [ext_resource type="Texture2D" uid="uid://dtvkt13oydyc4" path="res://Art/Wind_Hashashin/PNG/idle/idle_6.png" id="6_ejrhw"]
+[ext_resource type="Script" uid="uid://5jjwbr0mlmjx" path="res://Util/Components/hurtbox.gd" id="6_ueu0g"]
 [ext_resource type="Texture2D" uid="uid://c8srgu5l8esm1" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_7.png" id="7_sjagy"]
 [ext_resource type="Texture2D" uid="uid://bhdomvdf1vnru" path="res://Art/Wind_Hashashin/PNG/idle/idle_7.png" id="7_xiytc"]
 [ext_resource type="Texture2D" uid="uid://cnigdhbnxkxns" path="res://Art/Wind_Hashashin/PNG/idle/idle_8.png" id="8_05lvs"]
@@ -1039,9 +1040,12 @@ node_connections = [&"TimeScale", 0, &"StateMachine", &"output", 0, &"TimeScale"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_246et"]
 size = Vector2(0, 0)
 
-[node name="Hahashin" type="CharacterBody2D"]
+[node name="Hahashin" type="CharacterBody2D" groups=["player"]]
 collision_mask = 136
 script = ExtResource("1_mom7b")
+max_speed = 200.0
+max_health = 1e+07
+health = 1e+07
 damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr")])
 current_damage = ExtResource("3_vqspa")
 
@@ -1064,8 +1068,21 @@ advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/TimeScale/scale = 1.0
 
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("6_ueu0g")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_hrca3")
+
+[node name="DamageNumbersAnchor" type="Node2D" parent="."]
+position = Vector2(0, -50)
+
 [node name="Hitbox" type="Area2D" parent="."]
 unique_name_in_owner = true
+collision_layer = 4
+collision_mask = 8
 script = ExtResource("117_p3ltc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]

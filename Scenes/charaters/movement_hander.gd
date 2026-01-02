@@ -24,12 +24,19 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if player and player.alive:
+		# 只有在can_move为true时才更新速度
 		if player.can_move:
 			var velocity = player.velocity
 			velocity = velocity.move_toward(
-				player.input_direction*player.max_speed, 
+				player.input_direction*player.max_speed,
 				(1.0/acceleration_time) * player.max_speed * delta)
 			player.velocity = velocity
+		else:
+			# 攻击时速度逐渐减为0（除非是翻滚等特殊状态）
+			if not animation_handler.is_playing_roll():
+				player.velocity = player.velocity.move_toward(Vector2.ZERO, (1.0/acceleration_time) * player.max_speed * delta)
+
+		# 更新精灵翻转（基于面向方向）
 		if player.last_face_direction.x < 0:
 			anim_sprite.flip_h = true
 			%Hitbox.scale.x = -1

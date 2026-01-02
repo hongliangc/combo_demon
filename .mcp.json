@@ -22,10 +22,9 @@
       }
     },
     "godot": {
-      "command": "npx",
+      "command": "node",
       "args": [
-        "-y",
-        "godot-mcp"
+        "C:\\Users\\ivan\\AppData\\Roaming\\npm\\node_modules\\godot-mcp\\build\\index.js"
       ],
       "env": {
         "GODOT_PATH": "D:\\devtool\\godot\\Godot_v4.4.1-stable_win64.exe\\Godot_v4.4.1-stable_win64.exe"

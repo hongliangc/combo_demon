@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3 uid="uid://dvdtxgsuir5jc"]
+
+[sub_resource type="Gradient" id="Gradient_k8mpv"]
+offsets = PackedFloat32Array(0, 0.547009, 1)
+colors = PackedColorArray(0.941406, 0.626819, 0.136063, 1, 0.612336, 0.889011, 0.973708, 1, 0.03125, 0.03125, 0.03125, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_dmc2j"]
+gradient = SubResource("Gradient_k8mpv")
+
+[sub_resource type="Curve" id="Curve_eyqj6"]
+_data = [Vector2(0.00384615, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.306947), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_aqk3v"]
+curve = SubResource("Curve_eyqj6")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_kmqwa"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 50.0
+direction = Vector3(0, -1, 0)
+spread = 180.0
+initial_velocity_min = 80.0
+initial_velocity_max = 120.0
+gravity = Vector3(0, 0, 0)
+scale_min = 2.0
+scale_max = 2.0
+scale_curve = SubResource("CurveTexture_aqk3v")
+color_ramp = SubResource("GradientTexture1D_dmc2j")
+
+[node name="TeleportVfx" type="GPUParticles2D"]
+emitting = false
+amount = 150
+one_shot = true
+process_material = SubResource("ParticleProcessMaterial_kmqwa")

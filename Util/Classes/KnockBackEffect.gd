@@ -1,40 +1,43 @@
 extends AttackEffect
 class_name KnockBackEffect
 
-## 击退特效 - 将敌人水平击退并控制一段时间
+## 击退特效 - 可应用到任何 CharacterBody2D（Player, Boss, Enemy）
 
 @export_group("击退参数")
-## 击退力度（水平速度）
+## 击退力度
 @export var knockback_force: float = 200.0
-
-## 摩擦力（影响减速速度，越大减速越快）
-@export var friction: float = 0.8
-
-## 是否在击退期间禁用敌人AI
-@export var disable_ai_during_knockback: bool = true
 
 func _init():
 	effect_name = "击退"
 	duration = 0.5
 
-func apply_effect(enemy: Enemy, damage_source_position: Vector2) -> void:
-	super.apply_effect(enemy, damage_source_position)
+func apply_effect(target: CharacterBody2D, damage_source_position: Vector2) -> void:
+	super.apply_effect(target, damage_source_position)
 
-	print("[KnockBackEffect] 开始应用击退效果")
-	print("[KnockBackEffect] 敌人当前速度: ", enemy.velocity)
+	if show_debug_info:
+		print("[KnockBackEffect] 开始应用击退效果")
+		print("[KnockBackEffect] 目标当前速度: ", target.velocity)
 
-	# 计算击退方向（远离伤害源）
-	var direction = (enemy.global_position - damage_source_position).normalized()
+	# 计算击退方向（从攻击源指向目标）
+	var direction = (target.global_position - damage_source_position).normalized()
 
-	# 设置击退速度（仅水平方向）
-	enemy.velocity.x = direction.x * knockback_force
-	enemy.velocity.y = 0  # 不影响Y轴
+	# 设置击退速度
+	target.velocity = direction * knockback_force
 
-	print("[KnockBackEffect] 设置后的速度: ", enemy.velocity)
-	print("[KnockBackEffect] 击退方向: ", direction, " 力度: ", knockback_force)
+	# 禁用移动控制（如果目标有 can_move 属性）
+	if "can_move" in target:
+		target.can_move = false
+		# 使用定时器在持续时间后恢复控制
+		if target.get_tree():
+			await target.get_tree().create_timer(duration).timeout
+			if is_instance_valid(target) and "can_move" in target:
+				target.can_move = true
+				if show_debug_info:
+					print("[KnockBackEffect] 恢复移动控制")
 
-	# 注意：不在这里设置 enemy.stunned，由 stun 状态的 enter() 方法管理
-	# 注意：击退状态的持续时间和摩擦力由 stun 状态管理
+	if show_debug_info:
+		print("[KnockBackEffect] 设置后的速度: ", target.velocity)
+		print("[KnockBackEffect] 击退力度: ", knockback_force, " 方向: ", direction)
 
 func get_description() -> String:
 	return "击退 - 力度: %.0f, 持续: %.1f秒" % [knockback_force, duration]

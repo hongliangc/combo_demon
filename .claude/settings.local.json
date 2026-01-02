@@ -3,7 +3,9 @@
     "allow": [
       "Bash(choco --version:*)",
       "Bash(bash:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(godot --headless --script-check:*)"
     ],
     "deny": [],
     "ask": []
@@ -12,5 +14,6 @@
     "filesystem",
     "github",
     "godot"
-  ]
+  ],
+  "enableAllProjectMcpServers": true
 }

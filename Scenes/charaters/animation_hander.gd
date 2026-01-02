@@ -66,4 +66,11 @@ func on_animation_finished(animation_name: String):
 		var movement_handler = get_parent().get_node("MovementHandler")
 		if movement_handler:
 			movement_handler.on_animation_finished()
+
+## 检查当前是否正在播放翻滚动画
+func is_playing_roll() -> bool:
+	if playback:
+		var current_state = playback.get_current_node()
+		return current_state == "roll"
+	return false
 	

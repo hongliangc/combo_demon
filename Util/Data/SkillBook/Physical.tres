@@ -7,8 +7,6 @@
 [sub_resource type="Resource" id="KnockBackEffect_1"]
 script = ExtResource("2_knockback")
 knockback_force = 200.0
-friction = 0.8
-disable_ai_during_knockback = true
 effect_name = "击退"
 duration = 0.5
 show_debug_info = false
