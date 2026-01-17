@@ -12,7 +12,11 @@ func enter():
 	attack_timer = attack_duration
 	has_attacked = false
 
+	if owner_node is not Boss:
+		return
+
 	# 停止移动，准备攻击
+	var boss = owner_node as Boss
 	boss.velocity = Vector2.ZERO
 
 func process_state(delta: float) -> void:
@@ -25,12 +29,16 @@ func process_state(delta: float) -> void:
 
 	# 攻击结束
 	if attack_timer <= 0:
+		if owner_node is not Boss:
+			return
+
 		# 设置攻击冷却
 		set_attack_cooldown()
 
 		# 根据距离决定下一个状态
-		if player and player.alive:
-			var distance = get_distance_to_player()
+		if is_target_alive():
+			var boss = owner_node as Boss
+			var distance = get_distance_to_target()
 			if distance < boss.min_distance:
 				transitioned.emit(self, "retreat")
 			elif distance > boss.attack_range:
@@ -41,11 +49,20 @@ func process_state(delta: float) -> void:
 			transitioned.emit(self, "idle")
 
 func physics_process_state(delta: float) -> void:
+	if owner_node is not Boss:
+		return
+
 	# 攻击时缓慢减速
+	var boss = owner_node as Boss
 	boss.velocity = boss.velocity.lerp(Vector2.ZERO, 10.0 * delta)
 
 func perform_attack():
+	if owner_node is not Boss:
+		return
+
 	print("Boss 执行攻击！")
+
+	var boss = owner_node as Boss
 
 	# 根据阶段决定攻击模式
 	match boss.current_phase:
@@ -75,14 +92,15 @@ func attack_pattern_phase_1():
 		1:
 			# Rapid Fire - 快速单发射击
 			print("阶段1攻击：快速射击")
-			attack_manager.fire_single_projectile(player.global_position)
+			if target_node:
+				attack_manager.fire_single_projectile((target_node as Node2D).global_position)
 			# 0.1秒后再发射两发
 			await get_tree().create_timer(0.1).timeout
-			if is_instance_valid(attack_manager) and player:
-				attack_manager.fire_single_projectile(player.global_position)
+			if is_instance_valid(attack_manager) and target_node:
+				attack_manager.fire_single_projectile((target_node as Node2D).global_position)
 			await get_tree().create_timer(0.1).timeout
-			if is_instance_valid(attack_manager) and player:
-				attack_manager.fire_single_projectile(player.global_position)
+			if is_instance_valid(attack_manager) and target_node:
+				attack_manager.fire_single_projectile((target_node as Node2D).global_position)
 		2:
 			# Combo - 三连击
 			print("阶段1攻击：三连击")
@@ -108,7 +126,7 @@ func attack_pattern_phase_2():
 		2:
 			# Laser Sweep - 激光扫射
 			print("阶段2攻击：激光扫射")
-			if attack_manager.laser_scene and player:
+			if attack_manager.laser_scene and target_node:
 				attack_manager.fire_laser_at_player()
 		3:
 			# Combo - 扇形 + 螺旋
@@ -143,7 +161,7 @@ func attack_pattern_phase_3():
 		2:
 			# Rapid Laser + Projectiles - 激光 + 弹幕组合
 			print("阶段3攻击：激光弹幕组合")
-			if attack_manager.laser_scene and player:
+			if attack_manager.laser_scene and target_node:
 				attack_manager.fire_laser_at_player()
 			await get_tree().create_timer(0.2).timeout
 			if is_instance_valid(attack_manager):
@@ -166,14 +184,18 @@ func attack_pattern_phase_3():
 
 func get_attack_manager() -> BossAttackManager:
 	# 从Boss节点查找攻击管理器
-	if boss:
-		for child in boss.get_children():
+	if owner_node is Boss:
+		for child in (owner_node as Boss).get_children():
 			if child is BossAttackManager:
 				return child
 	return null
 
 func set_attack_cooldown():
+	if owner_node is not Boss:
+		return
+
 	# 根据阶段设置不同的攻击冷却
+	var boss = owner_node as Boss
 	match boss.current_phase:
 		Boss.Phase.PHASE_1:
 			boss.attack_cooldown = 1.5
@@ -187,6 +209,10 @@ func exit():
 
 # 攻击状态下仍然可以被打断
 func on_damaged(_damage: Damage):
+	if owner_node is not Boss:
+		return
+
 	# 只有在非第三阶段才会被打断
+	var boss = owner_node as Boss
 	if boss.current_phase != Boss.Phase.PHASE_3:
 		transitioned.emit(self, "stun")

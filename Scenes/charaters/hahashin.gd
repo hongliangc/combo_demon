@@ -89,7 +89,8 @@ func on_damaged(damage: Damage, attacker_position: Vector2) -> void:
 			elif "launch_force" in effect:
 				velocity.y = -effect.launch_force
 
-	print("Player 受到伤害: ", damage_amount, " 剩余生命: ", health)
+	# 调试打印
+	DebugConfig.info("Player 受到伤害: %d 剩余生命: %d" % [damage_amount, health], "", "combat")
 
 	# 检查死亡
 	if health <= 0:
@@ -125,7 +126,9 @@ func die() -> void:
 		return
 
 	alive = false
-	print("Player 死亡!")
+
+	# 调试打印
+	DebugConfig.error("Player 死亡!", "", "player")
 
 	# 隐藏玩家
 	visible = false

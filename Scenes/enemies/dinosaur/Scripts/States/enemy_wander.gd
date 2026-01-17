@@ -1,29 +1,21 @@
-extends EnemyStates
+extends "res://Util/StateMachine/CommonStates/wander_state.gd"
 
-var wander_timer: Timer
-var wander_direction: Vector2
+## Enemy Wander 状态 - 使用通用 WanderState 模板
+## 配置参数以匹配原有行为
 
-func enter():
-	wander_direction = Vector2.UP.rotated(deg_to_rad(randf_range(0, 360)))
-	wander_timer = Timer.new()
-	wander_timer.wait_time = randf_range(enemy.min_wander_time, enemy.max_wander_time)
-	wander_timer.autostart = true
-	wander_timer.timeout.connect(self.on_timer_finished)
-	add_child(wander_timer)
+func _ready():
+	# 随机方向
+	random_direction = true
 
-func physics_process_state(delta) -> void:
-	enemy.velocity = wander_direction * enemy.wander_speed
-	enemy.move_and_slide()
-	
-	#print("enemy wander velocity:{0}, chase_speed:{1} ,enemy global pos:{2}".format([enemy.velocity, enemy.chase_speed, enemy.global_position]))
-	try_chase()
+	# 使用 owner 的速度和时间参数
+	use_owner_speed = true  # 使用 owner.wander_speed, min_wander_time, max_wander_time
 
-func exit():
-	wander_timer.stop()
-	wander_timer.timeout.disconnect(self.on_timer_finished)
-	wander_timer.queue_free()
-	wander_timer = null
-	
-	
-func on_timer_finished():
-	transitioned.emit(self, "Idle")
+	# 启用玩家检测
+	enable_player_detection = true
+
+	# 状态转换
+	next_state_on_timeout = "idle"  # 超时后转到 idle
+	chase_state_name = "chase"  # 检测到玩家后转到 chase
+
+	# 移动设置
+	enable_sprite_flip = true

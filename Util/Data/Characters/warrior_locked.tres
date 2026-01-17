@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Util/Classes/CharacterData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "warrior"
+display_name = "勇士"
+description = "强壮的近战战士，擅长高伤害输出和承受伤害。（即将推出）"
+scene_path = ""
+base_health = 150.0
+base_speed = 80.0
+base_damage = 15.0
+tags = ["melee", "tank", "strength"]
+is_unlocked = false

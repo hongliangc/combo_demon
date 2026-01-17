@@ -8,11 +8,18 @@ var target_patrol_point: Vector2
 
 func enter():
 	print("Boss: 进入巡逻状态")
-	target_patrol_point = boss.get_next_patrol_point()
+	if owner_node is Boss:
+		var boss = owner_node as Boss
+		target_patrol_point = boss.get_next_patrol_point()
 
-func physics_process_state(delta: float) -> void:
+func physics_process_state(_delta: float) -> void:
+	if owner_node is not Boss:
+		return
+
+	var boss = owner_node as Boss
+
 	# 检测玩家
-	if player and player.alive and is_player_in_range(boss.detection_radius):
+	if is_target_alive() and is_target_in_range(boss.detection_radius):
 		transitioned.emit(self, "chase")
 		return
 

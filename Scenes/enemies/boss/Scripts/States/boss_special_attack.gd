@@ -12,7 +12,11 @@ func enter():
 	attack_timer = special_attack_duration
 	has_attacked = false
 
+	if owner_node is not Boss:
+		return
+
 	# 停止移动
+	var boss = owner_node as Boss
 	boss.velocity = Vector2.ZERO
 
 func process_state(delta: float) -> void:
@@ -25,21 +29,34 @@ func process_state(delta: float) -> void:
 
 	# 攻击结束
 	if attack_timer <= 0:
+		if owner_node is not Boss:
+			return
+
 		# 设置特殊攻击冷却
 		set_special_attack_cooldown()
 
 		# 返回战斗状态
+		var boss = owner_node as Boss
 		if boss.current_phase == Boss.Phase.PHASE_3:
 			transitioned.emit(self, "enrage")
 		else:
 			transitioned.emit(self, "circle")
 
 func physics_process_state(delta: float) -> void:
+	if owner_node is not Boss:
+		return
+
 	# 保持静止或缓慢移动
+	var boss = owner_node as Boss
 	boss.velocity = boss.velocity.lerp(Vector2.ZERO, 10.0 * delta)
 
 func perform_special_attack():
+	if owner_node is not Boss:
+		return
+
 	print("Boss 执行特殊攻击！")
+
+	var boss = owner_node as Boss
 
 	# 根据阶段使用不同的特殊攻击
 	match boss.current_phase:
@@ -86,13 +103,17 @@ func shockwave_attack():
 				attack_manager.fire_aoe()
 
 func get_attack_manager() -> BossAttackManager:
-	if boss:
-		for child in boss.get_children():
+	if owner_node is Boss:
+		for child in (owner_node as Boss).get_children():
 			if child is BossAttackManager:
 				return child
 	return null
 
 func set_special_attack_cooldown():
+	if owner_node is not Boss:
+		return
+
+	var boss = owner_node as Boss
 	match boss.current_phase:
 		Boss.Phase.PHASE_1:
 			boss.special_attack_cooldown = 5.0
@@ -106,5 +127,9 @@ func exit():
 
 # 特殊攻击状态可以被打断（除了第三阶段）
 func on_damaged(damage: Damage):
+	if owner_node is not Boss:
+		return
+
+	var boss = owner_node as Boss
 	if boss.current_phase != Boss.Phase.PHASE_3:
 		transitioned.emit(self, "stun")

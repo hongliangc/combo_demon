@@ -5,15 +5,20 @@
       "Bash(bash:*)",
       "Bash(cat:*)",
       "Bash(mkdir:*)",
-      "Bash(godot --headless --script-check:*)"
+      "Bash(godot --headless --script-check:*)",
+      "Bash(ls:*)",
+      "Bash(ping:*)",
+      "Bash(timeout /t 10 /nobreak)",
+      "Bash(powershell:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "filesystem",
     "github",
     "godot"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

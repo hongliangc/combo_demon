@@ -22,11 +22,15 @@ func enter():
 	retreat_attack_timer = 0.0
 
 func physics_process_state(delta: float) -> void:
-	if not player or not player.alive:
+	if not is_target_alive():
 		transitioned.emit(self, "patrol")
 		return
 
-	var distance = get_distance_to_player()
+	if owner_node is not Boss:
+		return
+
+	var boss = owner_node as Boss
+	var distance = get_distance_to_target()
 	retreat_timer += delta
 	retreat_attack_timer -= delta
 	escape_skill_cooldown -= delta
@@ -51,8 +55,9 @@ func physics_process_state(delta: float) -> void:
 		return
 
 	# 远离玩家
-	var direction = (boss.global_position - player.global_position).normalized()
-	boss.velocity = direction * boss.move_speed * retreat_speed_multiplier
+	if target_node:
+		var direction = (boss.global_position - (target_node as Node2D).global_position).normalized()
+		boss.velocity = direction * boss.move_speed * retreat_speed_multiplier
 
 	# 撤退时发动攻击（边退边打）
 	if retreat_attack_timer <= 0:
@@ -61,12 +66,16 @@ func physics_process_state(delta: float) -> void:
 
 func handle_cornered_situation():
 	"""处理被逼入角落的情况"""
+	if owner_node is not Boss:
+		return
+
 	print("Boss 被逼入角落！")
 
 	# 设置脱困技能CD，防止无限触发
 	escape_skill_cooldown = ESCAPE_SKILL_CD
 
 	# 根据阶段选择不同的脱困策略
+	var boss = owner_node as Boss
 	match boss.current_phase:
 		Boss.Phase.PHASE_1:
 			# 第一阶段：使用击退技能
@@ -90,8 +99,12 @@ func use_knockback_skill():
 
 func use_teleport_skill():
 	"""闪现到地图内随机安全位置"""
+	if owner_node is not Boss:
+		return
+
 	print("Boss 使用闪现技能！")
 
+	var boss = owner_node as Boss
 	var safe_position = find_safe_teleport_position()
 	if safe_position != Vector2.ZERO:
 		# 闪现特效（可选）
@@ -108,8 +121,14 @@ func use_teleport_skill():
 
 func find_safe_teleport_position() -> Vector2:
 	"""寻找安全的闪现位置（确保在地图wall内且不碰撞）"""
-	if not player:
+	if not target_node:
 		return Vector2.ZERO
+
+	if owner_node is not Boss:
+		return Vector2.ZERO
+
+	var boss = owner_node as Boss
+	var player_pos = (target_node as Node2D).global_position
 
 	# 获取地图边界
 	var map_bounds = get_map_bounds()
@@ -126,7 +145,7 @@ func find_safe_teleport_position() -> Vector2:
 			continue
 
 		# 检查距离玩家足够远（至少200像素）
-		var dist_to_player = random_pos.distance_to(player.global_position)
+		var dist_to_player = random_pos.distance_to(player_pos)
 		if dist_to_player < 200:
 			continue
 
@@ -140,7 +159,7 @@ func find_safe_teleport_position() -> Vector2:
 	for angle in range(0, 360, 45):
 		var rad = deg_to_rad(angle)
 		var offset = Vector2(cos(rad), sin(rad)) * 250
-		var candidate_pos = player.global_position + offset
+		var candidate_pos = player_pos + offset
 
 		# 确保在地图边界内
 		candidate_pos.x = clamp(candidate_pos.x, map_bounds.position.x, map_bounds.position.x + map_bounds.size.x)
@@ -155,8 +174,10 @@ func find_safe_teleport_position() -> Vector2:
 
 func is_position_valid(position: Vector2) -> bool:
 	"""检查位置是否有效（无墙壁碰撞）"""
-	if not boss:
+	if owner_node is not Boss:
 		return false
+
+	var boss = owner_node as Boss
 
 	# 使用射线检测检查该位置是否有墙壁
 	var space_state = boss.get_world_2d().direct_space_state
@@ -230,6 +251,10 @@ func create_teleport_effect(position: Vector2):
 
 func is_near_map_boundary() -> bool:
 	"""检测是否靠近地图边缘"""
+	if owner_node is not Boss:
+		return false
+
+	var boss = owner_node as Boss
 	var map_bounds = get_map_bounds()
 	var margin = 50.0  # 边缘安全距离
 
@@ -240,12 +265,20 @@ func is_near_map_boundary() -> bool:
 
 func is_stuck() -> bool:
 	"""检测是否卡住（速度很小但在尝试移动）"""
+	if owner_node is not Boss:
+		return false
+
+	var boss = owner_node as Boss
 	return boss.velocity.length() < 10.0 and retreat_timer > 0.5
 
 func perform_retreat_attack():
 	"""撤退时发动攻击"""
+	if owner_node is not Boss:
+		return
+
 	print("Boss 撤退时发动攻击")
 
+	var boss = owner_node as Boss
 	var attack_manager = get_attack_manager()
 	if not attack_manager:
 		return
@@ -254,8 +287,8 @@ func perform_retreat_attack():
 	match boss.current_phase:
 		Boss.Phase.PHASE_1:
 			# 单发弹幕
-			if player:
-				attack_manager.fire_single_projectile(player.global_position)
+			if target_node:
+				attack_manager.fire_single_projectile((target_node as Node2D).global_position)
 		Boss.Phase.PHASE_2:
 			# 小型扇形弹幕
 			attack_manager.fire_projectiles(3, PI / 6)
@@ -264,8 +297,8 @@ func perform_retreat_attack():
 			attack_manager.fire_spiral_projectiles(8)
 
 func get_attack_manager() -> BossAttackManager:
-	if boss:
-		for child in boss.get_children():
+	if owner_node is Boss:
+		for child in (owner_node as Boss).get_children():
 			if child is BossAttackManager:
 				return child
 	return null

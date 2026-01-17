@@ -8,12 +8,16 @@ extends BossState
 func enter():
 	print("Boss: 进入狂暴状态！！！")
 
-func physics_process_state(delta: float) -> void:
-	if not player or not player.alive:
+func physics_process_state(_delta: float) -> void:
+	if not is_target_alive():
 		transitioned.emit(self, "patrol")
 		return
 
-	var distance = get_distance_to_player()
+	if owner_node is not Boss:
+		return
+
+	var boss = owner_node as Boss
+	var distance = get_distance_to_target()
 
 	# 太近了也会短暂后退（即使是狂暴模式）
 	if distance < boss.min_distance * 0.5:  # 第三阶段更贴身，只在很近时后退
@@ -21,22 +25,26 @@ func physics_process_state(delta: float) -> void:
 		return
 
 	# 狂暴模式：直接冲向玩家
-	var direction = get_direction_to_player()
+	var direction = get_direction_to_target()
 	boss.velocity = direction * boss.move_speed * enrage_speed_multiplier
 
 	# 快速攻击
 	if boss.attack_cooldown <= 0:
-		perform_rapid_attack()
+		_perform_rapid_attack()
 		boss.attack_cooldown = rapid_attack_cooldown
 
 	# 频繁使用特殊攻击（第三阶段更激进）
 	if boss.special_attack_cooldown <= 0 and randf() < 0.3:
 		transitioned.emit(self, "specialattack")
 
-func perform_rapid_attack():
+func _perform_rapid_attack():
+	if owner_node is not Boss:
+		return
+
+	var boss = owner_node as Boss
 	print("Boss 狂暴快速攻击！")
 
-	var attack_manager = get_attack_manager()
+	var attack_manager = _get_attack_manager()
 	if not attack_manager:
 		return
 
@@ -50,14 +58,15 @@ func perform_rapid_attack():
 		1:
 			# 三连发追踪弹
 			print("狂暴攻击：三连发追踪弹")
-			if player:
-				attack_manager.fire_single_projectile(player.global_position)
+			if target_node:
+				var target_pos = (target_node as Node2D).global_position
+				attack_manager.fire_single_projectile(target_pos)
 				await get_tree().create_timer(0.1).timeout
-				if is_instance_valid(attack_manager) and player:
-					attack_manager.fire_single_projectile(player.global_position)
+				if is_instance_valid(attack_manager) and target_node:
+					attack_manager.fire_single_projectile((target_node as Node2D).global_position)
 				await get_tree().create_timer(0.1).timeout
-				if is_instance_valid(attack_manager) and player:
-					attack_manager.fire_single_projectile(player.global_position)
+				if is_instance_valid(attack_manager) and target_node:
+					attack_manager.fire_single_projectile((target_node as Node2D).global_position)
 		2:
 			# 小型螺旋弹幕
 			print("狂暴攻击：小型螺旋弹幕")
@@ -65,7 +74,7 @@ func perform_rapid_attack():
 		3:
 			# 激光 + 弹幕组合
 			print("狂暴攻击：激光弹幕组合")
-			if player:
+			if target_node:
 				attack_manager.fire_laser_at_player()
 			await get_tree().create_timer(0.15).timeout
 			if is_instance_valid(attack_manager):
@@ -75,9 +84,9 @@ func perform_rapid_attack():
 	if boss.anim_player and boss.anim_player.has_animation("attack"):
 		boss.anim_player.play("attack")
 
-func get_attack_manager() -> BossAttackManager:
-	if boss:
-		for child in boss.get_children():
+func _get_attack_manager() -> BossAttackManager:
+	if owner_node is Boss:
+		for child in (owner_node as Boss).get_children():
 			if child is BossAttackManager:
 				return child
 	return null

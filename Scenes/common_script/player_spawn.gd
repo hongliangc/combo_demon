@@ -1,13 +1,18 @@
 extends Node2D
 class_name player_spawn
 
+## 角色场景预加载（用于编辑器测试和备用）
 var player_selection: Dictionary = {
 	"hahashin": preload("res://Scenes/charaters/hahashin.tscn"),
 }
 
-@export_group("Charactor Selection") 
-@export_enum("hahashin") 
+@export_group("Character Selection")
+@export_enum("hahashin")
 var player_name: String = "hahashin"
+
+## 是否使用 GameManager 的角色选择
+@export var use_game_manager: bool = true
+
 var player = null
 
 @onready var camera: Camera2D = $"../Camera2D"
@@ -15,12 +20,38 @@ var player = null
 var aim_position:Vector2
 
 func _ready() -> void:
-	var scene : PackedScene = player_selection[player_name]
-	player = scene.instantiate()
-	player.global_position = self.global_position
-	add_child(player)
-	
-		# 获取当前屏幕分辨率（不含缩放）
+	_spawn_player()
+	_setup_camera()
+
+
+## 生成玩家角色
+func _spawn_player() -> void:
+	# 优先使用 GameManager 的角色选择
+	if use_game_manager and GameManager and GameManager.has_selected_character():
+		player = GameManager.create_player()
+		if player:
+			player.global_position = self.global_position
+			add_child(player)
+			print("PlayerSpawn: Spawned character from GameManager - ", GameManager.selected_character.display_name)
+			return
+
+	# 备用方案：使用预设的角色
+	if player_selection.has(player_name):
+		var scene: PackedScene = player_selection[player_name]
+		player = scene.instantiate()
+		player.global_position = self.global_position
+		add_child(player)
+		print("PlayerSpawn: Spawned default character - ", player_name)
+	else:
+		push_error("PlayerSpawn: Character not found - ", player_name)
+
+
+## 设置摄像机
+func _setup_camera() -> void:
+	if not camera:
+		return
+
+	# 获取当前屏幕分辨率（不含缩放）
 	var screen_size = get_viewport_rect().size
 	print("Screen resolution: ", screen_size)
 

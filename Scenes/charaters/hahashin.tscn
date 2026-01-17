@@ -1041,7 +1041,7 @@ node_connections = [&"TimeScale", 0, &"StateMachine", &"output", 0, &"TimeScale"
 size = Vector2(0, 0)
 
 [node name="Hahashin" type="CharacterBody2D" groups=["player"]]
-collision_mask = 136
+collision_mask = 128
 script = ExtResource("1_mom7b")
 max_speed = 200.0
 max_health = 1e+07

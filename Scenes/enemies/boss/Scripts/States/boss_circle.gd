@@ -7,12 +7,18 @@ extends BossState
 func enter():
 	print("Boss: 进入绕圈状态")
 
-func physics_process_state(delta: float) -> void:
-	if not player or not player.alive:
+func physics_process_state(_delta: float) -> void:
+	if not is_target_alive():
 		transitioned.emit(self, "patrol")
 		return
 
-	var distance = get_distance_to_player()
+	if owner_node is not Boss or target_node is not Node2D:
+		return
+
+	var boss = owner_node as Boss
+	var player_pos = (target_node as Node2D).global_position
+
+	var distance = get_distance_to_target()
 
 	# 离开检测范围
 	if distance > boss.detection_radius:
@@ -30,11 +36,11 @@ func physics_process_state(delta: float) -> void:
 		return
 
 	# 绕圈移动逻辑
-	var to_player = player.global_position - boss.global_position
-	var desired_distance = (boss.attack_range + boss.min_distance) / 2
+	var to_player = player_pos - boss.global_position
+	var desired_distance = (boss.attack_range + boss.min_distance) / 2.0
 
 	# 计算切向（绕圈方向）
-	var tangent = to_player.rotated(PI / 2 * boss.circle_direction).normalized()
+	var tangent = to_player.rotated(PI / 2.0 * boss.circle_direction).normalized()
 
 	# 计算径向（接近或远离）
 	var radial = to_player.normalized()

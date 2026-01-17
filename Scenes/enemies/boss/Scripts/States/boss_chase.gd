@@ -8,15 +8,19 @@ extends BossState
 var chase_attack_timer := 0.0
 
 func enter():
-	print("Boss: 进入追击状态")
+	DebugConfig.debug("Boss: 进入追击状态", "", "ai")
 	chase_attack_timer = 0.0
 
 func physics_process_state(delta: float) -> void:
-	if not player or not player.alive:
+	if not is_target_alive():
 		transitioned.emit(self, "patrol")
 		return
 
-	var distance = get_distance_to_player()
+	if owner_node is not Boss:
+		return
+
+	var boss = owner_node as Boss
+	var distance = get_distance_to_target()
 	chase_attack_timer -= delta
 
 	# 离开检测范围，返回巡逻
@@ -35,30 +39,26 @@ func physics_process_state(delta: float) -> void:
 		return
 
 	# 追击玩家，添加一些随机性避免直线追击
-	var direction = get_direction_to_player()
+	var direction = get_direction_to_target()
 	var random_offset = Vector2(randf_range(-0.2, 0.2), randf_range(-0.2, 0.2))
 	direction = (direction + random_offset).normalized()
 
-	# 根据阶段调整速度
-	var speed_multiplier = 1.0
-	match boss.current_phase:
-		Boss.Phase.PHASE_2:
-			speed_multiplier = 1.3
-		Boss.Phase.PHASE_3:
-			speed_multiplier = 1.5
-
-	boss.velocity = direction * boss.move_speed * speed_multiplier
+	boss.velocity = direction * boss.move_speed
 
 	# 追击时发动攻击（边追边打）
 	if chase_attack_timer <= 0:
-		perform_chase_attack()
+		_perform_chase_attack()
 		chase_attack_timer = chase_attack_cooldown
 
-func perform_chase_attack():
+func _perform_chase_attack():
 	"""追击时发动攻击"""
-	print("Boss 追击时发动攻击")
+	if owner_node is not Boss:
+		return
 
-	var attack_manager = get_attack_manager()
+	var boss = owner_node as Boss
+	DebugConfig.debug("Boss 追击时发动攻击", "", "ai")
+
+	var attack_manager = _get_attack_manager()
 	if not attack_manager:
 		return
 
@@ -66,18 +66,18 @@ func perform_chase_attack():
 	match boss.current_phase:
 		Boss.Phase.PHASE_1:
 			# 第一阶段：单发追踪弹
-			if player:
-				attack_manager.fire_single_projectile(player.global_position)
+			if target_node:
+				attack_manager.fire_single_projectile((target_node as Node2D).global_position)
 		Boss.Phase.PHASE_2:
-			# 第二阶段：小扇形弹幕（移除双发追踪弹避免await）
+			# 第二阶段：小扇形弹幕
 			attack_manager.fire_projectiles(3, PI / 8)
 		Boss.Phase.PHASE_3:
-			# 第三阶段：固定使用扇形弹幕（避免await）
+			# 第三阶段：固定使用扇形弹幕
 			attack_manager.fire_projectiles(5, PI / 4)
 
-func get_attack_manager() -> BossAttackManager:
-	if boss:
-		for child in boss.get_children():
+func _get_attack_manager() -> BossAttackManager:
+	if owner_node is Boss:
+		for child in (owner_node as Boss).get_children():
 			if child is BossAttackManager:
 				return child
 	return null

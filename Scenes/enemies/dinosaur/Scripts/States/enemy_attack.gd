@@ -1,27 +1,24 @@
-extends EnemyStates
+extends "res://Util/StateMachine/CommonStates/attack_state.gd"
 
-var attack_component := AttackComponent.new()
-@onready var anchor = $"../../AttackAnchor"
-var attack_interval: float = 3
-var attack_timer: float = 0
+## Enemy Attack 状态 - 使用通用 AttackState 模板
+## 配置参数以匹配原有行为
 
+func _ready():
+	# 攻击设置
+	attack_interval = 3.0
+	attack_name = "slash_attack"
 
-func enter():
-	attack_timer = 0
+	# 使用 AttackComponent
+	use_attack_component = true
+	attack_anchor_path = "../../AttackAnchor"
 
-func physics_process_state(delta) -> void:
-	if !player or !player.alive:
-		transitioned.emit(self, "wander")
-	if !enemy.alive:
-		return
-	var	direction = player.global_position - enemy.global_position
-	var distance = direction.length()
-	if distance > enemy.follow_radius:
-		transitioned.emit(self, "chase")
-		return
-	
-	attack_timer -= delta
-	if attack_timer <= 0:
-		attack_timer = attack_interval
-		attack_component.perform_attack("slash_attack", direction.normalized(), anchor)
-	
+	# 距离设置
+	use_owner_range = true  # 使用 owner.follow_radius
+
+	# 状态转换
+	chase_state_name = "chase"
+	idle_state_name = "wander"
+
+	# 移动设置
+	stop_movement = false  # 攻击时不立即停止
+	deceleration_rate = 10.0

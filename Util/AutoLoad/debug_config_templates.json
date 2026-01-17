@@ -1,0 +1,156 @@
+{
+  "_README": "这个文件包含了常用的配置模板，可以复制到 debug_config.json 中使用",
+
+  "template_1_development": {
+    "_name": "开发模式 - 显示所有日志",
+    "global": {
+      "enabled": true,
+      "min_level": "DEBUG",
+      "output_to_file": false
+    }
+  },
+
+  "template_2_testing": {
+    "_name": "测试模式 - 只显示重要信息",
+    "global": {
+      "enabled": true,
+      "min_level": "INFO",
+      "output_to_file": false
+    }
+  },
+
+  "template_3_release": {
+    "_name": "发布模式 - 只显示错误",
+    "global": {
+      "enabled": true,
+      "min_level": "ERROR",
+      "output_to_file": false
+    }
+  },
+
+  "template_4_debug_boss": {
+    "_name": "调试 Boss - 只显示 Boss 相关日志",
+    "global": {
+      "enabled": true,
+      "min_level": "ERROR"
+    },
+    "path_configs": {
+      "Scenes/enemies/boss/": {
+        "enabled": true,
+        "min_level": "DEBUG"
+      }
+    }
+  },
+
+  "template_5_debug_combat": {
+    "_name": "调试战斗 - 只显示战斗相关日志",
+    "global": {
+      "enabled": true,
+      "min_level": "WARNING"
+    },
+    "category_configs": {
+      "combat": {
+        "enabled": true,
+        "min_level": "DEBUG"
+      }
+    }
+  },
+
+  "template_6_no_state_machine": {
+    "_name": "关闭状态机日志 - 减少日志噪音",
+    "global": {
+      "enabled": true,
+      "min_level": "INFO"
+    },
+    "category_configs": {
+      "state_machine": {
+        "enabled": false,
+        "min_level": "WARNING"
+      }
+    },
+    "path_configs": {
+      "Util/StateMachine/": {
+        "enabled": false,
+        "min_level": "WARNING"
+      }
+    }
+  },
+
+  "template_7_performance_profiling": {
+    "_name": "性能分析 - 记录到文件",
+    "global": {
+      "enabled": true,
+      "min_level": "INFO",
+      "output_to_file": true,
+      "file_path": "user://performance.log"
+    },
+    "category_configs": {
+      "state_machine": {
+        "enabled": false
+      }
+    }
+  },
+
+  "template_8_ui_debug": {
+    "_name": "UI 调试 - 只显示 UI 相关日志",
+    "global": {
+      "enabled": true,
+      "min_level": "ERROR"
+    },
+    "path_configs": {
+      "Scenes/UI/": {
+        "enabled": true,
+        "min_level": "DEBUG"
+      }
+    },
+    "category_configs": {
+      "ui": {
+        "enabled": true,
+        "min_level": "DEBUG"
+      }
+    }
+  },
+
+  "template_9_enemies_only": {
+    "_name": "敌人调试 - 显示所有敌人日志",
+    "global": {
+      "enabled": true,
+      "min_level": "WARNING"
+    },
+    "path_configs": {
+      "Scenes/enemies/": {
+        "enabled": true,
+        "min_level": "DEBUG"
+      }
+    },
+    "category_configs": {
+      "ai": {
+        "enabled": true,
+        "min_level": "DEBUG"
+      }
+    }
+  },
+
+  "template_10_hierarchical": {
+    "_name": "层级配置 - 演示路径优先级",
+    "_description": "更具体的路径配置会覆盖通用路径配置",
+    "global": {
+      "enabled": true,
+      "min_level": "INFO"
+    },
+    "path_configs": {
+      "Scenes/enemies/": {
+        "enabled": true,
+        "min_level": "WARNING"
+      },
+      "Scenes/enemies/boss/": {
+        "enabled": true,
+        "min_level": "DEBUG"
+      },
+      "Scenes/enemies/dinosaur/": {
+        "enabled": false,
+        "min_level": "ERROR"
+      }
+    }
+  }
+}

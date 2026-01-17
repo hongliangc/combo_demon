@@ -1,0 +1,74 @@
+{
+  "_comment": "日志配置文件 - 控制游戏中各种日志的输出",
+  "_levels": "日志级别: DEBUG=0, INFO=1, WARNING=2, ERROR=3",
+
+  "global": {
+    "enabled": true,
+    "min_level": "DEBUG",
+    "output_to_file": false,
+    "file_path": "user://debug.log"
+  },
+
+  "path_configs": {
+    "_comment": "目录/文件路径的日志配置，支持通配符 *",
+
+    "Scenes/enemies/": {
+      "enabled": true,
+      "min_level": "INFO"
+    },
+
+    "Scenes/enemies/boss/": {
+      "enabled": true,
+      "min_level": "DEBUG"
+    },
+
+    "Scenes/enemies/dinosaur/": {
+      "enabled": true,
+      "min_level": "INFO"
+    },
+
+    "Scenes/charaters/": {
+      "enabled": true,
+      "min_level": "INFO"
+    },
+
+    "Util/StateMachine/": {
+      "enabled": false,
+      "min_level": "WARNING"
+    },
+
+    "Scenes/UI/": {
+      "enabled": true,
+      "min_level": "INFO"
+    }
+  },
+
+  "category_configs": {
+    "_comment": "功能分类的日志配置（可选，用于特定功能标签）",
+
+    "combat": {
+      "enabled": true,
+      "min_level": "INFO"
+    },
+
+    "state_machine": {
+      "enabled": false,
+      "min_level": "DEBUG"
+    },
+
+    "player": {
+      "enabled": true,
+      "min_level": "INFO"
+    },
+
+    "ai": {
+      "enabled": true,
+      "min_level": "DEBUG"
+    },
+
+    "ui": {
+      "enabled": true,
+      "min_level": "INFO"
+    }
+  }
+}

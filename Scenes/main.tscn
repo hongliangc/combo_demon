@@ -271,6 +271,9 @@ tile_set = SubResource("TileSet_8gbba")
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)
 
+[node name="PlayerSpawn" type="Node2D" parent="."]
+script = ExtResource("3_jjvhh")
+
 [node name="Enemies" type="Node" parent="."]
 
 [node name="Enemy" parent="Enemies" instance=ExtResource("2_8gbba")]
@@ -278,8 +281,9 @@ max_health = 100000
 health = 100000
 wander_speed = 0.0
 
-[node name="PlayerSpawn" type="Node2D" parent="."]
-script = ExtResource("3_jjvhh")
+[node name="Enemy2" parent="Enemies" instance=ExtResource("2_8gbba")]
+
+[node name="Enemy3" parent="Enemies" instance=ExtResource("2_8gbba")]
 
 [node name="Boss" parent="." instance=ExtResource("4_jjvhh")]
 position = Vector2(-70, -3)
