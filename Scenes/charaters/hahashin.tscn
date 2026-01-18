@@ -1,4 +1,4 @@
-[gd_scene load_steps=154 format=3 uid="uid://bxttk2162m4p4"]
+[gd_scene load_steps=155 format=3 uid="uid://bxttk2162m4p4"]
 
 [ext_resource type="Texture2D" uid="uid://ci2uaxeklamvi" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_1.png" id="1_c3kl5"]
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
@@ -12,6 +12,7 @@
 [ext_resource type="Resource" uid="uid://bjhtsxp31ycfw" path="res://Util/Data/SkillBook/KnockUp.tres" id="4_3aexr"]
 [ext_resource type="Texture2D" uid="uid://byxwlodyme57h" path="res://Art/Wind_Hashashin/PNG/idle/idle_4.png" id="4_g73ga"]
 [ext_resource type="Texture2D" uid="uid://dkdb6ji0xhxph" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_4.png" id="4_q1taa"]
+[ext_resource type="Resource" uid="uid://dgc6rhqmwycag" path="res://Util/Data/SkillBook/SpecialAttack.tres" id="4_special"]
 [ext_resource type="Texture2D" uid="uid://by5c28sgtesto" path="res://Art/Wind_Hashashin/PNG/idle/idle_5.png" id="5_ktvv7"]
 [ext_resource type="Texture2D" uid="uid://deb0nbib5dksa" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_5.png" id="5_o2kwx"]
 [ext_resource type="Texture2D" uid="uid://bfty6xjyj1ly1" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_6.png" id="6_6s4sr"]
@@ -809,6 +810,62 @@ tracks/1/keys = {
 "update": 1,
 "values": ["atk_sp"]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Hitbox/CollisionShape2D:disabled")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.4329, 2.9304),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Hitbox/CollisionShape2D:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.4329, 0.5328, 0.8325, 1.0323, 1.1322, 1.4319, 1.6317, 1.7316, 1.8315, 1.9314, 2.9304),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(29.5, 1), Vector2(60, 2), Vector2(-1.5, -68.5), Vector2(-3.5, -54.5), Vector2(3, -6.5), Vector2(84.5, -0.5), Vector2(59.5, -1.5), Vector2(-19, -3.5), Vector2(-63.5, 0.5), Vector2(30.5, -7), Vector2(2, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Hitbox/CollisionShape2D:shape:size")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.4329, 0.5328, 0.8325, 1.0323, 1.1322, 1.4319, 1.6317, 1.7316, 1.8315, 1.9314, 2.9304),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(53, 36), Vector2(60, 42), Vector2(69, 57), Vector2(69, 47), Vector2(80, 59), Vector2(61, 47), Vector2(59, 47), Vector2(108, 51), Vector2(79, 55), Vector2(127, 70), Vector2(58, 48)]
+}
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.4, 2.9),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"switch_to_special_attack"
+}, {
+"args": [],
+"method": &"perform_special_attack"
+}, {
+"args": [],
+"method": &"switch_to_physical"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_sohtc"]
 length = 0.8
@@ -1046,7 +1103,7 @@ script = ExtResource("1_mom7b")
 max_speed = 200.0
 max_health = 1e+07
 health = 1e+07
-damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr")])
+damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr"), ExtResource("4_special")])
 current_damage = ExtResource("3_vqspa")
 
 [node name="FloorCollision" type="CollisionShape2D" parent="."]

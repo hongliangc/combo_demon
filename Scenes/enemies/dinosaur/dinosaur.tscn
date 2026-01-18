@@ -346,7 +346,7 @@ bg_color = Color(0, 0, 0, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i6tsu"]
 bg_color = Color(1, 0.105409, 0.126585, 1)
 
-[node name="Enemy" type="CharacterBody2D"]
+[node name="Enemy" type="CharacterBody2D" groups=["enemy"]]
 light_mask = 8
 visibility_layer = 192
 collision_layer = 8

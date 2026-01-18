@@ -17,6 +17,5 @@ script = ExtResource("1_r3ije")
 max_amount = 80.0
 min_amount = 50.0
 amount = 60.0
-type = "KnockUp"
 effects = Array[ExtResource("1_f6w6l")]([SubResource("KnockUpEffect_1")])
 metadata/_custom_type_script = "uid://dhptij5yeksrr"

@@ -8,6 +8,10 @@ var alive: bool = true
 var last_face_direction:Vector2 = Vector2.RIGHT
 var input_direction: Vector2 = Vector2.RIGHT
 
+# 特殊攻击目标位置和检测到的敌人列表
+var special_attack_target_position: Vector2 = Vector2.ZERO
+var special_attack_detected_enemies: Array = []
+
 @export_group("Speed")
 @export var max_speed: float = 100
 
@@ -90,7 +94,7 @@ func on_damaged(damage: Damage, attacker_position: Vector2) -> void:
 				velocity.y = -effect.launch_force
 
 	# 调试打印
-	DebugConfig.info("Player 受到伤害: %d 剩余生命: %d" % [damage_amount, health], "", "combat")
+	#DebugConfig.info("Player 受到伤害: %d 剩余生命: %d" % [damage_amount, health], "", "combat")
 
 	# 检查死亡
 	if health <= 0:
@@ -119,6 +123,11 @@ func switch_to_physical() -> void:
 
 func switch_to_knockup() -> void:
 	current_damage = damage_types[1]
+
+func switch_to_special_attack() -> void:
+	if damage_types.size() > 2:
+		current_damage = damage_types[2]
+		DebugConfig.debug("特殊攻击: 切换到特殊攻击伤害配置", "", "combat")
 
 ## 玩家死亡处理
 func die() -> void:
@@ -164,3 +173,105 @@ func debug_print() -> void:
 	else:
 		print("当前伤害: null")
 	print("====================================")
+
+## 检测并准备特殊攻击：检测前方是否有敌人
+## 如果有敌人，返回 true 并记录第一个敌人位置和所有检测到的敌人，否则返回 false
+func prepare_special_attack() -> bool:
+	var detection_radius = 300.0  # 检测半径
+	var detection_angle = 45.0  # 检测角度（上下各45度）
+
+	# 检测前方范围内的敌人
+	var enemies_in_range = _detect_enemies_in_cone(detection_radius, detection_angle)
+
+	if enemies_in_range.is_empty():
+		DebugConfig.debug("特殊攻击: 前方无敌人", "", "combat")
+		special_attack_detected_enemies.clear()
+		return false
+
+	# 记录第一个敌人位置作为移动目标
+	var first_enemy = enemies_in_range[0]
+	special_attack_target_position = first_enemy.global_position
+
+	# 保存所有检测到的敌人，用于后续聚集
+	special_attack_detected_enemies = enemies_in_range.duplicate()
+
+	DebugConfig.info("特殊攻击: 检测到 %d 个敌人 -> %v" % [enemies_in_range.size(), special_attack_target_position], "", "combat")
+	return true
+
+## 执行特殊攻击移动：将角色移动到第一个敌人位置
+## 在动画开始前调用（由 animation_handler 触发）
+func execute_special_attack_movement() -> void:
+	DebugConfig.info("=== 开始特殊攻击移动 ===", "", "combat")
+
+	# 使用 Tween 快速移动到目标位置
+	var tween = create_tween()
+	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.set_trans(Tween.TRANS_QUAD)
+
+	var move_duration = 0.2  # 移动时间
+	tween.tween_property(self, "global_position", special_attack_target_position, move_duration)
+
+	# 等待移动完成
+	await tween.finished
+
+	DebugConfig.info("特殊攻击移动完成，当前位置 = %v" % global_position, "", "combat")
+
+## 特殊攻击：在动画的攻击帧中调用，聚集所有检测到的敌人
+## 此方法在动画 0.4s 时调用，在 Hitbox 启用（0.4329s）之前
+func perform_special_attack() -> void:
+	if special_attack_detected_enemies.is_empty():
+		DebugConfig.debug("特殊攻击: 无敌人需要聚集", "", "combat")
+		return
+
+	DebugConfig.info("特殊攻击: 聚集 %d 个敌人到 %v" % [special_attack_detected_enemies.size(), global_position], "", "combat")
+
+	# 聚集所有检测到的敌人到玩家当前位置
+	for enemy in special_attack_detected_enemies:
+		if is_instance_valid(enemy):
+			# 创建聚集特效
+			var gather_effect = GatherEffect.new()
+			gather_effect.set_gather_position(global_position)
+			gather_effect.gather_duration = 0.3
+			gather_effect.show_debug_info = true
+
+			# 应用聚集特效（不 await，并行执行）
+			gather_effect.apply_effect(enemy, global_position)
+
+	# 清空检测列表
+	special_attack_detected_enemies.clear()
+
+## 检测扇形范围内的敌人
+## @param radius: 检测半径
+## @param angle_degrees: 扇形角度（上下各angle_degrees度）
+## @return: 敌人数组，按距离排序
+func _detect_enemies_in_cone(radius: float, angle_degrees: float) -> Array:
+	var enemies_found = []
+	var all_enemies = get_tree().get_nodes_in_group("enemy")
+
+	for enemy in all_enemies:
+		if not is_instance_valid(enemy):
+			continue
+
+		# 检查距离
+		var distance = global_position.distance_to(enemy.global_position)
+		if distance > radius:
+			continue
+
+		# 计算方向向量和角度差
+		var direction_to_enemy = (enemy.global_position - global_position).normalized()
+		var angle_to_enemy = rad_to_deg(last_face_direction.angle_to(direction_to_enemy))
+
+		# 检查是否在扇形角度范围内
+		if abs(angle_to_enemy) <= angle_degrees:
+			enemies_found.append({
+				"enemy": enemy,
+				"distance": distance,
+				"angle": angle_to_enemy
+			})
+			DebugConfig.debug("检测: %s 距离:%.1f 角度:%.1f°" % [enemy.name, distance, angle_to_enemy], "", "combat")
+
+	# 按距离排序（最近的在前面）
+	enemies_found.sort_custom(func(a, b): return a["distance"] < b["distance"])
+
+	# 返回敌人节点数组
+	return enemies_found.map(func(data): return data["enemy"])

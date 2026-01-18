@@ -5,5 +5,4 @@
 [resource]
 script = ExtResource("1_a0pd0")
 amount = 60.0
-type = "KnockBack"
 metadata/_custom_type_script = "uid://dhptij5yeksrr"

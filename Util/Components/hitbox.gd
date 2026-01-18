@@ -17,16 +17,12 @@ class_name Hitbox
 ## 最大伤害值（当 damage 为 null 时使用）
 @export var max_damage: float = 50.0
 
-## 伤害类型（当 damage 为 null 时使用）
-@export_enum("Physical", "KnockUp", "KnockBack") var damage_type: String = "Physical"
-
 func _ready() -> void:
 	# 如果没有配置 damage 资源，创建默认的
 	if damage == null:
 		damage = Damage.new()
 		damage.min_amount = min_damage
 		damage.max_amount = max_damage
-		damage.type = damage_type
 
 	# 使用Area节点自带的区域area_entered signal连接回调接口，检测碰撞
 	area_entered.connect(_on_hitbox_area_entered_)

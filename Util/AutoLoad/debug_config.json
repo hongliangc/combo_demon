@@ -4,7 +4,7 @@
 
   "global": {
     "enabled": true,
-    "min_level": "DEBUG",
+    "min_level": "INFO",
     "output_to_file": false,
     "file_path": "user://debug.log"
   },
@@ -67,6 +67,11 @@
     },
 
     "ui": {
+      "enabled": true,
+      "min_level": "INFO"
+    },
+
+    "effect": {
       "enabled": true,
       "min_level": "INFO"
     }

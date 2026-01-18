@@ -16,10 +16,12 @@ func _process(delta: float) -> void:
 	if not player.can_move:
 		return
 	# 技能按键处理，切换到技能是否状态，技能释放完毕后状态变为idle。不直接参与run,walk等状态切换
-	for key in animation_handler.skill_config.keys():	
+	for key in animation_handler.skill_config.keys():
 		if Input.is_action_just_pressed(key):
 			animation_handler.play_animation(key)
-			if key != "roll":
+			# roll和特殊攻击不在这里禁用移动
+			# 特殊攻击会在检测到敌人后才禁用移动
+			if key != "roll" and key != "atk_sp":
 				player.can_move = false
 
 func _physics_process(delta: float) -> void:

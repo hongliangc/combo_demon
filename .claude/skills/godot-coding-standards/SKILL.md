@@ -1,93 +1,43 @@
 ---
 name: godot-coding-standards
-description: Godot 4.x GDScript 编码规范。当编写、审查、修改 Godot 代码时使用。适用于：GDScript 脚本、场景创建、组件设计、Resource 类、信号连接、节点组织、类型注解、命名规范、性能优化。触发词：godot, gdscript, 组件, 信号, export, 场景。
+description: Godot 4.x 核心架构原则。当设计、审查 Godot 组件和系统时使用。关注：组件模式、信号通信、Resource设计、系统架构。触发词：godot, 组件, 信号, 架构, 设计。
 ---
 
-# Godot 4.x 编码规范
+# Godot 4.x 核心架构原则
 
-为 Godot 4.x 项目设计的编码规范，确保代码的**通用性、模块化、可复用性、简洁性**。
+为 Godot 4.x 项目设计的核心原则，确保代码的**通用性、模块化、可复用性、简洁性**。
 
-## 核心原则
+## 核心设计原则
 
-1. **通用性** - 使用 `@export` 使组件可配置，避免硬编码
-2. **模块化** - 单一职责，组件模式，信号松耦合
-3. **可复用性** - Resource 类存储数据，清晰公共接口
-4. **简洁实用** - 注重实用，避免过度设计
+### 1. 通用性优先
+- 使用 `@export` 暴露可配置参数，避免硬编码
+- 组件应该能在不同场景中复用，不依赖特定父节点
+- 通过配置而非代码修改来调整行为
 
-## 快速参考
+### 2. 模块化设计
+- **单一职责**：每个组件只做一件事（Health、Movement、Attack）
+- **组件化思维**：用小组件组合出复杂行为，避免巨型类
+- **信号松耦合**：通过信号通信，避免直接调用和硬依赖
 
-### 命名规范
-```gdscript
-class_name PlayerHealth      # PascalCase
-var max_health: float        # snake_case
-const MAX_SPEED = 200.0      # UPPER_SNAKE_CASE
-signal health_changed()      # snake_case
-func take_damage() -> void:  # snake_case
-```
+### 3. 可复用性
+- **Resource 类**：用于存储配置数据（Damage、SkillData）
+- **清晰接口**：公共方法定义清晰，private方法用 `_` 前缀
+- **独立性**：组件可以独立测试和使用
 
-### 代码组织顺序
-```gdscript
-extends CharacterBody2D
-class_name Player
-## 类文档注释
-
-signal died()                          # 1. 信号
-enum State { IDLE, MOVING }            # 2. 枚举/常量
-@export var speed: float = 150.0       # 3. @export 变量
-var health: float = 100.0              # 4. public 变量
-var _internal: int = 0                 # 5. private 变量 (_前缀)
-@onready var sprite: Sprite2D = $Sprite2D  # 6. @onready
-
-func _ready() -> void: pass            # 7. 内置回调
-func _physics_process(delta): pass     # 8. 内置回调
-func take_damage(dmg: Damage): pass    # 9. 公共方法
-func _update_state(): pass             # 10. 私有方法
-func on_damaged(): pass                # 11. 信号处理 (on_前缀)
-```
-
-### 类型注解 (必须)
-```gdscript
-var max_health: float = 100.0
-var items: Array[Item] = []
-func attack(target: Node2D) -> bool:
-    return true
-```
-
-### Export 变量分组
-```gdscript
-@export_group("Movement")
-@export var speed: float = 150.0
-@export var jump_force: float = 300.0
-
-@export_group("Combat")
-@export var damage: Damage
-```
-
-### 信号使用
-```gdscript
-# 声明
-signal health_changed(current: float, maximum: float)
-
-# 连接 (Godot 4 风格)
-health_component.died.connect(on_death)
-
-# 发射
-health_changed.emit(health, max_health)
-```
-
-## 详细规范
-
-完整的详细规范请参阅：
-- [REFERENCE.md](REFERENCE.md) - 完整编码规范和示例
-- [CHECKLIST.md](CHECKLIST.md) - 代码审查检查清单
+### 4. 简洁实用
+- 注重实用性，避免过度设计
+- 不为未来需求预先设计
+- 代码自解释，复杂逻辑才加注释
 
 ## 组件模式示例
 
+### 基础组件模板
 ```gdscript
 extends Node
 class_name Health
 
 ## 可复用的生命值组件
+## 通过信号通知状态变化，不依赖特定父节点
 
 signal health_changed(current: float, maximum: float)
 signal died()
@@ -108,10 +58,24 @@ func heal(amount: float) -> void:
     health += amount
 ```
 
-## 检查清单 (快速版)
+### Resource 数据类
+```gdscript
+extends Resource
+class_name Damage
 
-- [ ] 类型注解完整？
-- [ ] 使用 `@export` 可配置？
-- [ ] 信号而非直接调用？
-- [ ] 单一职责？
-- [ ] 有文档注释？
+## 伤害数据配置类
+## 可在编辑器中创建 .tres 资源文件
+
+@export var base_damage: float = 10.0
+@export var damage_type: String = "physical"
+@export_group("Effects")
+@export var knockback_force: float = 0.0
+@export var stun_duration: float = 0.0
+```
+
+## 架构检查要点
+
+- **通用性**：是否使用 `@export` 配置化？能否跨场景复用？
+- **模块化**：是否单一职责？是否用信号解耦？
+- **可复用性**：是否有清晰接口？Resource 类是否正确使用？
+- **简洁性**：是否避免过度设计？代码是否自解释？

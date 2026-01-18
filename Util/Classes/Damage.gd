@@ -13,9 +13,6 @@ class_name Damage
 ## 实际伤害值
 @export var amount: float = 10.0
 
-## 伤害类型（保留用于兼容性，建议使用effects数组）
-@export_enum("Physical", "KnockUp", "KnockBack") var type: String = "Physical"
-
 ## 随机数生成器（静态共享，避免重复创建）
 static var _rng: RandomNumberGenerator = null
 
@@ -69,7 +66,6 @@ func randomize_damage() -> void:
 ## 调试打印伤害信息
 func debug_print() -> void:
 	print("---------- 伤害信息 ----------")
-	print("伤害类型: ", type)
 	print("伤害值: ", amount, " (范围: ", min_amount, "-", max_amount, ")")
 	print("特效数量: ", effects.size())
 	print("特效描述: ", get_effects_description())
