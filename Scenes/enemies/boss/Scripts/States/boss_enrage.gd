@@ -6,7 +6,8 @@ extends BossState
 @export var rapid_attack_cooldown := 0.5
 
 func enter():
-	print("Boss: 进入狂暴状态！！！")
+	pass
+	# print("Boss: 进入狂暴状态！！！")
 
 func physics_process_state(_delta: float) -> void:
 	if not is_target_alive():
@@ -42,7 +43,7 @@ func _perform_rapid_attack():
 		return
 
 	var boss = owner_node as Boss
-	print("Boss 狂暴快速攻击！")
+	#print("Boss 狂暴快速攻击！")
 
 	var attack_manager = _get_attack_manager()
 	if not attack_manager:
@@ -95,6 +96,7 @@ func exit():
 	pass
 
 # 狂暴状态不会被击晕
-func on_damaged(_damage: Damage):
-	print("Boss 狂暴中，无法击晕！")
+func on_damaged(_damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
+	pass
+	#print("Boss 狂暴中，无法击晕！")
 	# 不会切换到 stun 状态

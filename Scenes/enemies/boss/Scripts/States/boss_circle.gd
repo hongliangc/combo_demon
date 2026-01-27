@@ -5,7 +5,8 @@ extends BossState
 @export var circle_speed_multiplier := 0.8
 
 func enter():
-	print("Boss: 进入绕圈状态")
+	pass
+	# print("Boss: 进入绕圈状态")
 
 func physics_process_state(_delta: float) -> void:
 	if not is_target_alive():

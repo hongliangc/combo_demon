@@ -1,4 +1,4 @@
-[gd_scene load_steps=155 format=3 uid="uid://bxttk2162m4p4"]
+[gd_scene load_steps=161 format=3 uid="uid://bxttk2162m4p4"]
 
 [ext_resource type="Texture2D" uid="uid://ci2uaxeklamvi" path="res://Art/Wind_Hashashin/PNG/1_atk/1_atk_1.png" id="1_c3kl5"]
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
@@ -118,9 +118,14 @@
 [ext_resource type="Texture2D" uid="uid://dbp1mcg73nxu3" path="res://Art/Wind_Hashashin/PNG/run/run_8.png" id="104_246et"]
 [ext_resource type="AudioStream" uid="uid://darf54p1hw7ug" path="res://Sound/sword_slash.mp3" id="112_mydql"]
 [ext_resource type="AudioStream" uid="uid://dbmjdalwoup22" path="res://Sound/running-in-grass.mp3" id="113_fp3de"]
-[ext_resource type="Script" uid="uid://ewlu4e5khm1k" path="res://Scenes/charaters/movement_hander.gd" id="113_mnt5w"]
-[ext_resource type="Script" uid="uid://b1tau21465081" path="res://Scenes/charaters/animation_hander.gd" id="114_ltrpv"]
+[ext_resource type="Script" uid="uid://bngu63cnq7ltu" path="res://Util/Classes/AttackEffect.gd" id="116_x7kqx"]
 [ext_resource type="Script" uid="uid://cdjkxgdwhu0en" path="res://Scenes/charaters/hitbox.gd" id="117_p3ltc"]
+[ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Util/Components/HealthComponent.gd" id="118_health"]
+[ext_resource type="Script" uid="uid://wgmi45hwmslf" path="res://Util/Components/MovementComponent.gd" id="119_movement"]
+[ext_resource type="Script" uid="uid://qis5uertou08" path="res://Util/Components/AnimationComponent.gd" id="120_animation"]
+[ext_resource type="Script" uid="uid://djmeifitglu7e" path="res://Util/Components/CombatComponent.gd" id="121_combat"]
+[ext_resource type="Script" uid="uid://cdsgggqiqgpu5" path="res://Util/Components/SkillManager.gd" id="122_skill"]
+[ext_resource type="Script" uid="uid://b005ddipbd5go" path="res://Util/Components/CameraManager.gd" id="123_camera"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hrca3"]
 radius = 23.0217
@@ -1094,17 +1099,21 @@ nodes/TimeScale/position = Vector2(320, 80)
 nodes/output/position = Vector2(620, 80)
 node_connections = [&"TimeScale", 0, &"StateMachine", &"output", 0, &"TimeScale"]
 
+[sub_resource type="Resource" id="Resource_osxcc"]
+script = ExtResource("2_p3ltc")
+max_amount = 1.0
+min_amount = 1.0
+amount = 10.0
+effects = Array[ExtResource("116_x7kqx")]([])
+metadata/_custom_type_script = "uid://dhptij5yeksrr"
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_246et"]
 size = Vector2(0, 0)
 
 [node name="Hahashin" type="CharacterBody2D" groups=["player"]]
+collision_layer = 2
 collision_mask = 128
 script = ExtResource("1_mom7b")
-max_speed = 200.0
-max_health = 1e+07
-health = 1e+07
-damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr"), ExtResource("4_special")])
-current_damage = ExtResource("3_vqspa")
 
 [node name="FloorCollision" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_hrca3")
@@ -1141,15 +1150,32 @@ unique_name_in_owner = true
 collision_layer = 4
 collision_mask = 8
 script = ExtResource("117_p3ltc")
+damage = SubResource("Resource_osxcc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("RectangleShape2D_246et")
 disabled = true
 
-[node name="MovementHandler" type="Node" parent="."]
-script = ExtResource("113_mnt5w")
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("118_health")
+max_health = 1e+07
+health = 1e+07
 
-[node name="AnimationHandler" type="Node" parent="."]
-script = ExtResource("114_ltrpv")
+[node name="MovementComponent" type="Node" parent="."]
+script = ExtResource("119_movement")
+max_speed = 200.0
+
+[node name="AnimationComponent" type="Node" parent="."]
+script = ExtResource("120_animation")
+
+[node name="CombatComponent" type="Node" parent="."]
+script = ExtResource("121_combat")
+damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr"), ExtResource("4_special")])
+
+[node name="SkillManager" type="Node" parent="."]
+script = ExtResource("122_skill")
+
+[node name="CameraManager" type="Node" parent="."]
+script = ExtResource("123_camera")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

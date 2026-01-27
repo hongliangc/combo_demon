@@ -9,13 +9,13 @@ script = ExtResource("4_stun")
 stun_duration = 1.0
 stop_movement = true
 effect_name = "强制眩晕"
-duration = 1.0
+duration = 5.0
 show_debug_info = true
 
 [resource]
 script = ExtResource("1_damage")
-max_amount = 100.0
-min_amount = 50.0
-amount = 80.0
+max_amount = 1.0
+min_amount = 1.0
+amount = 1.0
 effects = Array[ExtResource("2_attackeffect")]([SubResource("ForceStunEffect_1")])
 metadata/_custom_type_script = "uid://dhptij5yeksrr"

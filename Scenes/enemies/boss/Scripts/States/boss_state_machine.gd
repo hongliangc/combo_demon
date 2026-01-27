@@ -16,17 +16,17 @@ func _setup_signals() -> void:
 			owner_node.phase_changed.connect(_on_phase_changed)
 
 # 重写 damaged 处理，添加阶段转换期间的无敌判断
-func _on_owner_damaged(damage: Damage) -> void:
+func _on_owner_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
 	# 阶段转换期间不接受伤害导致的状态切换
 	if is_transitioning_phase:
 		return
 
 	# 调用基类方法
-	super._on_owner_damaged(damage)
+	super._on_owner_damaged(damage, attacker_position)
 
 # 阶段改变时的回调
 func _on_phase_changed(new_phase: int):
-	print("Boss 阶段改变回调: Phase %d" % (new_phase + 1))
+	#print("Boss 阶段改变回调: Phase %d" % (new_phase + 1))
 
 	# 设置阶段转换标志，防止被伤害打断
 	is_transitioning_phase = true

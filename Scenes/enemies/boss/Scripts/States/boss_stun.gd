@@ -35,6 +35,6 @@ func on_timeout() -> void:
 
 
 ## Boss 眩晕时间重置提示
-func on_damaged(damage: Damage) -> void:
-	super.on_damaged(damage)
-	print("[Boss Stun] 眩晕时间重置")
+func on_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
+	super.on_damaged(damage, attacker_position)
+	#print("[Boss Stun] 眩晕时间重置")

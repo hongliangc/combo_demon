@@ -22,6 +22,7 @@ GameManager="*res://Util/AutoLoad/game_manager.gd"
 SoundManager="*res://Util/AutoLoad/sound_manager.gd"
 DamageNumbers="*res://Util/AutoLoad/damage_numbers.gd"
 DebugConfig="*res://Util/AutoLoad/debug_config.gd"
+TimeManager="*res://Util/Autoloads/TimeManager.gd"
 
 [display]
 

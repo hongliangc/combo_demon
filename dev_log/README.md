@@ -1,81 +1,365 @@
-# 开发日志结构说明
+# 开发日志 - 使用指南
+
+> **优化的日志组织系统** | 分类清晰 | 快速检索 | Token友好
+
+---
+
+## 🎯 快速开始
+
+### 新手入门（3步）
+1. 📖 阅读 [QUICK_REFERENCE.md](QUICK_REFERENCE.md) - 快速了解项目（~300 tokens）
+2. 📊 查看 [INDEX.md](INDEX.md) - 按类型查找文档
+3. 📅 浏览 [TIMELINE.md](TIMELINE.md) - 按日期查看进展
+
+### 日常使用
+- **查找Bug修复**: [INDEX.md](INDEX.md) → Bug修复章节
+- **查看任务进度**: [planning/optimization_work_plan.md](planning/optimization_work_plan.md)
+- **了解架构**: [architecture/architecture_uml_diagrams.md](architecture/architecture_uml_diagrams.md)
+- **快速参考**: [QUICK_REFERENCE.md](QUICK_REFERENCE.md)
+
+---
 
 ## 📂 目录结构
 
 ```
 dev_log/
-├── README.md              # 本文件：日志结构说明
-├── sessions/              # 按日期的会话日志
-│   ├── 2026-01-17.md     # 今日会话记录
-│   ├── 2026-01-18.md     # 明日会话记录
-│   └── ...
-└── archive/               # 历史归档（不自动加载）
-    └── dev_log_legacy.md  # 旧的完整开发日志（2025-12到2026-01）
+├── 📌 核心索引
+│   ├── README.md                 # 本文件：使用指南
+│   ├── INDEX.md                  # 按类型分类索引（~500 tokens）
+│   ├── TIMELINE.md               # 按日期时间线（~800 tokens）
+│   └── QUICK_REFERENCE.md        # 快速参考（~300 tokens）⭐
+│
+├── 🐛 bug-fixes/                  # Bug修复文档
+│   ├── player_autonomous_components_implementation_2026-01-19.md
+│   │   └── 特殊攻击后无法移动
+│   └── await_memory_leak_fix_2026-01-18.md
+│       └── await内存泄漏修复
+│
+├── 🏗️ refactoring/                # 重构优化文档
+│   ├── autonomous_component_architecture_2026-01-18.md
+│   │   └── Player自治组件架构设计
+│   └── player_refactoring_guide_2026-01-18.md
+│       └── 重构实施指南
+│
+├── 📐 architecture/                # 架构设计文档
+│   ├── architecture_uml_diagrams.md  ⭐
+│   │   └── 5类UML图表（类图、时序图、信号图等）
+│   └── architecture_review_2026-01-18.md
+│       └── 架构评审和11项优化建议
+│
+├── 📋 planning/                    # 规划文档
+│   ├── optimization_work_plan.md     ⭐
+│   │   └── 11项任务追踪（4/11完成）
+│   └── session_summary_2026-01-19.md
+│       └── 2026-01-19会话总结
+│
+├── 🔧 tools/                       # 工具文档
+│   ├── sessionstart_hook_guide.md
+│   │   └── Session Hook使用指南
+│   └── token_optimization_report.md
+│       └── Token优化分析
+│
+├── 📁 archive/                     # 归档文档
+│   └── 旧版本文档（不自动加载）
+│
+└── 📅 sessions/                    # 会话记录
+    └── 按日期的会话日志
 ```
 
-## 📝 使用规范
+⭐ = 高频使用文档
 
-### 会话日志 (sessions/)
-- **文件命名**: `YYYY-MM-DD.md`
-- **创建时机**: 每次新会话开始时
-- **记录内容**:
-  - ✅ 本次会话解决的问题
-  - ✅ 重要的架构决策
-  - ✅ 遇到的挑战和解决方案
-  - ✅ 学到的经验教训
+---
 
-### 归档日志 (archive/)
-- **用途**: 存放历史完整日志，**不会自动加载**到会话中
-- **查阅方式**: 需要时手动读取
-- **内容**: 项目早期的详细开发记录
+## 📚 文档分类详解
 
-## 🎯 日志模板
+### 1️⃣ 核心索引（必读）
 
-创建新会话日志时使用以下模板：
+#### INDEX.md - 总索引
+- **用途**: 按类型快速查找所有文档
+- **分类**: Bug修复、特性开发、重构优化、架构设计、规划文档、工具文档
+- **特点**: 带Token估算、快速摘要
+- **适合**: 查找特定类型的文档
 
-```markdown
-# 会话日志 - YYYY-MM-DD
+#### TIMELINE.md - 时间线
+- **用途**: 按日期查看所有开发活动
+- **特点**: 时间倒序、详细记录
+- **统计**: 按类型和日期的Token消耗统计
+- **适合**: 了解开发进程、查找特定日期的工作
 
-## 🎯 本次目标
-- [ ] 任务1
-- [ ] 任务2
+#### QUICK_REFERENCE.md - 快速参考 ⭐
+- **用途**: 最核心信息速览
+- **Token**: ~300（最省）
+- **内容**: 架构概览、关键流程、待办任务、快速检索
+- **适合**: 快速上手、日常查阅
 
-## 📝 完成内容
+---
 
-### 功能A
-- 描述具体实现...
-- 修改的文件：[file.gd](../path/to/file.gd)
+### 2️⃣ Bug修复文档
 
-## 🐛 遇到的问题
-1. **问题描述**
-   - 原因分析
-   - 解决方案
+#### [player_autonomous_components_implementation_2026-01-19.md](bug-fixes/player_autonomous_components_implementation_2026-01-19.md)
+- **Bug**: 特殊攻击后无法移动
+- **原因**: SkillManager未等待动画完成
+- **修复**: 添加 `await animation_finished`
+- **Token**: ~800
 
-## 💡 重要决策
-- 决策1：...
-- 理由：...
+#### [await_memory_leak_fix_2026-01-18.md](bug-fixes/await_memory_leak_fix_2026-01-18.md)
+- **Bug**: await导致内存泄漏
+- **原因**: 持有target引用无法释放
+- **修复**: 改用信号连接
+- **Token**: ~800
 
-## 📚 学到的经验
-- 经验1
-- 经验2
+---
 
-## 📦 相关文件
-- [file1.gd](../path)
-- [file2.gd](../path)
+### 3️⃣ 重构优化文档
+
+#### [autonomous_component_architecture_2026-01-18.md](refactoring/autonomous_component_architecture_2026-01-18.md) ⭐
+- **内容**: Player自治组件架构完整设计
+- **重点**: 5个组件、设计模式、信号通信
+- **Token**: ~800
+
+#### [player_refactoring_guide_2026-01-18.md](refactoring/player_refactoring_guide_2026-01-18.md)
+- **内容**: 重构实施步骤指南
+- **重点**: 迁移步骤、测试验证
+- **Token**: ~600
+
+---
+
+### 4️⃣ 架构设计文档
+
+#### [architecture_uml_diagrams.md](architecture/architecture_uml_diagrams.md) ⭐⭐
+- **内容**: 5类UML图表
+  1. Player组件类图
+  2. 特殊攻击流程时序图
+  3. 信号通信架构图
+  4. 组件生命周期状态图
+  5. 系统架构层次图
+- **格式**: Mermaid + ASCII Art
+- **Token**: ~2000
+- **特点**: 可视化、GitHub可渲染
+
+#### [architecture_review_2026-01-18.md](architecture/architecture_review_2026-01-18.md)
+- **内容**: 全面架构评审
+- **重点**: 11项优化建议、代码分析
+- **Token**: ~1200
+
+---
+
+### 5️⃣ 规划文档
+
+#### [optimization_work_plan.md](planning/optimization_work_plan.md) ⭐
+- **内容**: 11项优化任务追踪
+- **进度**: 4/11完成（36%）
+- **分类**: 高/中/低优先级
+- **Token**: ~1000
+- **用途**: 任务管理、进度追踪
+
+#### [session_summary_2026-01-19.md](planning/session_summary_2026-01-19.md)
+- **内容**: 2026-01-19会话总结
+- **重点**: Bug修复、测试结果、经验总结
+- **Token**: ~400
+
+---
+
+## 🔍 使用场景
+
+### 场景1: 快速了解项目
+**目标**: 用最少时间了解项目状态
+**路径**:
+1. [QUICK_REFERENCE.md](QUICK_REFERENCE.md) (3分钟)
+2. [INDEX.md](INDEX.md) 浏览分类 (5分钟)
+
+**Token消耗**: ~800
+
+---
+
+### 场景2: 排查Bug
+**目标**: 查找类似问题的解决方案
+**路径**:
+1. [INDEX.md](INDEX.md) → Bug修复章节
+2. 查看相关Bug修复文档
+3. [architecture_uml_diagrams.md](architecture/architecture_uml_diagrams.md) 理解流程
+
+**Token消耗**: ~1,500
+
+---
+
+### 场景3: 学习架构
+**目标**: 深入理解系统架构
+**路径**:
+1. [architecture_review_2026-01-18.md](architecture/architecture_review_2026-01-18.md) - 了解问题
+2. [autonomous_component_architecture_2026-01-18.md](refactoring/autonomous_component_architecture_2026-01-18.md) - 学习方案
+3. [architecture_uml_diagrams.md](architecture/architecture_uml_diagrams.md) - 可视化理解
+4. [player_autonomous_components_implementation_2026-01-19.md](bug-fixes/player_autonomous_components_implementation_2026-01-19.md) - 实践经验
+
+**Token消耗**: ~4,800
+
+---
+
+### 场景4: 日常开发
+**目标**: 查看待办任务、了解进度
+**路径**:
+1. [QUICK_REFERENCE.md](QUICK_REFERENCE.md) - 查看待办
+2. [optimization_work_plan.md](planning/optimization_work_plan.md) - 详细任务
+3. 相关技术文档
+
+**Token消耗**: ~1,300
+
+---
+
+## 💡 Token优化建议
+
+### 优先使用低Token文档
+
+| 文档 | Token | 用途 |
+|------|-------|------|
+| QUICK_REFERENCE.md | ~300 | ⭐⭐⭐ 日常首选 |
+| INDEX.md | ~500 | ⭐⭐ 查找文档 |
+| TIMELINE.md | ~800 | ⭐ 查看进展 |
+| [optimization_work_plan.md](planning/optimization_work_plan.md) | ~1000 | ⭐ 任务管理 |
+
+### 按需加载详细文档
+
+只有在需要深入了解时才查看：
+- [architecture_uml_diagrams.md](architecture/architecture_uml_diagrams.md) (~2000)
+- [architecture_review_2026-01-18.md](architecture/architecture_review_2026-01-18.md) (~1200)
+- 其他技术文档 (~800)
+
+### 避免重复加载
+
+- 使用INDEX.md快速定位，避免盲目搜索
+- 用QUICK_REFERENCE.md回忆核心信息
+- 用TIMELINE.md查找日期相关内容
+
+---
+
+## 📋 文档更新规范
+
+### 何时创建新文档
+
+#### Bug修复
+```
+Bug修复_YYYY-MM-DD.md
+- 问题描述
+- 根本原因分析
+- 解决方案（代码对比）
+- 测试验证
+- 经验总结
 ```
 
-## 🔍 查找历史记录
+#### 特性开发
+```
+Feature_功能名_YYYY-MM-DD.md
+- 需求背景
+- 设计方案
+- 实现细节
+- 测试验证
+```
 
-如果需要查看历史开发记录：
+#### 重构优化
+```
+Refactor_模块名_YYYY-MM-DD.md
+- 问题分析
+- 重构方案
+- 实施步骤
+- 成果对比
+```
 
+### 文档命名规范
+
+格式: `[类型]_[主题]_YYYY-MM-DD.md`
+
+示例:
+- `player_autonomous_components_implementation_2026-01-19.md`
+- `await_memory_leak_fix_2026-01-18.md`
+- `architecture_uml_diagrams.md`
+
+### 更新索引文档
+
+每次添加新文档后，更新：
+1. **INDEX.md** - 添加到对应分类
+2. **TIMELINE.md** - 添加到对应日期
+3. **QUICK_REFERENCE.md** - 更新关键信息（如需要）
+
+---
+
+## 🔧 维护工具
+
+### 搜索文档
 ```bash
-# 查看归档日志
-cat dev_log/archive/dev_log_legacy.md
+# 按关键词搜索
+grep -r "特殊攻击" dev_log/
 
-# 搜索特定功能
-grep -r "状态机" dev_log/
+# 按日期查找
+ls dev_log/*2026-01-19*
+
+# 查看所有Bug修复
+grep -l "Bug修复" dev_log/*.md
+```
+
+### 统计信息
+```bash
+# 文档数量
+ls -1 dev_log/*.md | wc -l
+
+# 总字数
+wc -w dev_log/*.md
+
+# 按大小排序
+ls -lhS dev_log/*.md
 ```
 
 ---
 
-**最后更新**: 2026-01-17
+## 📊 当前统计
+
+| 指标 | 数值 |
+|------|------|
+| 总文档数 | 19个 |
+| Bug修复文档 | 2个 |
+| 架构文档 | 3个 |
+| 规划文档 | 1个 |
+| 重构文档 | 2个 |
+| 工具文档 | 3个 |
+| 会话记录 | 3个 |
+| 索引文档 | 4个 |
+| 总Token估算 | ~10,000 |
+| 平均Token/文档 | ~530 |
+
+---
+
+## 🎯 最佳实践
+
+### ✅ DO（推荐）
+- ✅ 优先查看 QUICK_REFERENCE.md
+- ✅ 使用 INDEX.md 快速定位
+- ✅ 按需加载详细文档
+- ✅ 记录关键决策和经验
+- ✅ 更新索引文档
+
+### ❌ DON'T（避免）
+- ❌ 盲目加载所有文档
+- ❌ 重复查看相同内容
+- ❌ 忽略Token消耗
+- ❌ 创建重复内容的文档
+- ❌ 忘记更新索引
+
+---
+
+## 🚀 下一步
+
+### 立即行动
+1. 阅读 [QUICK_REFERENCE.md](QUICK_REFERENCE.md)
+2. 浏览 [INDEX.md](INDEX.md)
+3. 开始开发！
+
+### 需要帮助？
+- 查不到信息？→ 使用 INDEX.md 按类型查找
+- 忘记时间？→ 查看 TIMELINE.md
+- 需要快速回忆？→ 看 QUICK_REFERENCE.md
+
+---
+
+**创建日期**: 2026-01-19
+**最后更新**: 2026-01-19
+**维护者**: Claude + 用户
+**版本**: v2.0（优化版）

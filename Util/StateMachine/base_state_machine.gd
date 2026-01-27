@@ -136,9 +136,9 @@ func _on_state_transition(from_state: BaseState, new_state_name: String) -> void
 
 
 ## 当 owner 受到伤害时
-func _on_owner_damaged(damage: Damage) -> void:
+func _on_owner_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
 	if current_state and current_state.has_method("on_damaged"):
-		current_state.on_damaged(damage)
+		current_state.on_damaged(damage, attacker_position)
 
 
 ## 强制切换到指定状态（用于外部控制）

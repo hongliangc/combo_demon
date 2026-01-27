@@ -8,7 +8,7 @@ var attack_timer := 0.0
 var has_attacked := false
 
 func enter():
-	print("Boss: 进入攻击状态")
+	# print("Boss: 进入攻击状态")
 	attack_timer = attack_duration
 	has_attacked = false
 
@@ -60,7 +60,7 @@ func perform_attack():
 	if owner_node is not Boss:
 		return
 
-	print("Boss 执行攻击！")
+	#print("Boss 执行攻击！")
 
 	var boss = owner_node as Boss
 
@@ -208,7 +208,7 @@ func exit():
 	pass
 
 # 攻击状态下仍然可以被打断
-func on_damaged(_damage: Damage):
+func on_damaged(_damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
 	if owner_node is not Boss:
 		return
 

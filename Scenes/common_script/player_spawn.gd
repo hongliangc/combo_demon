@@ -19,6 +19,9 @@ var player = null
 @export var sensitivity := 0.25
 var aim_position:Vector2
 
+## CameraManager 引用（用于检查是否正在进行镜头切换）
+var _camera_manager: CameraManager = null
+
 func _ready() -> void:
 	_spawn_player()
 	_setup_camera()
@@ -58,9 +61,21 @@ func _setup_camera() -> void:
 	# 计算摄像机可视区域（世界范围）
 	var visible_world = screen_size * camera.zoom
 	print("Visible world size: ", visible_world)
+
+	# 延迟查找 CameraManager（等待玩家子节点初始化）
+	call_deferred("_find_camera_manager")
+
+## 查找玩家的 CameraManager 组件
+func _find_camera_manager() -> void:
+	if player:
+		_camera_manager = player.get_node_or_null("CameraManager")
 	
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if player and camera:
+		# 如果 CameraManager 正在进行镜头切换，跳过跟随逻辑
+		if _camera_manager and _camera_manager.is_transitioning:
+			return
+
 		var base_pos = player.global_position
 		var world_mouse = get_global_mouse_position()
 
@@ -70,6 +85,7 @@ func _physics_process(delta: float) -> void:
 		offset.x = clamp(offset.x, -max_offset.x, max_offset.x)
 		offset.y = clamp(offset.y, -max_offset.y, max_offset.y)
 		#基于offset的一半，1/4屏幕中心位置
+		offset = Vector2.ZERO # 不跟随鼠标
 		var target_pos = base_pos + offset * sensitivity
 
 		# print("base_pos:{0} world_mouse:{1}, offset:{2}, target_pos:{3}".format([base_pos, world_mouse, offset, target_pos]))

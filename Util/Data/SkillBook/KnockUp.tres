@@ -6,10 +6,13 @@
 
 [sub_resource type="Resource" id="KnockUpEffect_1"]
 script = ExtResource("2_knockup")
-launch_force = 300.0
-horizontal_force = 0.0
+launch_height = 80.0
+horizontal_distance = 0.0
+rise_duration = 0.25
+fall_duration = 0.2
+use_attack_direction = true
 effect_name = "击飞"
-duration = 1.0
+duration = 0.45
 show_debug_info = false
 
 [resource]

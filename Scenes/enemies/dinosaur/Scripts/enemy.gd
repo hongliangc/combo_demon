@@ -1,12 +1,17 @@
 extends CharacterBody2D
 class_name Enemy
 
-# 发送信号给StunState
-signal damaged(damage: Damage)
+## Enemy 基类 - 使用组件化架构
+## 伤害处理由 HealthComponent 负责
+## 状态机通过监听 damaged 信号响应
 
+# ============ 信号 ============
+## 转发给状态机（由 HealthComponent.damaged 触发）
+signal damaged(damage: Damage, attacker_position: Vector2)
+
+# ============ 配置参数 ============
 @export_group("Textures")
 @export var textures: Array[Texture2D] = []
-
 
 @export_group("Health")
 @export var max_health := 100
@@ -23,47 +28,44 @@ signal damaged(damage: Damage)
 @export var follow_radius := 25.0
 @export var chase_speed := 75
 
-@onready var sprite : Sprite2D = $Sprite2D
-@onready var damage_numbers_anchor: Node2D= $DamageNumbersAnchor
-var stunned : bool = false
-var alive : bool = true
+# ============ 运行时变量 ============
+var stunned: bool = false
+var can_move: bool = true  # 用于技能聚集时强制停止移动
+var alive: bool = true
 
-@onready var anim_player: AnimationPlayer =  $AnimationPlayer
+# ============ 节点引用 ============
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var damage_numbers_anchor: Node2D = $DamageNumbersAnchor
+@onready var anim_player: AnimationPlayer = $AnimationPlayer
+@onready var health_component: HealthComponent = $HealthComponent
+
 func _ready() -> void:
 	sprite.texture = textures.pick_random()
+	_setup_signals()
 
+## 设置信号连接
+func _setup_signals() -> void:
+	# 连接 Hurtbox 到 HealthComponent
+	var hurtbox = get_node_or_null("Hurtbox")
+	if hurtbox and health_component:
+		hurtbox.damaged.connect(health_component.take_damage)
 
+	# 监听 HealthComponent 的信号
+	if health_component:
+		health_component.damaged.connect(_on_health_component_damaged)
+		health_component.died.connect(on_death)
+
+		# 同步初始生命值到 HealthComponent
+		health_component.max_health = max_health
+		health_component.health = health
+
+## HealthComponent 受伤时的回调 - 转发 damaged 信号给状态机
+func _on_health_component_damaged(damage: Damage, attacker_position: Vector2) -> void:
+	# 转发信号给状态机
+	damaged.emit(damage, attacker_position)
+
+## 死亡处理
 func on_death() -> void:
+	alive = false
 	velocity = Vector2.ZERO
 	anim_player.play("death")
-	pass # 用于爆装备
-
-
-func dislay_damage_number(damage: Damage) -> void:
-	var is_critical = false
-	if damage.amount > damage.max_amount *0.8:
-		is_critical = true
-	DamageNumbers.display_number(damage.amount, damage_numbers_anchor.global_position, is_critical)
-
-
-func on_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
-	print("========== Enemy.on_damaged 被调用 ==========")
-	print("当前位置: ", global_position)
-	print("当前速度: ", velocity)
-
-	# 显示伤害数字
-	dislay_damage_number(damage)
-	print("enemy on_damage damage")
-	damage.debug_print()
-
-	# 应用攻击特效（击飞、击退等）
-	print("特效数量: ", damage.effects.size())
-	if damage.effects.size() > 0:
-		print("开始应用特效...")
-		damage.apply_effects(self, attacker_position)
-		print("特效应用完成，当前velocity: ", velocity)
-
-	# 通知状态机切换（在特效应用之后）
-	print("发送 damaged 信号到状态机...")
-	damaged.emit(damage)
-	print("==========================================")

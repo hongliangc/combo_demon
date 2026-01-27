@@ -17,7 +17,7 @@ var escape_skill_cooldown := 0.0
 const ESCAPE_SKILL_CD := 3.0  # 脱困技能3秒CD
 
 func enter():
-	print("Boss: 进入撤退状态")
+	#print("Boss: 进入撤退状态")
 	retreat_timer = 0.0
 	retreat_attack_timer = 0.0
 
@@ -69,7 +69,7 @@ func handle_cornered_situation():
 	if owner_node is not Boss:
 		return
 
-	print("Boss 被逼入角落！")
+	#print("Boss 被逼入角落！")
 
 	# 设置脱困技能CD，防止无限触发
 	escape_skill_cooldown = ESCAPE_SKILL_CD
@@ -88,7 +88,7 @@ func handle_cornered_situation():
 
 func use_knockback_skill():
 	"""使用击退技能推开玩家"""
-	print("Boss 使用击退技能！")
+	#print("Boss 使用击退技能！")
 	var attack_manager = get_attack_manager()
 	if attack_manager and attack_manager.has_method("fire_knockback_wave"):
 		attack_manager.fire_knockback_wave()
@@ -102,7 +102,7 @@ func use_teleport_skill():
 	if owner_node is not Boss:
 		return
 
-	print("Boss 使用闪现技能！")
+	#print("Boss 使用闪现技能！")
 
 	var boss = owner_node as Boss
 	var safe_position = find_safe_teleport_position()
@@ -117,7 +117,7 @@ func use_teleport_skill():
 		# 终点特效（可选）
 		create_teleport_effect(boss.global_position)
 
-		print("Boss 闪现到位置: ", safe_position)
+		#print("Boss 闪现到位置: ", safe_position)
 
 func find_safe_teleport_position() -> Vector2:
 	"""寻找安全的闪现位置（确保在地图wall内且不碰撞）"""
@@ -151,11 +151,11 @@ func find_safe_teleport_position() -> Vector2:
 
 		# 检查该位置是否有墙壁碰撞
 		if is_position_valid(random_pos):
-			print("找到有效闪现位置: ", random_pos)
+			#print("找到有效闪现位置: ", random_pos)
 			return random_pos
 
 	# 如果找不到完美位置，尝试在玩家附近找一个安全位置
-	print("未找到完美位置，尝试备用策略")
+	#print("未找到完美位置，尝试备用策略")
 	for angle in range(0, 360, 45):
 		var rad = deg_to_rad(angle)
 		var offset = Vector2(cos(rad), sin(rad)) * 250
@@ -169,7 +169,7 @@ func find_safe_teleport_position() -> Vector2:
 			return candidate_pos
 
 	# 最后的备用方案：当前位置
-	print("警告：无法找到有效闪现位置，保持原位")
+	#print("警告：无法找到有效闪现位置，保持原位")
 	return boss.global_position
 
 func is_position_valid(position: Vector2) -> bool:
@@ -229,7 +229,7 @@ func get_map_bounds() -> Rect2:
 		)
 
 	# 备用方案：返回默认估算值
-	print("警告：未找到TileMap，使用默认地图边界")
+	#print("警告：未找到TileMap，使用默认地图边界")
 	return Rect2(-500, -500, 1000, 1000)
 
 func create_teleport_effect(position: Vector2):
@@ -276,7 +276,7 @@ func perform_retreat_attack():
 	if owner_node is not Boss:
 		return
 
-	print("Boss 撤退时发动攻击")
+	#print("Boss 撤退时发动攻击")
 
 	var boss = owner_node as Boss
 	var attack_manager = get_attack_manager()

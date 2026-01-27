@@ -10,7 +10,11 @@
       "Bash(ping:*)",
       "Bash(timeout /t 10 /nobreak)",
       "Bash(powershell:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(grep:*)",
+      "Bash(done)",
+      "Bash(timeout /t 3 /nobreak)",
+      "Bash(godot --headless --check-only --script:*)"
     ],
     "deny": [],
     "ask": []

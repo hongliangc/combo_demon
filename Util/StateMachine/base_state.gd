@@ -82,7 +82,7 @@ func try_chase(detection_radius: float) -> bool:
 
 
 ## 受到伤害时的回调（子类可重写）
-func on_damaged(_damage: Damage) -> void:
+func on_damaged(_damage: Damage, attacker_position: Vector2) -> void:
 	# 默认：切换到 stun 状态
 	if state_machine and state_machine.states.has("stun"):
 		transitioned.emit(self, "stun")

@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c5cbe07dk5lyn" path="res://Art/Arks/DinoSprites - mort.png" id="3_ueu0g"]
 [ext_resource type="Texture2D" uid="uid://cqcr6ctruxfn5" path="res://Art/Arks/DinoSprites - tard.png" id="4_i6tsu"]
 [ext_resource type="Script" uid="uid://5jjwbr0mlmjx" path="res://Util/Components/hurtbox.gd" id="6_ueu0g"]
-[ext_resource type="Script" uid="uid://cwqi55w0m2ned" path="res://Scenes/enemies/dinosaur/Scripts/enemy_health.gd" id="7_i6tsu"]
+[ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Util/Components/HealthComponent.gd" id="7_health"]
 [ext_resource type="Script" uid="uid://comc52hdgfw4i" path="res://Scenes/enemies/dinosaur/Scripts/enemy_health_bar.gd" id="8_7q47s"]
 [ext_resource type="Script" uid="uid://by5htk5ejoyb8" path="res://Scenes/enemies/dinosaur/Scripts/enemy_animation_handler.gd" id="8_aqges"]
 [ext_resource type="Script" uid="uid://c3wwecu6yfgiu" path="res://Scenes/enemies/dinosaur/Scripts/States/enemy_chase.gd" id="9_6b5td"]
@@ -377,10 +377,8 @@ libraries = {
 }
 autoplay = "idle"
 
-[node name="HealthHandler" type="Node" parent="." node_paths=PackedStringArray("enemy", "hurtbox")]
-script = ExtResource("7_i6tsu")
-enemy = NodePath("..")
-hurtbox = NodePath("../Hurtbox")
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("7_health")
 
 [node name="AnimationHandler" type="Node" parent="." node_paths=PackedStringArray("anim_player", "sprite")]
 script = ExtResource("8_aqges")
@@ -427,6 +425,4 @@ position = Vector2(0, -11)
 
 [node name="AttackAnchor" type="Node2D" parent="."]
 
-[connection signal="died" from="HealthHandler" to="." method="on_death"]
-[connection signal="health_changed" from="HealthHandler" to="HealthBar" method="on_health_changed"]
-[connection signal="max_health_changed" from="HealthHandler" to="HealthBar" method="on_max_health_changed"]
+[connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

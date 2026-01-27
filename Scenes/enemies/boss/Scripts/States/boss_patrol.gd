@@ -7,7 +7,7 @@ extends BossState
 var target_patrol_point: Vector2
 
 func enter():
-	print("Boss: 进入巡逻状态")
+	#print("Boss: 进入巡逻状态")
 	if owner_node is Boss:
 		var boss = owner_node as Boss
 		target_patrol_point = boss.get_next_patrol_point()

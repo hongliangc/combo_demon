@@ -1,14 +1,13 @@
 extends CharacterBody2D
 class_name Boss
 
-## Boss 基类 - 支持多阶段战斗、8方位移动、高级AI
-
-# 预加载血条场景
-const HealthBarScene = preload("res://Scenes/UI/HealthBar.tscn")
+## Boss 基类 - 使用组件化架构
+## 支持多阶段战斗、8方位移动、高级AI
+## 伤害处理由 HealthComponent 负责
 
 # ============ 信号 ============
-signal damaged(damage: Damage)
-signal health_changed(current: float, maximum: float)
+## 转发给状态机（由 HealthComponent.damaged 触发）
+signal damaged(damage: Damage, attacker_position: Vector2)
 signal phase_changed(new_phase: int)
 signal boss_defeated()
 
@@ -75,8 +74,8 @@ enum Phase {
 # ============ 运行时变量 ============
 var current_phase: Phase = Phase.PHASE_1
 var stunned := false
+var can_move := true  # 用于技能聚集时强制停止移动
 var alive := true
-var is_invincible := false  # 无敌状态（阶段转换时使用）
 
 # 攻击冷却
 var attack_cooldown := 0.0
@@ -87,27 +86,35 @@ var circle_direction := 1  # 1=顺时针, -1=逆时针
 var patrol_points: Array[Vector2] = []
 var current_patrol_index := 0
 
-# 血条引用
-var health_bar = null
-
 # ============ 节点引用 ============
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var damage_numbers_anchor: Node2D = $DamageNumbersAnchor
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
+@onready var health_component: HealthComponent = $HealthComponent
 
 func _ready() -> void:
 	if not textures.is_empty():
 		sprite.texture = textures.pick_random()
 
 	setup_patrol_points()
+	_setup_signals()
 
-	# 连接 Hurtbox 信号
+## 设置信号连接
+func _setup_signals() -> void:
+	# 连接 Hurtbox 到 HealthComponent
 	var hurtbox = get_node_or_null("Hurtbox")
-	if hurtbox and hurtbox.has_signal("damaged"):
-		hurtbox.damaged.connect(on_damaged)
+	if hurtbox and health_component:
+		hurtbox.damaged.connect(health_component.take_damage)
 
-	# 初始化血条
-	setup_health_bar()
+	# 监听 HealthComponent 的信号
+	if health_component:
+		health_component.damaged.connect(_on_health_component_damaged)
+		health_component.health_changed.connect(_on_health_changed)
+		health_component.died.connect(on_death)
+
+		# 同步初始生命值到 HealthComponent
+		health_component.max_health = max_health
+		health_component.health = health
 
 func _physics_process(delta: float) -> void:
 	# 更新攻击冷却
@@ -137,44 +144,20 @@ func setup_patrol_points() -> void:
 			var angle = i * PI / 2
 			patrol_points.append(center + Vector2(cos(angle), sin(angle)) * 200)
 
-# ============ 血条UI ============
+# ============ 伤害处理 ============
 
-## 设置血条UI
-func setup_health_bar() -> void:
-	# 实例化血条
-	if HealthBarScene:
-		health_bar = HealthBarScene.instantiate()
-		add_child(health_bar)
+## HealthComponent 受伤时的回调 - 转发信号给状态机
+func _on_health_component_damaged(damage: Damage, attacker_position: Vector2) -> void:
+	# 转发信号给状态机
+	damaged.emit(damage, attacker_position)
 
-		# 设置血条位置（在Boss上方）
-		health_bar.position = Vector2(-100, -120)
+## 生命值变化时检查阶段转换
+func _on_health_changed(current: float, _maximum: float) -> void:
+	# 同步本地 health 变量
+	health = int(current)
 
-		# 初始化血条数值
-		health_bar.set_max_value(max_health)
-		health_bar.set_value(health)
-		health_bar.bar_color = Color(0.8, 0.1, 0.1)  # 红色
-		health_bar.show_text = true
-
-		# 根据阶段改变血条颜色
-		update_health_bar_color()
-
-## 更新血条显示
-func update_health_bar() -> void:
-	if health_bar:
-		health_bar.tween_to_value(health, 0.2)
-
-## 根据阶段更新血条颜色
-func update_health_bar_color() -> void:
-	if not health_bar:
-		return
-
-	match current_phase:
-		Phase.PHASE_1:
-			health_bar.bar_color = Color(0.8, 0.1, 0.1)  # 红色
-		Phase.PHASE_2:
-			health_bar.bar_color = Color(0.9, 0.5, 0.1)  # 橙色
-		Phase.PHASE_3:
-			health_bar.bar_color = Color(0.9, 0.1, 0.5)  # 紫红色（狂暴）
+	# 检查阶段转换
+	check_phase_transition()
 
 # ============ 8方位朝向更新 ============
 func update_facing_direction() -> void:
@@ -194,57 +177,6 @@ func update_facing_direction() -> void:
 		var target_rotation = DIRECTIONS_8[direction_index].angle()
 		sprite.rotation = lerp_angle(sprite.rotation, target_rotation, rotation_speed * get_physics_process_delta_time())
 
-# ============ 伤害处理 ============
-func display_damage_number(damage: Damage) -> void:
-	var is_critical = false
-	if damage.amount > damage.max_amount * 0.8:
-		is_critical = true
-	DamageNumbers.display_number(damage.amount, damage_numbers_anchor.global_position, is_critical)
-
-func on_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
-	print("========== Boss.on_damaged 被调用 ==========")
-	print("当前血量: ", health, "/", max_health)
-
-	# 如果无敌，不接受伤害
-	if is_invincible:
-		print("Boss 处于无敌状态，忽略伤害")
-		return
-
-	# 显示伤害数字
-	display_damage_number(damage)
-
-	# 扣除生命值
-	health -= int(damage.amount)
-	health = max(0, health)
-
-	# 更新血条
-	update_health_bar()
-
-	health_changed.emit(health, max_health)
-
-	# 应用攻击特效（击飞、击退等）- 使用通用特效系统
-	print("特效数量: ", damage.effects.size())
-	if damage.effects.size() > 0:
-		print("开始应用特效...")
-		for effect in damage.effects:
-			if effect != null and effect.has_method("apply_effect"):
-				effect.apply_effect(self, attacker_position)
-				print("应用特效: ", effect.effect_name if "effect_name" in effect else "未知特效")
-		print("特效应用完成，当前velocity: ", velocity)
-
-	# 检查阶段转换
-	check_phase_transition()
-
-	# 通知状态机切换
-	print("发送 damaged 信号到状态机...")
-	damaged.emit(damage)
-
-	# 检查死亡
-	if health <= 0:
-		on_death()
-
-	print("==========================================")
-
 # ============ 阶段转换 ============
 func check_phase_transition() -> void:
 	var health_percent = float(health) / float(max_health)
@@ -260,40 +192,26 @@ func change_phase(new_phase: Phase) -> void:
 
 	current_phase = new_phase
 
-	# 更新血条颜色
-	update_health_bar_color()
-
 	# 阶段转换特效：短暂无敌 + 击退周围敌人
 	activate_phase_transition_effect()
 
 	phase_changed.emit(new_phase)
 
-	print("========== Boss 阶段转换 ==========")
 	match new_phase:
-		Phase.PHASE_1:
-			print("进入第一阶段")
 		Phase.PHASE_2:
-			print("进入第二阶段 - 更激进的攻击模式！")
 			# 重置特殊攻击冷却，立即使用
 			special_attack_cooldown = 0
-			# 可以添加阶段转换特效
 		Phase.PHASE_3:
-			print("进入第三阶段 - 狂暴模式！")
 			special_attack_cooldown = 0
-			# 可以添加狂暴特效
-	print("====================================")
 
 # ============ 阶段转换特效 ============
 func activate_phase_transition_effect() -> void:
 	"""阶段转换时的特效：短暂无敌 + 击退周围单位"""
-	print("激活阶段转换特效：无敌 + 击退")
+	DebugConfig.debug("激活阶段转换特效：无敌 + 击退", "", "combat")
 
-	# 1. 开启短暂无敌（1秒）
-	is_invincible = true
-	get_tree().create_timer(1.0).timeout.connect(func():
-		is_invincible = false
-		print("Boss 无敌状态结束")
-	)
+	# 1. 开启短暂无敌（1秒）- 使用 HealthComponent 的无敌功能
+	if health_component:
+		health_component.set_invincible(true, 1.0)
 
 	# 2. 击退周围的所有单位（玩家和敌人）
 	knockback_nearby_units()
@@ -334,21 +252,17 @@ func knockback_nearby_units() -> void:
 		# 对玩家应用击退
 		if collider.is_in_group("player") and collider.has_method("apply_knockback"):
 			collider.apply_knockback(direction * strength)
-			print("击退玩家")
 
 		# 对其他敌人应用击退
 		elif collider is CharacterBody2D:
 			if "velocity" in collider:
 				collider.velocity += direction * strength
-				print("击退单位: ", collider.name)
 
 # ============ 死亡处理 ============
 func on_death() -> void:
 	alive = false
 	velocity = Vector2.ZERO
 	boss_defeated.emit()
-
-	print("Boss 被击败！")
 
 	if anim_player and anim_player.has_animation("death"):
 		anim_player.play("death")

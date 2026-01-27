@@ -27,13 +27,23 @@ func apply_effect(target: CharacterBody2D, damage_source_position: Vector2) -> v
 	# 禁用移动控制（如果目标有 can_move 属性）
 	if "can_move" in target:
 		target.can_move = false
-		# 使用定时器在持续时间后恢复控制
+		# 使用信号连接在持续时间后恢复控制（避免await内存泄漏）
 		if target.get_tree():
-			await target.get_tree().create_timer(duration).timeout
-			if is_instance_valid(target) and "can_move" in target:
-				target.can_move = true
-				if show_debug_info:
-					print("[KnockBackEffect] 恢复移动控制")
+			var timer = target.get_tree().create_timer(duration)
+			timer.timeout.connect(func():
+				if is_instance_valid(target) and "can_move" in target:
+					# 检查是否被眩晕，如果被眩晕则不恢复移动
+					var is_stunned = false
+					if "stunned" in target:
+						is_stunned = target.stunned
+
+					if not is_stunned:
+						target.can_move = true
+						if show_debug_info:
+							print("[KnockBackEffect] 恢复移动控制")
+					elif show_debug_info:
+						print("[KnockBackEffect] 目标被眩晕，不恢复移动")
+			, CONNECT_ONE_SHOT)
 
 	if show_debug_info:
 		print("[KnockBackEffect] 设置后的速度: ", target.velocity)

@@ -1,217 +1,211 @@
 # Combo Demon - 项目上下文
 
-> **2D 动作游戏** | Godot 4.4.1 | 连招战斗系统
+> **2D 动作游戏** | Godot 4.4.1 | 连招战斗系统 | 81个脚本 | 21个场景
 
 ## 🎯 项目概述
 
-**核心玩法**: 流畅的连招战斗 + 状态机AI + 多种攻击特效
+**核心玩法**: 流畅连招战斗 + 状态机AI + 多阶段Boss战 + 攻击特效系统
 
 **技术栈**: Godot 4.4.1 (Mobile Renderer) | GDScript | Git | MCP
 
 ---
 
+## 🆕 最近更新
+
+### 2026-01-19: Player自治组件架构重构 ✅
+**类型**: 重大架构优化 + Bug修复
+
+**重构成果**:
+- ✨ **全新架构**: 将Player从单体278行重构为5个自治组件（119行主类 + 5组件）
+- 🔧 **代码简化**: 主类 `-57%`（278行 → 119行）
+- 🗑️ **清理冗余**: 删除 `movement_hander.gd` 和 `animation_hander.gd`
+- 🎯 **职责分离**: 每个组件单一职责，完全自治运行
+- 🔌 **信号解耦**: 组件间通过信号通信，零耦合
+- 🐛 **Bug修复**: 修复特殊攻击后无法移动的严重Bug
+
+**5大自治组件**:
+```
+Player (hahashin.gd) - 119行
+├── HealthComponent    - 生命值管理
+├── MovementComponent  - 自动处理输入和移动（_process + _physics_process）
+├── AnimationComponent - 自动管理AnimationTree
+├── CombatComponent    - 自动处理技能输入
+└── SkillManager       - 自动执行特殊攻击完整流程
+```
+
+**参考文档**:
+- 📄 [player_autonomous_components_implementation_2026-01-19.md](../../dev_log/player_autonomous_components_implementation_2026-01-19.md)
+- 📄 [autonomous_component_architecture_2026-01-18.md](../../dev_log/autonomous_component_architecture_2026-01-18.md)
+- 📋 [optimization_work_plan.md](../../dev_log/optimization_work_plan.md)
+
+---
+
 ## 📦 核心架构
 
-### 系统层级图
+### 系统层级
 
 ```
-AutoLoad 单例层
-├── UIManager          # UI层级管理（6层：Background/Game/Menu/Popup/Tooltip/Loading）
-├── GameManager        # 游戏流程（角色选择、场景切换）
-├── SoundManager       # 音效管理
-├── DamageNumbers      # 伤害数字显示
-└── DebugConfig        # 调试日志系统（4级别、分类标签、路径配置）
+AutoLoad 单例
+├── GameManager      - 游戏流程、角色选择、场景切换
+├── UIManager        - UI层级管理（6层）、Toast、对话框
+├── SoundManager     - 音效管理
+├── DamageNumbers    - 伤害数字显示
+└── DebugConfig      - 4级日志（debug/info/warn/error）+ 分类标签
 
-游戏系统
-├── 角色系统           # Scenes/charaters/hahashin.gd
-│   ├── 移动处理       # movement_hander.gd
-│   ├── 动画管理       # animation_hander.gd
-│   └── 攻击判定       # hitbox.gd
-├── 敌人系统           # Scenes/enemies/
-│   ├── 普通敌人       # dinosaur/ (状态机: idle/wander/chase/attack/stun)
-│   └── Boss          # boss/ (9状态: idle/patrol/chase/circle/attack/retreat/special/enrage/stun)
-├── 战斗系统           # Util/Components/
-│   ├── Health        # 生命值管理
-│   ├── Hitbox        # 攻击判定（支持@export配置和Damage资源）
-│   ├── Hurtbox       # 受击判定
-│   └── AttackEffect  # 特效基类（KnockUp/KnockBack）
-└── 武器系统           # Weapons/
-    ├── 近战           # slash/claw/
-    └── 远程           # bullet/fire, bubble
+核心系统
+├── 状态机 (StateMachine)
+│   ├── BaseState          - 统一接口
+│   └── CommonStates/      - 5个通用模板（80%复用）
+│       ├── idle_state     - 12@export，玩家检测
+│       ├── chase_state    - 10@export，动态范围
+│       ├── attack_state   - 11@export，组件集成
+│       ├── wander_state   - 13@export，随机/固定
+│       └── stun_state     - 10@export，击飞物理模拟
+│
+├── 伤害系统 (Damage/AttackEffect)
+│   ├── Damage (Resource)  - 伤害值 + 特效数组
+│   ├── Hitbox/Hurtbox    - 碰撞检测
+│   └── Effects/          - KnockUp/KnockBack/Gather/ForceStun
+│
+├── Boss战
+│   ├── Boss基类          - 多阶段（3阶段）、8方位移动
+│   ├── 状态机（9状态）   - idle/patrol/chase/circle/attack/retreat/special/enrage/stun
+│   ├── 攻击管理器        - 统一攻击模式
+│   └── 连招系统          - combo_attack
+│
+└── Player (自治组件架构 ✨ 2026-01-19)
+    ├── HealthComponent    - 生命值、受伤、死亡、血条UI
+    ├── MovementComponent  - 自动处理输入、移动、加速、翻转
+    ├── AnimationComponent - 自动管理AnimationTree、动画播放
+    ├── CombatComponent    - 自动处理技能输入、伤害类型切换
+    └── SkillManager       - 自动执行特殊攻击完整流程
+        └── 扇形检测 → 移动 → 动画 → 聚集敌人
 ```
 
 ---
 
-## 🧩 关键模块说明
+## 🧩 关键模块
 
-### 1️⃣ 状态机框架 (Util/StateMachine/)
+### 状态机 ⭐⭐⭐⭐⭐
 
-**通用状态模板**（80%复用率）:
-- `idle_state.gd` - 待机（12个@export参数，支持玩家检测）
-- `wander_state.gd` - 巡游（13参数，随机/固定方向）
-- `chase_state.gd` - 追击（10参数，动态攻击范围）
-- `attack_state.gd` - 攻击（11参数，AttackComponent集成）
-- `stun_state.gd` - 眩晕（10参数，自定义恢复逻辑）
+**特点**:
+- **零代码配置** - 编辑器直接设置@export参数
+- **高复用率** - Enemy/Boss共用通用状态模板
+- **继承扩展** - 继承 + super() 实现自定义
 
-**使用方式**:
+**示例**:
 ```gdscript
-# 方式1: 纯配置（0代码）
-# 在场景中添加状态节点，设置@export参数
+# 方式1: 零代码（在场景中添加状态节点，设置参数）
 
-# 方式2: 继承+重载
+# 方式2: 继承扩展
 extends "res://Util/StateMachine/CommonStates/chase_state.gd"
-func physics_process_state(delta: float) -> void:
+func physics_process_state(delta):
     super.physics_process_state(delta)
     # 自定义逻辑
 ```
 
-### 2️⃣ 伤害系统 (Util/Classes/)
+### 伤害系统 ⭐⭐⭐⭐
 
-**核心类**:
-```gdscript
-# Damage.gd - 伤害数据（Resource）
-@export var min_amount: float
-@export var max_amount: float
-@export_enum("Physical", "KnockUp", "KnockBack") var type: String
-@export var effects: Array[AttackEffect]  # 特效数组
+**Damage Resource**:
+- `min/max_amount` - 伤害范围
+- `effects: Array[AttackEffect]` - 可组合多个特效
+- `静态RNG` - 性能优化，避免重复创建
 
-func randomize_damage() -> void  # 静态RNG，所有实例共享
-func apply_effects(target: Node) -> void
-```
+**配置方式**:
+1. **简单** - Hitbox设置 min_damage/max_damage
+2. **高级** - 拖入 Damage.tres 资源（.tres文件）
 
-**Hitbox配置方式**:
-1. **简单配置**: Inspector设置 `min_damage`/`max_damage`
-2. **高级配置**: 拖入 `.tres` Damage资源（支持复杂特效）
-
-**攻击特效**:
-- `KnockUpEffect` - 击飞（抛物线运动，适配8方向俯视地图）
+**特效系统**:
+- `KnockUpEffect` - 击飞（8方向抛物线，重力模拟）
 - `KnockBackEffect` - 击退
+- `GatherEffect` - 聚集敌人（特殊攻击用）
+- `ForceStunEffect` - 强制眩晕（禁用移动）
 
-### 3️⃣ UI系统 (Util/UI/)
+### Boss战 ⭐⭐⭐⭐⭐
 
-**UIManager API**:
-```gdscript
-# Toast提示（4种类型：info/success/warning/error）
-UIManager.show_toast("操作成功！", 2.0, "success")
+**多阶段**:
+- 第1阶段（100%-66%血量）- 基础模式
+- 第2阶段（66%-33%血量） - 1.3x速度 + 激进攻击
+- 第3阶段（33%-0%血量）  - 1.5x速度 + 狂暴模式
 
-# 确认对话框
-UIManager.show_confirm_dialog("标题", "消息", on_confirm, on_cancel)
+**转阶段特效**: 短暂无敌 + 击退周围单位
 
-# 打开面板（自动管理层级和堆栈）
-UIManager.open_panel(panel_scene, UIManager.UILayer.POPUP)
+**8方位系统**: 预计算DIRECTIONS_8常量，平滑旋转
 
-# 场景转场（淡入淡出）
-UIManager.transition_to_scene("res://Scenes/main.tscn")
-```
+### Player技能 (自治组件架构)
 
-**组件规范**:
-- 继承 `Control`（非CanvasLayer）
-- 实现 `play_open_animation()` / `play_close_animation()`
-- 使用 `class_name` 便于引用
+**伤害类型**: Physical、KnockUp、SpecialAttack
 
-### 4️⃣ 调试日志系统 (Util/AutoLoad/debug_config.gd)
+**特殊攻击流程** (SkillManager自动执行):
+1. **检测** - 扇形范围检测敌人（detection_radius, detection_angle）
+2. **禁用移动** - `movement_component.can_move = false`
+3. **移动** - Tween移动到第一个敌人位置
+4. **播放动画** - 播放特殊攻击动画并等待完成
+5. **聚集敌人** - GatherEffect聚集所有检测到的敌人
+6. **触发伤害** - Hitbox触发伤害和眩晕效果
+7. **恢复移动** - `movement_component.can_move = true` ✅
 
-**4级别日志**:
-```gdscript
-DebugConfig.debug("调试信息", "", "state_machine")  # 青色
-DebugConfig.info("一般信息", "", "combat")           # 绿色
-DebugConfig.warn("警告信息")                         # 黄色
-DebugConfig.error("错误信息")                        # 红色
-```
-
-**配置驱动** (debug_config.json):
-- 全局开关和最低级别
-- 分类标签配置（combat/state_machine/player/ai/ui）
-- 路径层级配置（最长匹配优先）
+**关键设计**: 完整的生命周期管理，确保状态正确恢复
 
 ---
 
-## 🎮 输入映射
+## 🎮 配置
+
+### 输入映射
 
 | 操作 | 按键 | 功能 |
 |------|------|------|
-| move_* | 方向键 | 移动 |
+| move_* | 方向键 | 8方向移动 |
 | primary_fire | 鼠标左键 | 主攻击 |
-| dash | 空格 | 冲刺 |
 | atk_sp | V | 特殊攻击 |
 | atk_1/2/3 | X/W/E | 技能1/2/3 |
-| roll | R | 翻滚 |
+| dash/roll | 空格/R | 冲刺/翻滚 |
+
+### 物理层
+
+| Layer | 名称 | 碰撞规则 |
+|-------|------|---------|
+| 2 | Player | ✅ World, Walls, Enemy, Enemy Projectile |
+| 3 | Player Projectile | ✅ Enemy, Walls |
+| 4 | Enemy | ✅ World, Walls, Player, Player Projectile |
+| 5 | Enemy Projectile | ✅ Player, Walls |
+| 8 | Walls | ✅ All |
 
 ---
 
-## 🎨 物理层设置
-
-| Layer | 名称 | 用途 |
-|-------|------|------|
-| 1 | World | 世界环境 |
-| 2 | Player | 玩家角色 |
-| 3 | Player Projectile | 玩家弹药 |
-| 4 | Enemy | 敌人 |
-| 5 | Enemy Projectile | 敌人弹药 |
-| 7 | Object | 可交互对象 |
-| 8 | Walls | 墙体/障碍物 |
-
-**碰撞规则**:
-- Player: ✅ World, Walls, Enemy, Enemy Projectile
-- Enemy: ✅ World, Walls, Player, Player Projectile
-
----
-
-## 📁 文件组织规范
+## 📁 目录结构
 
 ```
 Scenes/
-├── charaters/           # 角色（.tscn + .gd同目录）
-├── enemies/             # 敌人（普通+Boss）
-└── UI/                  # UI界面
+├── charaters/       # Player（Hahashin）
+├── enemies/         # Enemy (dinosaur/) + Boss (boss/)
+└── UI/              # 所有UI组件
 
 Util/
-├── AutoLoad/            # 全局单例
-├── Classes/             # 数据类（Damage, CharacterData, AttackEffect）
-├── Components/          # 可复用组件（Health, Hitbox, Hurtbox）
-├── StateMachine/        # 状态机框架
-│   └── CommonStates/    # 通用状态模板
-└── UI/                  # UI系统
-    ├── Core/            # UIManager
-    ├── Components/      # Toast, ConfirmDialog
-    └── Modules/         # LoadingScreen等
+├── AutoLoad/        # 7个全局单例
+├── StateMachine/    # 状态机框架 + CommonStates/
+├── Classes/         # Resource类（Damage, CharacterData, AttackEffect）
+├── Components/      # 可复用组件（Health, Hitbox, Hurtbox）
+└── Data/            # .tres资源文件
 
-Util/Data/               # 资源文件 (.tres)
-├── SkillBook/           # 技能配置（Physical.tres, KnockUp.tres等）
-└── Characters/          # 角色数据（hahashin.tres等）
-
-Weapons/                 # 武器系统
-├── slash/               # 近战
-└── bullet/              # 远程
+Weapons/
+├── slash/           # 近战武器
+└── bullet/          # 远程武器
 ```
 
 ---
 
-## 🔧 MCP集成
+## 📚 设计原则
 
-**已启用MCP服务**:
-- `filesystem` - 文件系统操作
-- `github` - GitHub集成
-- `godot` - Godot编辑器集成（启动编辑器、运行项目、创建场景）
+### 核心原则（godot-coding-standards skill）
 
-**常用MCP功能**:
-```javascript
-mcp__godot__launch_editor       // 启动Godot编辑器
-mcp__godot__run_project         // 运行游戏
-mcp__godot__get_debug_output    // 获取调试输出
-```
-
----
-
-## 📚 重要设计原则
-
-### 编码规范（godot-coding-standards skill）
-1. **通用性**: `@export` 配置化，避免硬编码
-2. **模块化**: 单一职责，组件模式，信号松耦合
-3. **可复用性**: Resource类存储数据，清晰公共接口
-4. **简洁实用**: 注重实用，避免过度设计
+1. **通用性** - `@export` 配置化，场景复用
+2. **模块化** - 单一职责，组件模式，信号解耦
+3. **可复用性** - Resource存储数据，清晰接口
+4. **简洁实用** - 避免过度设计，代码自解释
 
 ### 命名规范
+
 ```gdscript
 class_name PlayerHealth      # PascalCase
 var max_health: float        # snake_case
@@ -221,22 +215,45 @@ func take_damage() -> void   # snake_case + 类型注解
 ```
 
 ### 性能优化
-- 使用 `@onready` 延迟初始化
-- 对象池管理频繁创建的对象（bullet_pool.gd）
+
+- `@onready` 延迟初始化
 - 静态RNG避免重复创建
-- 避免在 `_process()` 中创建对象
+- 对象池（bullet_pool）
+- 避免 `_process()` 创建对象
 
 ---
 
-## 📖 文档资源
+## 🔧 已知问题与优化建议
 
-- **开发日志**: [dev_log/](../../dev_log/) - 按日期的会话记录
-- **历史归档**: [dev_log/archive/](../../dev_log/archive/) - 完整历史记录（不自动加载）
-- **编码规范**: [.claude/skills/godot-coding-standards/](../skills/godot-coding-standards/) - Skill详细文档
+### 高优先级
+
+1. **Hitbox重复** - `Scenes/charaters/hitbox.gd` 与 `Util/Components/hitbox.gd` 重复
+2. **Player职责过重** - hahashin.gd 278行，应拆分为组件
+3. **AttackEffect的await** - 可能导致内存泄漏
+
+### 中优先级
+
+4. **StunState过重** - 161行，包含眩晕+物理模拟+特效判断
+5. **状态名称硬编码** - 使用字符串引用，应使用常量
+6. **Boss调试print** - 应统一使用 DebugConfig
+
+### 目录优化（可选）
+
+- `charaters` → `Characters` (拼写修正)
+- `Stategy` → `Strategy` (拼写修正)
+- 脚本与场景分离（Scripts/ + Scenes/）
+
+---
+
+## 📖 相关文档
+
+- **架构分析**: [dev_log/architecture_review_2026-01-18.md](../../dev_log/architecture_review_2026-01-18.md)
+- **编码规范**: [.claude/skills/godot-coding-standards/](../skills/godot-coding-standards/)
 - **状态机指南**: [Util/StateMachine/STATE_MACHINE_GUIDE.md](../../Util/StateMachine/STATE_MACHINE_GUIDE.md)
 - **调试系统**: [Util/AutoLoad/DEBUG_README.md](../../Util/AutoLoad/DEBUG_README.md)
 
 ---
 
-**最后更新**: 2026-01-17
-**预计Token消耗**: ~3000 tokens (减少80%)
+**最后更新**: 2026-01-18
+**Token消耗**: ~2500 tokens（优化后）
+**项目状态**: ✅ 可运行，架构清晰，性能良好

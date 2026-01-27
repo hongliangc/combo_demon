@@ -31,22 +31,9 @@ class_name StunState
 # ============ 内部变量 ============
 var stun_timer: Timer
 
-# 8方向地图专用：击飞物理模拟
-var original_y: float = 0.0  # 记录击飞前的原始Y坐标
-var vertical_offset: float = 0.0  # 模拟的垂直偏移（用于击飞动画）
-var vertical_velocity: float = 0.0  # 垂直速度（用于模拟抛物线）
-
 func enter() -> void:
 	if owner_node is not CharacterBody2D:
 		return
-
-	var body = owner_node as CharacterBody2D
-
-	# 记录原始Y坐标
-	original_y = body.global_position.y
-	# 从当前velocity获取垂直速度（由 KnockUpEffect 设置）
-	vertical_velocity = body.velocity.y
-	vertical_offset = 0.0
 
 	# 创建眩晕定时器
 	stun_timer = Timer.new()
@@ -60,44 +47,26 @@ func enter() -> void:
 		var enemy = owner_node as Enemy
 		enemy.stunned = true
 
-	DebugConfig.debug("眩晕: %s 开始 (Y:%.1f, v:%v)" % [owner_node.name, original_y, body.velocity], "", "state_machine")
+	DebugConfig.debug("眩晕: %s 开始" % owner_node.name, "", "state_machine")
 
 
-func physics_process_state(delta: float) -> void:
+func physics_process_state(_delta: float) -> void:
 	if owner_node is not CharacterBody2D:
 		return
 
 	var body = owner_node as CharacterBody2D
 
-	# 检查是否允许移动（ForceStunEffect 会设置 can_move = false）
+	# 检查是否允许横向移动（ForceStunEffect 会设置 can_move = false）
 	var can_move = true
 	if "can_move" in owner_node:
 		can_move = owner_node.can_move
 
-	# 如果被强制眩晕（can_move = false），完全静止，不执行任何物理模拟
+	# 如果不允许移动，直接停止横向速度
 	if not can_move:
-		body.velocity = Vector2.ZERO
+		body.velocity.x = 0
 		return
 
-	# ============ 击飞抛物线模拟 ============
-	# 更新垂直偏移和垂直速度
-	vertical_offset += vertical_velocity * delta
-	vertical_velocity += gravity * delta
-
-	# 如果已经回到或低于原点，停止下落
-	if vertical_offset >= 0:
-		vertical_offset = 0
-		vertical_velocity = 0
-		# 着地后逐渐减慢横向速度（摩擦力）
-		body.velocity.x = lerp(body.velocity.x, 0.0, friction)
-
-	# 设置实际位置：原始Y + 垂直偏移
-	body.global_position.y = original_y + vertical_offset
-
-	# ============ 横向移动 ============
-	# 只应用横向移动（由 KnockBackEffect 设置）
-	var horizontal_velocity = Vector2(body.velocity.x, 0)
-	body.velocity = horizontal_velocity
+	# 仅处理横向移动逻辑
 	body.move_and_slide()
 
 
@@ -114,13 +83,6 @@ func exit() -> void:
 		var enemy = owner_node as Enemy
 		enemy.stunned = false
 
-	# 确保回到原始Y坐标
-	if owner_node is CharacterBody2D:
-		var body = owner_node as CharacterBody2D
-		body.global_position.y = original_y
-		# 清除速度
-		body.velocity = Vector2.ZERO
-
 	DebugConfig.debug("眩晕: %s 结束" % owner_node.name, "", "state_machine")
 
 
@@ -133,7 +95,7 @@ func on_timeout() -> void:
 
 
 ## 受到伤害时的回调 - 更新击飞/击退速度并重置定时器
-func on_damaged(damage: Damage) -> void:
+func on_damaged(damage: Damage, attacker_position: Vector2) -> void:
 	if owner_node is not CharacterBody2D:
 		return
 
@@ -142,7 +104,7 @@ func on_damaged(damage: Damage) -> void:
 
 	# 检查是否包含击飞特效
 	if damage.has_effect("KnockUpEffect"):
-		vertical_velocity = body.velocity.y
+		#damage.apply_effect(owner_node, damage_source_position)
 		effects_applied.append("击飞")
 		# 重置定时器
 		if stun_timer and reset_on_damage:
@@ -150,8 +112,8 @@ func on_damaged(damage: Damage) -> void:
 
 	# 检查是否包含击退特效
 	if damage.has_effect("KnockBackEffect"):
+		#damage.apply_effect(owner_node, damage_source_position)
 		effects_applied.append("击退")
-		# 击退不需要特殊处理，velocity.x 已经被 KnockBackEffect 设置
 		# 重置定时器
 		if stun_timer and reset_on_damage:
 			stun_timer.start()

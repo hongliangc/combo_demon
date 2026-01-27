@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://brqqjp618jew8" path="res://Weapons/bullet/bubble/bubble_bullet.gd" id="1_n0ouu"]
 [ext_resource type="Texture2D" uid="uid://dsyrrxu8wclm4" path="res://Art/Bitlytic/blue_bubble.png" id="2_70vwq"]
-[ext_resource type="Script" uid="uid://dktngewwv7bxl" path="res://Weapons/bullet/bubble/hitbox.gd" id="3_70vwq"]
+[ext_resource type="Script" path="res://Util/Components/hitbox.gd" id="3_hitbox"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_n0ouu"]
 radius = 8.0
@@ -60,7 +60,9 @@ texture = ExtResource("2_70vwq")
 shape = SubResource("CircleShape2D_n0ouu")
 
 [node name="Hitbox" type="Area2D" parent="." groups=["player_bullet"]]
-script = ExtResource("3_70vwq")
+script = ExtResource("3_hitbox")
+destroy_owner_on_hit = true
+ignore_collision_groups = Array[String](["player_bullet"])
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("CircleShape2D_70vwq")

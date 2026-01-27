@@ -8,7 +8,7 @@ var attack_timer := 0.0
 var has_attacked := false
 
 func enter():
-	print("Boss: 进入特殊攻击状态")
+	# print("Boss: 进入特殊攻击状态")
 	attack_timer = special_attack_duration
 	has_attacked = false
 
@@ -54,7 +54,7 @@ func perform_special_attack():
 	if owner_node is not Boss:
 		return
 
-	print("Boss 执行特殊攻击！")
+	#print("Boss 执行特殊攻击！")
 
 	var boss = owner_node as Boss
 
@@ -126,7 +126,7 @@ func exit():
 	pass
 
 # 特殊攻击状态可以被打断（除了第三阶段）
-func on_damaged(damage: Damage):
+func on_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
 	if owner_node is not Boss:
 		return
 

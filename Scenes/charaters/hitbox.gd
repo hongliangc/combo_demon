@@ -7,11 +7,12 @@ func _ready() -> void:
 	# 玩家的 hitbox 直接使用 player.current_damage
 	area_entered.connect(_on_hitbox_area_entered_)
 
-## 玩家的伤害使用 player.current_damage，不需要随机化
+## 玩家的伤害使用 combat_component.current_damage，不需要随机化
 ## 重写基类方法，使用玩家配置的伤害数据
 func update_attack():
-	# 玩家的伤害从角色节点获取，支持动态切换技能
-	damage = player.current_damage
+	# 玩家的伤害从 CombatComponent 获取，支持动态切换技能
+	if player and player.combat_component:
+		damage = player.combat_component.current_damage
 
 # 建议子类覆盖该方法，然后get_owner().queue_free()
 func _on_hitbox_area_entered_(area: Area2D):
