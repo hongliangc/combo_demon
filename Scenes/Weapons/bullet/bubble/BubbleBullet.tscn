@@ -1,0 +1,76 @@
+[gd_scene load_steps=9 format=3 uid="uid://ckasmubexmp8i"]
+
+[ext_resource type="Script" uid="uid://dg6wjnib4rfd2" path="res://Scenes/Weapons/bullet/bubble/BubbleBullet.gd" id="1_n0ouu"]
+[ext_resource type="Texture2D" uid="uid://dsyrrxu8wclm4" path="res://Assets/Art/Bitlytic/blue_bubble.png" id="2_70vwq"]
+[ext_resource type="Script" uid="uid://c8wsmfs0k6c64" path="res://Core/Components/Hitbox.gd" id="3_hitbox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_n0ouu"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_70vwq"]
+radius = 9.0
+
+[sub_resource type="Animation" id="Animation_4mek4"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.000316107),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_6cfh5"]
+resource_name = "spawn"
+length = 0.2
+step = 0.02
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.08, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1.25, 1.25), Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qr4wk"]
+_data = {
+&"RESET": SubResource("Animation_4mek4"),
+&"spawn": SubResource("Animation_6cfh5")
+}
+
+[node name="BubbleBullet" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 217
+script = ExtResource("1_n0ouu")
+target_speed = 241.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_70vwq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_n0ouu")
+
+[node name="Hitbox" type="Area2D" parent="." groups=["player_bullet"]]
+script = ExtResource("3_hitbox")
+destroy_owner_on_hit = true
+ignore_collision_groups = Array[String](["player_bullet"])
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_70vwq")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_qr4wk")
+}
+
+[connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

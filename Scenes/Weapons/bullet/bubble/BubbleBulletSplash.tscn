@@ -1,0 +1,33 @@
+[gd_scene load_steps=6 format=3 uid="uid://c28b2jm65q08h"]
+
+[ext_resource type="Texture2D" uid="uid://dsyrrxu8wclm4" path="res://Assets/Art/Bitlytic/blue_bubble.png" id="1_tth1i"]
+[ext_resource type="Script" uid="uid://cq1yocxgrt3p4" path="res://Scenes/Weapons/bullet/bubble/BubbleBulletSplash.gd" id="2_d6vjn"]
+
+[sub_resource type="Curve" id="Curve_d6vjn"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_spl44"]
+curve = SubResource("Curve_d6vjn")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_32kvl"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 2.0
+spread = 180.0
+initial_velocity_min = 25.0
+initial_velocity_max = 25.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.25
+scale_max = 0.5
+scale_curve = SubResource("CurveTexture_spl44")
+
+[node name="BubbleBulletSplash" type="GPUParticles2D"]
+emitting = false
+amount = 3
+texture = ExtResource("1_tth1i")
+one_shot = true
+explosiveness = 0.75
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_32kvl")
+script = ExtResource("2_d6vjn")

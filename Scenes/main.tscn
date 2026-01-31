@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=4 uid="uid://cdmur7sotg8hq"]
 
-[ext_resource type="Texture2D" uid="uid://cyr2m6q5pv84" path="res://Art/RGS_Dev/tileset_brown.png" id="1_jjgbg"]
-[ext_resource type="PackedScene" uid="uid://ddmbjbw8i7pdh" path="res://Scenes/enemies/dinosaur/dinosaur.tscn" id="2_8gbba"]
-[ext_resource type="Script" uid="uid://b34qgb28vtpb7" path="res://Scenes/common_script/player_spawn.gd" id="3_jjvhh"]
-[ext_resource type="PackedScene" uid="uid://c3t7jfi7hqekh" path="res://Scenes/enemies/boss/boss.tscn" id="4_jjvhh"]
+[ext_resource type="Texture2D" uid="uid://cyr2m6q5pv84" path="res://Assets/Art/RGS_Dev/tileset_brown.png" id="1_jjgbg"]
+[ext_resource type="PackedScene" uid="uid://cvohapsnl617g" path="res://Scenes/Characters/Enemies/dinosaur/Dinosaur.tscn" id="2_8gbba"]
+[ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="3_jjvhh"]
+[ext_resource type="PackedScene" uid="uid://cqu5qcubrlemt" path="res://Scenes/Characters/Enemies/boss/Boss.tscn" id="4_jjvhh"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
 texture = ExtResource("1_jjgbg")

@@ -14,7 +14,15 @@
       "Bash(grep:*)",
       "Bash(done)",
       "Bash(timeout /t 3 /nobreak)",
-      "Bash(godot --headless --check-only --script:*)"
+      "Bash(godot --headless --check-only --script:*)",
+      "Bash(awk:*)",
+      "Bash(xargs sed:*)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(xargs:*)",
+      "Bash(while read f)",
+      "Bash(do echo \"$f\")",
+      "Bash(do basename \"$f\")",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

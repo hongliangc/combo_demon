@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Damage" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Core/Resources/Damage.gd" id="1_damage"]
+
+[resource]
+script = ExtResource("1_damage")
+max_amount = 30.0
+min_amount = 20.0
+amount = 25.0
+effects = Array[Resource]([])

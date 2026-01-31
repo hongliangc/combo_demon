@@ -29,6 +29,13 @@ description: Godot 4.x 核心架构原则。当设计、审查 Godot 组件和�
 - 不为未来需求预先设计
 - 代码自解释，复杂逻辑才加注释
 
+### 5. 继承与钩子方法
+- **通用逻辑放基类**：所有可复用逻辑在基类实现
+- **提供钩子方法**：基类提供可重写的钩子方法，让子类定制行为
+- **子类最小化重写**：子类只重写必要的钩子方法，不复制基类代码
+- **信号连接在基类**：信号连接只在基类 `_ready()` 中进行，子类不要重复连接
+- **避免覆盖 _ready()**：子类尽量不覆盖 `_ready()`，如需覆盖必须调用 `super()`
+
 ## 组件模式示例
 
 ### 基础组件模板
@@ -73,9 +80,49 @@ class_name Damage
 @export var stun_duration: float = 0.0
 ```
 
+### 钩子方法模式
+```gdscript
+# 基类 - 提供钩子方法
+class_name Hitbox
+extends Area2D
+
+## 钩子方法：子类可重写以定制伤害获取逻辑
+func update_attack() -> void:
+    if damage:
+        damage.randomize_damage()
+
+## 钩子方法：子类可重写以返回正确的攻击者位置
+func get_attacker_position() -> Vector2:
+    return global_position
+
+## 通用逻辑在基类实现，调用钩子方法
+func _on_hitbox_area_entered_(area: Area2D) -> void:
+    update_attack()
+    if area is Hurtbox:
+        area.take_damage(damage, get_attacker_position())
+```
+
+```gdscript
+# 子类 - 只重写钩子方法
+class_name PlayerHitbox
+extends Hitbox
+
+@onready var player: Hahashin = get_owner()
+
+## 重写：从 CombatComponent 获取伤害
+func update_attack() -> void:
+    damage = player.combat_component.current_damage
+
+## 重写：返回玩家位置
+func get_attacker_position() -> Vector2:
+    return player.global_position
+```
+
 ## 架构检查要点
 
 - **通用性**：是否使用 `@export` 配置化？能否跨场景复用？
 - **模块化**：是否单一职责？是否用信号解耦？
 - **可复用性**：是否有清晰接口？Resource 类是否正确使用？
 - **简洁性**：是否避免过度设计？代码是否自解释？
+- **继承设计**：基类是否提供钩子方法？子类是否只重写必要方法？
+- **信号连接**：子类是否重复连接了基类已连接的信号？是否遗漏 `super()` 调用？

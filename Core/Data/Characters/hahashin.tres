@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Core/Resources/CharacterData.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = "hahashin"
+display_name = "哈哈辛"
+description = "一位敏捷的战士，擅长近战连击攻击。拥有出色的机动性和多样的攻击组合。"
+scene_path = "res://Scenes/Characters/Player/Hahashin.tscn"
+base_health = 100.0
+base_speed = 100.0
+base_damage = 10.0
+tags = ["melee", "warrior", "agile"]
+is_unlocked = true

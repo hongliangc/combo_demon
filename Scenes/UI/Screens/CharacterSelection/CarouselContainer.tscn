@@ -1,0 +1,76 @@
+[gd_scene load_steps=3 format=3 uid="uid://df0tkcbghm7tt"]
+
+[ext_resource type="Script" uid="uid://bv1ljli5rujfx" path="res://Scenes/UI/Screens/CharacterSelection/CarouselContainer.gd" id="1_pbvg6"]
+[ext_resource type="PackedScene" uid="uid://dg7wadi4prd3p" path="res://Scenes/UI/Screens/CharacterSelection/CharacterCard.tscn" id="2_hvkyt"]
+
+[node name="CarouselContainer" type="Node2D" node_paths=PackedStringArray("position_offset_node")]
+script = ExtResource("1_pbvg6")
+selected_index = 3
+position_offset_node = NodePath("Control")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -829.936
+offset_right = -829.936
+
+[node name="CharacterCard" parent="Control" instance=ExtResource("2_hvkyt")]
+modulate = Color(1, 1, 1, 4.85894e-13)
+z_index = 97
+layout_mode = 0
+offset_top = -150.0
+offset_bottom = 150.0
+scale = Vector2(0.25, 0.25)
+mouse_filter = 2
+
+[node name="CharacterCard2" parent="Control" instance=ExtResource("2_hvkyt")]
+modulate = Color(1, 1, 1, 0.3)
+z_index = 98
+layout_mode = 0
+offset_left = 240.0
+offset_top = -150.0
+offset_right = 460.0
+offset_bottom = 150.0
+scale = Vector2(0.5, 0.5)
+mouse_filter = 2
+
+[node name="CharacterCard3" parent="Control" instance=ExtResource("2_hvkyt")]
+modulate = Color(1, 1, 1, 0.65)
+z_index = 99
+layout_mode = 0
+offset_left = 480.0
+offset_top = -150.0
+offset_right = 700.001
+offset_bottom = 150.0
+scale = Vector2(0.75, 0.75)
+mouse_filter = 2
+
+[node name="CharacterCard4" parent="Control" instance=ExtResource("2_hvkyt")]
+z_index = 100
+layout_mode = 0
+offset_left = 720.001
+offset_top = -150.0
+offset_right = 940.001
+offset_bottom = 150.0
+focus_mode = 2
+
+[node name="left" type="Button" parent="."]
+offset_left = -470.0
+offset_top = 205.0
+offset_right = -270.0
+offset_bottom = 275.0
+text = "left
+"
+
+[node name="right" type="Button" parent="."]
+offset_left = 226.0
+offset_top = 205.0
+offset_right = 426.0
+offset_bottom = 275.0
+text = "right
+"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[connection signal="pressed" from="left" to="." method="_left"]
+[connection signal="pressed" from="right" to="." method="_right"]

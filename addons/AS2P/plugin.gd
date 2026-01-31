@@ -1,7 +1,7 @@
 @tool
 extends EditorPlugin
 
-const Convertor = preload("res://addons/AS2P/InspectorConvertor.gd")
+const Convertor = preload("res://Addons/AS2P/InspectorConvertor.gd")
 
 var plugin: Convertor
 

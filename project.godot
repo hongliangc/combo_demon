@@ -11,18 +11,18 @@ config_version=5
 [application]
 
 config/name="combo_demon"
-run/main_scene="uid://cdmur7sotg8hq"
+run/main_scene="res://Scenes/main.tscn"
 config/features=PackedStringArray("4.4", "Mobile")
 config/icon="res://icon.svg"
 
 [autoload]
 
-UIManager="*res://Util/UI/Core/ui_manager.gd"
-GameManager="*res://Util/AutoLoad/game_manager.gd"
-SoundManager="*res://Util/AutoLoad/sound_manager.gd"
-DamageNumbers="*res://Util/AutoLoad/damage_numbers.gd"
-DebugConfig="*res://Util/AutoLoad/debug_config.gd"
-TimeManager="*res://Util/Autoloads/TimeManager.gd"
+UIManager="*res://Scenes/UI/Core/UIManager.gd"
+GameManager="*res://Core/Autoloads/GameManager.gd"
+SoundManager="*res://Core/Autoloads/SoundManager.gd"
+DamageNumbers="*res://Core/Autoloads/DamageNumbers.gd"
+DebugConfig="*res://Core/Autoloads/DebugConfig.gd"
+TimeManager="*res://Core/Autoloads/TimeManager.gd"
 
 [display]
 
@@ -30,17 +30,14 @@ window/stretch/mode="viewport"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/AS2P/plugin.cfg")
+enabled=PackedStringArray("res://Addons/AS2P/plugin.cfg")
 
 [file_customization]
 
 folder_colors={
-"res://Art/": "red",
-"res://Scenes/": "orange",
-"res://Shader/": "yellow",
-"res://Sound/": "green",
-"res://Util/": "blue",
-"res://Weapons/": "purple"
+"res://Assets/": "red",
+"res://Core/": "blue",
+"res://Scenes/": "orange"
 }
 
 [input]

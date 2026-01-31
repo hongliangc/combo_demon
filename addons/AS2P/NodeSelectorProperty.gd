@@ -178,5 +178,5 @@ func add_animation(anim_sprite: NodePath, anim: String, sprite_frames: SpriteFra
 
 	return updated
 
-func get_tooltip_text():
+func _get_tooltip(_at_position: Vector2) -> String:
 	return "AnimationSprite node to import frames from."

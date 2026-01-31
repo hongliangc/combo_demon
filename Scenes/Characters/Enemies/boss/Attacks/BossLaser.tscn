@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://cvx8p4n2mh1ld"]
+
+[ext_resource type="Script" uid="uid://ph86l6ehrxob" path="res://Scenes/Characters/Enemies/boss/Attacks/BossLaser.gd" id="1_script"]
+
+[sub_resource type="Curve" id="Curve_laser_width"]
+_data = [Vector2(0, 0.2), 0.0, 0.0, 0, 0, Vector2(1, 0.2), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_laser"]
+size = Vector2(500, 20)
+
+[node name="BossLaser" type="Node2D"]
+position = Vector2(595, 337)
+script = ExtResource("1_script")
+laser_length = 501.0
+
+[node name="LaserLine" type="Line2D" parent="."]
+points = PackedVector2Array(0, 0, 500, 0)
+width_curve = SubResource("Curve_laser_width")
+default_color = Color(1, 0, 0, 0.8)
+
+[node name="HitboxArea" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxArea"]
+position = Vector2(250, 0)
+shape = SubResource("RectangleShape2D_laser")
