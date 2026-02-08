@@ -1,0 +1,215 @@
+[gd_scene load_steps=29 format=3 uid="uid://cforestboar01"]
+
+[ext_resource type="Script" uid="uid://cbhw4q2rokly8" path="res://Scenes/Characters/Enemies/ForestBoar/ForestBoar.gd" id="1_boar"]
+[ext_resource type="Texture2D" uid="uid://dnet8nm0rwid8" path="res://Assets/Art/HighForest/Mob/Boar/Idle/Idle-Sheet.png" id="2_idle"]
+[ext_resource type="Texture2D" uid="uid://d6ucaibhfaqy" path="res://Assets/Art/HighForest/Mob/Boar/Run/Run-Sheet.png" id="4_run"]
+[ext_resource type="Texture2D" uid="uid://b5q0wuf16jyhr" path="res://Assets/Art/HighForest/Mob/Boar/Hit-Vanish/Hit-Sheet.png" id="5_hit"]
+[ext_resource type="Texture2D" uid="uid://cuqe7qfxwqybn" path="res://Assets/Art/HighForest/Mob/Boar/Walk/Walk-Base-Sheet.png" id="6_walk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(32, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(36, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nauev"]
+atlas = ExtResource("5_hit")
+region = Rect2(0, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wfwgc"]
+atlas = ExtResource("5_hit")
+region = Rect2(48, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_73yi1"]
+atlas = ExtResource("5_hit")
+region = Rect2(96, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d2lak"]
+atlas = ExtResource("5_hit")
+region = Rect2(144, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6t8hf"]
+atlas = ExtResource("2_idle")
+region = Rect2(0, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ia0rv"]
+atlas = ExtResource("2_idle")
+region = Rect2(48, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jursk"]
+atlas = ExtResource("2_idle")
+region = Rect2(96, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rpadi"]
+atlas = ExtResource("2_idle")
+region = Rect2(144, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_immcn"]
+atlas = ExtResource("4_run")
+region = Rect2(0, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b0hdw"]
+atlas = ExtResource("4_run")
+region = Rect2(48, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kbt0a"]
+atlas = ExtResource("4_run")
+region = Rect2(96, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0enro"]
+atlas = ExtResource("4_run")
+region = Rect2(144, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_764yg"]
+atlas = ExtResource("4_run")
+region = Rect2(192, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j6s36"]
+atlas = ExtResource("4_run")
+region = Rect2(240, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk1"]
+atlas = ExtResource("6_walk")
+region = Rect2(0, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk2"]
+atlas = ExtResource("6_walk")
+region = Rect2(48, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk3"]
+atlas = ExtResource("6_walk")
+region = Rect2(96, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk4"]
+atlas = ExtResource("6_walk")
+region = Rect2(144, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk5"]
+atlas = ExtResource("6_walk")
+region = Rect2(192, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk6"]
+atlas = ExtResource("6_walk")
+region = Rect2(240, 0, 48, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_boar"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nauev")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wfwgc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_73yi1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d2lak")
+}],
+"loop": false,
+"name": &"hit",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6t8hf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ia0rv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jursk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rpadi")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_immcn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b0hdw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kbt0a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0enro")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_764yg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j6s36")
+}],
+"loop": true,
+"name": &"run",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_walk1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_walk2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_walk3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_walk4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_walk5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_walk6")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 8.0
+}]
+
+[node name="ForestBoar" type="CharacterBody2D" groups=["enemy"]]
+collision_layer = 8
+collision_mask = 129
+script = ExtResource("1_boar")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -12)
+shape = SubResource("RectangleShape2D_body")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(0, -12)
+shape = SubResource("RectangleShape2D_hitbox")
+
+[node name="RayGround" type="RayCast2D" parent="."]
+position = Vector2(20, 0)
+target_position = Vector2(0, 20)
+
+[node name="RayWall" type="RayCast2D" parent="."]
+target_position = Vector2(25, 0)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -12)
+sprite_frames = SubResource("SpriteFrames_boar")
+animation = &"walk"
+autoplay = "idle"
+frame_progress = 0.727609
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -20.0
+offset_top = -35.0
+offset_right = 20.0
+offset_bottom = -30.0
+value = 100.0
+show_percentage = false

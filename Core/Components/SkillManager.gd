@@ -503,18 +503,16 @@ func _stun_enemy(enemy: Node) -> void:
 	# 强制切换到 stun 状态
 	var state_machine = _find_state_machine(enemy)
 	if state_machine:
-		var stun_state = state_machine.states.get("stun")
-
 		# 强制切换到 stun 状态
 		if state_machine.has_method("force_transition"):
 			state_machine.force_transition("stun")
 			DebugConfig.debug("眩晕敌人: %s 强制切换到stun状态" % enemy.name, "", "effect")
 
 			# 关键：停止stun状态的自动恢复timer，防止敌人在V技能结束前恢复
-			# 需要重新获取stun_state，因为force_transition后状态已经enter()
-			stun_state = state_machine.states.get("stun")
-			if stun_state and "stun_timer" in stun_state and stun_state.stun_timer:
-				stun_state.stun_timer.stop()
+			# 重新获取stun_state，因为force_transition后状态已经enter()
+			var stun_state = state_machine.states.get("stun")
+			if stun_state and stun_state.has_method("stop_timer"):
+				stun_state.stop_timer()
 				DebugConfig.debug("停止 %s 的stun timer，等待V技能结束" % enemy.name, "", "effect")
 		else:
 			DebugConfig.warning("状态机没有 force_transition 方法: %s" % enemy.name, "", "effect")
@@ -538,18 +536,11 @@ func _unstun_enemy(enemy: Node) -> void:
 	if not is_instance_valid(enemy):
 		return
 
-	# 恢复移动能力
-	if "can_move" in enemy:
-		enemy.can_move = true
-
-	# 查找状态机并重启 stun timer
+	# 查找状态机并调用恢复方法
 	var state_machine = _find_state_machine(enemy)
-	if state_machine:
-		var stun_state = state_machine.states.get("stun")
-		if stun_state and "stun_timer" in stun_state and stun_state.stun_timer:
-			# 重启 timer，让敌人自然恢复
-			stun_state.stun_timer.start()
-			DebugConfig.debug("重启 %s 的 stun timer" % enemy.name, "", "effect")
+	if state_machine and state_machine.has_method("recover_from_stun"):
+		state_machine.recover_from_stun()
+		DebugConfig.debug("恢复敌人: %s" % enemy.name, "", "effect")
 
 ## 查找目标的状态机节点（用于眩晕控制）
 func _find_state_machine(target: Node) -> Node:

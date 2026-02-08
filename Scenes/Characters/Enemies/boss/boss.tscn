@@ -1,27 +1,26 @@
 [gd_scene load_steps=27 format=3 uid="uid://cqu5qcubrlemt"]
 
-[ext_resource type="Script" uid="uid://c4vwkhayrop5f" path="res://Scenes/Characters/Enemies/boss/Scripts/Boss.gd" id="1_boss"]
+[ext_resource type="Script" uid="uid://c4vwkhayrop5f" path="res://Scenes/Characters/Enemies/Boss/Scripts/Boss.gd" id="1_boss"]
 [ext_resource type="Texture2D" uid="uid://d2mr0oginn5kf" path="res://Assets/Art/Ninja_Adventure/Actor/Boss/DemonCyclop/Sprite.png" id="2_sprite"]
-[ext_resource type="Script" uid="uid://do3eyt0kvgbl2" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossStateMachine.gd" id="3_statemachine"]
-[ext_resource type="Script" uid="uid://cugytepllupd0" path="res://Scenes/Characters/Enemies/boss/Scripts/BossAttackManager.gd" id="4_attackmanager"]
-[ext_resource type="PackedScene" uid="uid://bqw7xc3ykn8r1" path="res://Scenes/Characters/Enemies/boss/Attacks/BossProjectile.tscn" id="5_projectile"]
-[ext_resource type="PackedScene" uid="uid://cvx8p4n2mh1ld" path="res://Scenes/Characters/Enemies/boss/Attacks/BossLaser.tscn" id="6_laser"]
-[ext_resource type="PackedScene" uid="uid://d0ow3j5sx53nq" path="res://Scenes/Characters/Enemies/boss/Attacks/BossAoe.tscn" id="7_aoe"]
-[ext_resource type="Resource" uid="uid://blfx5oww3g2r4" path="res://Scenes/Characters/Enemies/boss/Resources/BossProjectileDamage.tres" id="8_proj_dmg"]
-[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/boss/Resources/BossLaserDamage.tres" id="9_laser_dmg"]
-[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/boss/Resources/BossAoeDamage.tres" id="10_aoe_dmg"]
-[ext_resource type="Script" uid="uid://cgmwp25e3hbwy" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossIdle.gd" id="11_idle"]
-[ext_resource type="Script" uid="uid://d1g6tjh1c6c8r" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossPatrol.gd" id="12_patrol"]
-[ext_resource type="Script" uid="uid://b4gclxub8a2pv" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossChase.gd" id="13_chase"]
-[ext_resource type="Script" uid="uid://cls180jwdct2v" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossCircle.gd" id="14_circle"]
-[ext_resource type="Script" uid="uid://b52hi0ynhj6yf" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossAttack.gd" id="15_attack"]
-[ext_resource type="Script" uid="uid://d3rrlgdbbgerj" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossRetreat.gd" id="16_retreat"]
-[ext_resource type="Script" uid="uid://bdwlrfjvq2fiw" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossStun.gd" id="17_stun"]
-[ext_resource type="Script" uid="uid://b0y33arqsugby" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossEnrage.gd" id="18_enrage"]
-[ext_resource type="Script" uid="uid://dppt8hsh15huj" path="res://Scenes/Characters/Enemies/boss/Scripts/States/BossSpecialAttack.gd" id="19_special"]
+[ext_resource type="Script" uid="uid://do3eyt0kvgbl2" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossStateMachine.gd" id="3_statemachine"]
+[ext_resource type="Script" uid="uid://cugytepllupd0" path="res://Scenes/Characters/Enemies/Boss/Scripts/BossAttackManager.gd" id="4_attackmanager"]
+[ext_resource type="PackedScene" uid="uid://bqw7xc3ykn8r1" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossProjectile.tscn" id="5_projectile"]
+[ext_resource type="PackedScene" uid="uid://cvx8p4n2mh1ld" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossLaser.tscn" id="6_laser"]
+[ext_resource type="PackedScene" uid="uid://d0ow3j5sx53nq" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossAoe.tscn" id="7_aoe"]
+[ext_resource type="Resource" uid="uid://blfx5oww3g2r4" path="res://Scenes/Characters/Enemies/Boss/Resources/BossProjectileDamage.tres" id="8_proj_dmg"]
+[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Boss/Resources/BossLaserDamage.tres" id="9_laser_dmg"]
+[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Boss/Resources/BossAoeDamage.tres" id="10_aoe_dmg"]
+[ext_resource type="Script" uid="uid://cgmwp25e3hbwy" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossIdle.gd" id="11_idle"]
+[ext_resource type="Script" uid="uid://d1g6tjh1c6c8r" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossPatrol.gd" id="12_patrol"]
+[ext_resource type="Script" uid="uid://b4gclxub8a2pv" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossChase.gd" id="13_chase"]
+[ext_resource type="Script" uid="uid://cls180jwdct2v" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossCircle.gd" id="14_circle"]
+[ext_resource type="Script" uid="uid://b52hi0ynhj6yf" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossAttack.gd" id="15_attack"]
+[ext_resource type="Script" uid="uid://d3rrlgdbbgerj" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossRetreat.gd" id="16_retreat"]
+[ext_resource type="Script" uid="uid://bdwlrfjvq2fiw" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossStun.gd" id="17_stun"]
+[ext_resource type="Script" uid="uid://b0y33arqsugby" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossEnrage.gd" id="18_enrage"]
+[ext_resource type="Script" uid="uid://dppt8hsh15huj" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossSpecialAttack.gd" id="19_special"]
 [ext_resource type="Script" uid="uid://5jjwbr0mlmjx" path="res://Core/Components/Hurtbox.gd" id="20_hurtbox"]
 [ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="21_health"]
-[ext_resource type="Script" uid="uid://fpm3llvwrbpm" path="res://Scenes/Characters/Enemies/dinosaur/Scripts/EnemyHealthBar.gd" id="22_healthbar"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_collision"]
 size = Vector2(48, 64)
@@ -34,6 +33,14 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill"]
 bg_color = Color(0.8, 0.1, 0.1, 1)
+
+[sub_resource type="GDScript" id="GDScript_boss_healthbar"]
+script/source = "extends ProgressBar
+
+func on_health_changed(current_health: float, max_health: float) -> void:
+	if max_health > 0:
+		value = current_health / max_health
+"
 
 [node name="Boss" type="CharacterBody2D" groups=["enemy"]]
 collision_layer = 8
@@ -80,7 +87,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
 max_value = 1.0
 value = 1.0
 show_percentage = false
-script = ExtResource("22_healthbar")
+script = SubResource("GDScript_boss_healthbar")
 
 [node name="BossAttackManager" type="Node" parent="."]
 script = ExtResource("4_attackmanager")

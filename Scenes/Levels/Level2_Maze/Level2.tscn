@@ -1,0 +1,118 @@
+[gd_scene load_steps=13 format=4 uid="uid://clevel2ma0e"]
+
+[ext_resource type="Script" uid="uid://bvvvwnn1xg6rq" path="res://Scenes/Levels/Level2_Maze/Level2.gd" id="1_level"]
+[ext_resource type="Texture2D" uid="uid://brwots7x3rhye" path="res://Assets/Art/HighForest/Assets/Tiles.png" id="2_tiles"]
+[ext_resource type="Texture2D" uid="uid://crjfjiyaqtnk2" path="res://Assets/Art/HighForest/Background/Background.png" id="3_bg"]
+[ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="4_spawn"]
+[ext_resource type="PackedScene" uid="uid://dh5collect001" path="res://Scenes/Levels/Components/Collectible.tscn" id="5_key"]
+[ext_resource type="PackedScene" uid="uid://bw6whsmmu4ism" path="res://Scenes/Levels/Components/MazeDoor.tscn" id="6_door"]
+[ext_resource type="PackedScene" uid="uid://dh5portal001" path="res://Scenes/Levels/Components/Portal.tscn" id="7_portal"]
+[ext_resource type="PackedScene" uid="uid://bw51dsuf1pism" path="res://Scenes/Levels/Components/LevelHUD.tscn" id="8_hud"]
+[ext_resource type="PackedScene" uid="uid://cforestboar01" path="res://Scenes/Characters/Enemies/ForestBoar/ForestBoar.tscn" id="9_boar"]
+[ext_resource type="PackedScene" uid="uid://d4fp6s833uuea" path="res://Scenes/Characters/Enemies/ForestSnail/ForestSnail.tscn" id="10_snail"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_maze"]
+texture = ExtResource("2_tiles")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:1/0 = 0
+1:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+3:1/0 = 0
+3:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[sub_resource type="TileSet" id="TileSet_maze"]
+physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 0
+sources/0 = SubResource("TileSetAtlasSource_maze")
+
+[node name="Level2" type="Node2D" groups=["level"]]
+script = ExtResource("1_level")
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.3, 0.3)
+
+[node name="Background" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
+modulate = Color(0.4, 0.5, 0.6, 1)
+position = Vector2(640, 300)
+scale = Vector2(4, 4)
+texture = ExtResource("3_bg")
+
+[node name="TileMap" type="Node2D" parent="."]
+
+[node name="Ground" type="TileMapLayer" parent="TileMap" groups=["tilemap"]]
+tile_map_data = PackedByteArray("AAD8/xkAAAABAAAA/f8ZAAAAAQAAAP7/GQAAAAEAAAAvABsAAAABAAAAMAAbAAAAAQACABsAAAABAAAAAwAbAAAAAQAAAC4AGwAAAAcAGwAAAAEAAAAIABsAAAABAAAACQAAAA0AGwAAAAEAAAAOABsAAAABAAAADwAAABMAGwAAAAEAAAAUABsAAAABAAAAFQAAABkAGwAAAAEAAAAaABsAAAABAAAAGwAAAB8AGwAAAAEAAAAgABsAAAABAAAAIQAAACUAGwAAAAEAAAAmABsAAAABAAAAJwAAACsAGwAAAAEAAAAsABsAAAABAAAALQAAADEAGwAAAAEAAAA=")
+tile_set = SubResource("TileSet_maze")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(400, 350)
+zoom = Vector2(2, 2)
+limit_left = 0
+limit_bottom = 500
+
+[node name="PlayerSpawn" type="Node2D" parent="." groups=["player_spawn"]]
+position = Vector2(32, 400)
+script = ExtResource("4_spawn")
+
+[node name="Keys" type="Node2D" parent="."]
+
+[node name="Key1" parent="Keys" instance=ExtResource("5_key")]
+position = Vector2(150, 380)
+item_type = "key"
+
+[node name="Key2" parent="Keys" instance=ExtResource("5_key")]
+position = Vector2(350, 300)
+item_type = "key"
+
+[node name="Key3" parent="Keys" instance=ExtResource("5_key")]
+position = Vector2(550, 350)
+item_type = "key"
+
+[node name="Key4" parent="Keys" instance=ExtResource("5_key")]
+position = Vector2(750, 280)
+item_type = "key"
+
+[node name="Key5" parent="Keys" instance=ExtResource("5_key")]
+position = Vector2(950, 350)
+item_type = "key"
+
+[node name="Doors" type="Node2D" parent="."]
+
+[node name="Door1" parent="Doors" instance=ExtResource("6_door")]
+position = Vector2(280, 410)
+
+[node name="Door2" parent="Doors" instance=ExtResource("6_door")]
+position = Vector2(480, 410)
+
+[node name="Door3" parent="Doors" instance=ExtResource("6_door")]
+position = Vector2(680, 410)
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Boar1" parent="Enemies" instance=ExtResource("9_boar")]
+position = Vector2(200, 430)
+
+[node name="Boar2" parent="Enemies" instance=ExtResource("9_boar")]
+position = Vector2(600, 430)
+
+[node name="Snail1" parent="Enemies" instance=ExtResource("10_snail")]
+position = Vector2(400, 430)
+
+[node name="Snail2" parent="Enemies" instance=ExtResource("10_snail")]
+position = Vector2(800, 430)
+
+[node name="Portal" parent="." instance=ExtResource("7_portal")]
+position = Vector2(1150, 400)
+
+[node name="LevelHUD" parent="." instance=ExtResource("8_hud")]

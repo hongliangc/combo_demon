@@ -6,6 +6,11 @@ extends BossState
 
 var target_patrol_point: Vector2
 
+func _init():
+	priority = StatePriority.BEHAVIOR
+	can_be_interrupted = true
+	animation_state = "patrol"
+
 func enter():
 	#print("Boss: 进入巡逻状态")
 	if owner_node is Boss:

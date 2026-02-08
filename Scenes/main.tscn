@@ -1,9 +1,9 @@
 [gd_scene load_steps=7 format=4 uid="uid://cdmur7sotg8hq"]
 
 [ext_resource type="Texture2D" uid="uid://cyr2m6q5pv84" path="res://Assets/Art/RGS_Dev/tileset_brown.png" id="1_jjgbg"]
-[ext_resource type="PackedScene" uid="uid://cvohapsnl617g" path="res://Scenes/Characters/Enemies/dinosaur/Dinosaur.tscn" id="2_8gbba"]
+[ext_resource type="PackedScene" uid="uid://c517jke1rqtk1" path="res://Scenes/Characters/Enemies/Dinosaur/Dinosaur.tscn" id="2_8gbba"]
 [ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="3_jjvhh"]
-[ext_resource type="PackedScene" uid="uid://cqu5qcubrlemt" path="res://Scenes/Characters/Enemies/boss/Boss.tscn" id="4_jjvhh"]
+[ext_resource type="PackedScene" uid="uid://cqu5qcubrlemt" path="res://Scenes/Characters/Enemies/Boss/Boss.tscn" id="4_jjvhh"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
 texture = ExtResource("1_jjgbg")
@@ -277,13 +277,16 @@ script = ExtResource("3_jjvhh")
 [node name="Enemies" type="Node" parent="."]
 
 [node name="Enemy" parent="Enemies" instance=ExtResource("2_8gbba")]
+position = Vector2(100, 50)
 max_health = 100000
 health = 100000
-wander_speed = 0.0
-
-[node name="Enemy2" parent="Enemies" instance=ExtResource("2_8gbba")]
-
-[node name="Enemy3" parent="Enemies" instance=ExtResource("2_8gbba")]
+min_wander_time = null
+max_wander_time = null
+wander_speed = null
+detection_radius = null
+chase_radius = null
+follow_radius = null
+chase_speed = null
 
 [node name="Boss" parent="." instance=ExtResource("4_jjvhh")]
 position = Vector2(-70, -3)

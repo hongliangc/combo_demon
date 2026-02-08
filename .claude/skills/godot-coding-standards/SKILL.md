@@ -118,6 +118,29 @@ func get_attacker_position() -> Vector2:
     return player.global_position
 ```
 
+### 6. 编辑器配置优先原则
+- **所有 Node 派生对象优先在编辑器中创建和配置**，而非在代码中 `new()` 后 `add_child()`
+- **编辑器负责**：节点层级结构、节点属性默认值、节点间连接关系（AnimationTree 节点连接、信号连接等）
+- **代码负责**：运行时参数驱动（`set()`）、状态切换触发（`travel()`）、条件判断逻辑
+- **禁止在代码中**：创建节点对象再挂载到场景树，除非是确实需要动态生成的场景（如子弹、特效、敌人生成等运行时实例化场景）
+- **动态生成的正确方式**：通过 `preload` / `load` 加载 `.tscn` 场景后 `instantiate()`，而非手动 `new()` + 逐个设置属性
+- **好处**：可视化直观、易于调试、避免硬编码路径错误、减少代码复杂度
+
+```gdscript
+# ✅ 正确：编辑器配置节点，代码只控制参数
+func set_locomotion(blend_position: Vector2) -> void:
+    anim_tree.set("parameters/locomotion/blend_position", blend_position)
+
+# ✅ 正确：动态生成通过实例化场景
+var projectile = preload("res://Scenes/Projectile.tscn").instantiate()
+get_tree().current_scene.add_child(projectile)
+
+# ❌ 错误：代码中手动创建节点
+var sprite = Sprite2D.new()
+sprite.texture = load("res://icon.png")
+add_child(sprite)
+```
+
 ## 架构检查要点
 
 - **通用性**：是否使用 `@export` 配置化？能否跨场景复用？
@@ -126,3 +149,4 @@ func get_attacker_position() -> Vector2:
 - **简洁性**：是否避免过度设计？代码是否自解释？
 - **继承设计**：基类是否提供钩子方法？子类是否只重写必要方法？
 - **信号连接**：子类是否重复连接了基类已连接的信号？是否遗漏 `super()` 调用？
+- **编辑器优先**：是否有在代码中 `new()` Node 派生对象的情况？是否应该改为编辑器配置或场景实例化？

@@ -4,6 +4,12 @@ class_name BossState
 ## Boss 状态基类 - 直接继承 BaseState
 ## 提供 Boss 通用功能：攻击管理器访问、阶段判断、受伤响应
 
+func _init():
+	# 默认为行为层，子类可覆盖
+	priority = StatePriority.BEHAVIOR
+	can_be_interrupted = true
+	animation_state = "idle"
+
 ## 获取 Boss 的攻击管理器（子类共用）
 func get_attack_manager() -> BossAttackManager:
 	if owner_node is Boss:

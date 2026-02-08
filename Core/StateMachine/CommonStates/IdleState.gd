@@ -2,79 +2,88 @@ extends BaseState
 
 ## 通用 Idle 状态
 ## 适用于所有需要待机状态的实体
-## 可通过导出参数自定义行为
+## 支持定时转换和玩家检测
 
-## 动画设置
-@export var idle_animation := "idle"
+func _init():
+	priority = StatePriority.BEHAVIOR
+	can_be_interrupted = true
+	animation_state = "idle"
 
-## 时间设置
+# ============ 时间设置 ============
+@export_group("时间设置")
+## 最小待机时间
 @export var min_idle_time := 1.0
+## 最大待机时间
 @export var max_idle_time := 3.0
-@export var use_fixed_time := false  # 使用固定时间而非随机
+## 使用固定时间而非随机
+@export var use_fixed_time := false
 
-## 检测设置（优先使用 owner.detection_radius）
-@export var default_detection_radius := 100.0
+# ============ 检测设置 ============
+@export_group("检测设置")
+## 是否启用玩家检测
 @export var enable_player_detection := true
 
-## 状态转换设置
-@export var next_state_on_timeout := "wander"  # 超时后转换的状态 (如果为空则重新待机)
-@export var chase_state_name := "chase"  # 检测到玩家时转换的状态
+# ============ 状态转换 ============
+@export_group("状态转换")
+## 超时后转换的状态
+@export var next_state_on_timeout := "wander"
 
-## 移动设置
-@export var stop_movement := true  # 是否停止移动
-@export var deceleration_rate := 5.0  # 减速率 (如果不立即停止)
+# ============ 移动设置 ============
+@export_group("移动设置")
+## 是否立即停止移动
+@export var stop_immediately := true
+## 减速率（如果不立即停止）
+@export var deceleration_rate := 5.0
 
-var idle_timer := 0.0
 
 func enter() -> void:
 	# 设置待机时间
-	if use_fixed_time:
-		idle_timer = min_idle_time
-	else:
-		idle_timer = randf_range(min_idle_time, max_idle_time)
-
-	# 播放动画（如果 owner 有动画播放器）
-	if owner_node and owner_node.has_method("play_animation"):
-		owner_node.play_animation(idle_animation)
+	var duration = min_idle_time if use_fixed_time else randf_range(min_idle_time, max_idle_time)
+	start_timer(duration, _on_idle_timeout)
 
 	# 停止移动
-	if stop_movement and owner_node is CharacterBody2D:
-		(owner_node as CharacterBody2D).velocity = Vector2.ZERO
+	if stop_immediately:
+		stop_movement()
+
+	# 设置动画：idle 位置（0, 0）
+	set_locomotion(Vector2.ZERO)
 
 
 func physics_process_state(delta: float) -> void:
-	# 确保停止移动
-	if owner_node is CharacterBody2D:
-		var body = owner_node as CharacterBody2D
+	if owner_node is not CharacterBody2D:
+		return
 
-		if not stop_movement:
-			# 渐进减速（如果不是立即停止）
-			body.velocity = body.velocity.lerp(Vector2.ZERO, deceleration_rate * delta)
-		else:
-			# 立即停止：每帧强制设置velocity为ZERO，防止外部因素（如重力）修改velocity
-			body.velocity = Vector2.ZERO
+	var body = owner_node as CharacterBody2D
 
-		# 调用 move_and_slide() 来应用速度变化
-		body.move_and_slide()
+	if stop_immediately:
+		body.velocity = Vector2.ZERO
+	else:
+		decelerate_velocity(deceleration_rate, delta)
+
+	body.move_and_slide()
+
+	# 保持 locomotion 在 idle 位置
+	set_locomotion(Vector2.ZERO)
 
 
-func process_state(delta: float) -> void:
-	idle_timer -= delta
-
-	# 检测玩家（从 owner 获取检测半径或使用默认值）
-	if enable_player_detection and is_target_alive():
-		var radius: float = get_owner_property("detection_radius", default_detection_radius)
-		if is_target_in_range(radius):
-			transitioned.emit(self, chase_state_name)
+func process_state(_delta: float) -> void:
+	# 检测玩家
+	if enable_player_detection:
+		# 优先检查攻击范围：在攻击范围内直接进入攻击，跳过追击
+		if try_attack():
+			return
+		if try_chase():
 			return
 
-	# 待机时间结束
-	if idle_timer <= 0:
-		if next_state_on_timeout != "" and state_machine.states.has(next_state_on_timeout):
-			transitioned.emit(self, next_state_on_timeout)
-		else:
-			# 如果没有指定下一个状态，重新待机
-			if use_fixed_time:
-				idle_timer = min_idle_time
-			else:
-				idle_timer = randf_range(min_idle_time, max_idle_time)
+
+func _on_idle_timeout() -> void:
+	if next_state_on_timeout != "":
+		transition_to(next_state_on_timeout)
+	else:
+		# 重新开始待机
+		var duration = min_idle_time if use_fixed_time else randf_range(min_idle_time, max_idle_time)
+		start_timer(duration, _on_idle_timeout)
+
+
+func exit() -> void:
+	stop_timer()

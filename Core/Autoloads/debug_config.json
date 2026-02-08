@@ -16,9 +16,8 @@
       "enabled": true,
       "min_level": "INFO"
     },
-
-    "Scenes/enemies/boss/": {
-      "enabled": true,
+    "Scenes/Characters/Enemies/boss/": {
+      "enabled": false,
       "min_level": "DEBUG"
     },
 
@@ -38,40 +37,6 @@
     },
 
     "Scenes/UI/": {
-      "enabled": true,
-      "min_level": "INFO"
-    }
-  },
-
-  "category_configs": {
-    "_comment": "功能分类的日志配置（可选，用于特定功能标签）",
-
-    "combat": {
-      "enabled": true,
-      "min_level": "INFO"
-    },
-
-    "state_machine": {
-      "enabled": false,
-      "min_level": "DEBUG"
-    },
-
-    "player": {
-      "enabled": true,
-      "min_level": "INFO"
-    },
-
-    "ai": {
-      "enabled": true,
-      "min_level": "DEBUG"
-    },
-
-    "ui": {
-      "enabled": true,
-      "min_level": "INFO"
-    },
-
-    "effect": {
       "enabled": true,
       "min_level": "INFO"
     }

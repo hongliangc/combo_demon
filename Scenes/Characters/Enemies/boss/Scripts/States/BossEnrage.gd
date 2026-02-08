@@ -5,6 +5,11 @@ extends BossState
 @export var enrage_speed_multiplier := 1.8
 @export var rapid_attack_cooldown := 0.5
 
+func _init():
+	priority = StatePriority.BEHAVIOR
+	can_be_interrupted = false  # 狂暴状态不可被打断
+	animation_state = "enrage"
+
 func enter():
 	pass
 	# print("Boss: 进入狂暴状态！！！")

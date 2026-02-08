@@ -33,6 +33,9 @@ var owner_node: Node
 ## Target 节点引用（通常是 Player）
 var target_node: Node
 
+## AnimationTree 节点引用（缓存供 BaseState.get_anim_tree() 使用）
+var anim_tree: AnimationTree
+
 # ============ 生命周期 ============
 func _ready() -> void:
 	# 获取 owner 节点（CharacterBody2D等）
@@ -51,6 +54,9 @@ func _ready() -> void:
 	# 延迟获取 target 节点，避免初始化顺序问题
 	if target_node_group != "":
 		call_deferred("_find_target_node")
+
+	# 缓存 AnimationTree 引用
+	_setup_animation_tree()
 
 	# 初始化状态字典
 	_setup_states()
@@ -101,6 +107,15 @@ func _setup_states() -> void:
 			child.state_machine = self
 
 
+## 缓存 AnimationTree 引用（供 BaseState.get_anim_tree() 使用）
+func _setup_animation_tree() -> void:
+	if not owner_node:
+		return
+	anim_tree = owner_node.get_node_or_null("AnimationTree")
+	if anim_tree:
+		anim_tree.active = true
+
+
 ## 设置信号连接（子类可重写）
 func _setup_signals() -> void:
 	# 连接 damaged 信号（如果 owner 有的话）
@@ -109,18 +124,34 @@ func _setup_signals() -> void:
 			owner_node.damaged.connect(_on_owner_damaged)
 
 
-## 状态转换处理
+## 状态转换处理（带优先级检查）
 func _on_state_transition(from_state: BaseState, new_state_name: String) -> void:
+	var state_name_str = str(current_state.name) if current_state else "null"
+
 	# 只处理当前状态的转换请求
 	if from_state != current_state:
+		var from_name = str(from_state.name) if from_state else "null"
+		print("[StateMachine] Ignoring transition from %s (current=%s)" % [from_name, state_name_str])
 		return
 
 	# 查找新状态
 	var new_state = states.get(new_state_name.to_lower())
 	if not new_state:
-		push_warning("[StateMachine] 状态 '%s' 不存在" % new_state_name)
+		print("[StateMachine] State '%s' not found, available: %s" % [new_state_name, states.keys()])
 		return
 
+	# 检查是否可以转换（优先级检查）
+	if current_state and not current_state.can_transition_to(new_state):
+		print("[StateMachine] Rejected: %s -> %s (priority: %d vs %d)" % [state_name_str, new_state_name, current_state.priority, new_state.priority])
+		return
+
+	print("[StateMachine] Transitioning: %s -> %s" % [state_name_str, new_state_name])
+	# 执行状态转换
+	_execute_transition(from_state, new_state)
+
+
+## 执行状态转换（内部方法）
+func _execute_transition(from_state: BaseState, new_state: BaseState) -> void:
 	# 退出当前状态
 	if current_state:
 		current_state.exit()
@@ -129,10 +160,10 @@ func _on_state_transition(from_state: BaseState, new_state_name: String) -> void
 	new_state.enter()
 	current_state = new_state
 
-	# 打印状态转换日志
+	# 状态转换日志（仅在调试模式下输出）
 	var owner_name = str(owner_node.name) if owner_node else "Unknown"
 	var from_name = str(from_state.name) if from_state else "None"
-	DebugConfig.debug("[%s StateMachine] %s -> %s" % [owner_name, from_name, new_state_name], "", "state_machine")
+	DebugConfig.debug("[%s] %s -> %s" % [owner_name, from_name, new_state.name], "", "state_machine")
 
 
 ## 当 owner 受到伤害时
@@ -141,9 +172,15 @@ func _on_owner_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO
 		current_state.on_damaged(damage, attacker_position)
 
 
-## 强制切换到指定状态（用于外部控制）
+## 强制切换到指定状态（忽略优先级检查，用于控制状态）
 func force_transition(new_state_name: String) -> void:
-	_on_state_transition(current_state, new_state_name)
+	var new_state = states.get(new_state_name.to_lower())
+	if not new_state:
+		push_warning("[StateMachine] 强制转换失败: 状态 '%s' 不存在" % new_state_name)
+		return
+
+	# 直接执行转换，不检查优先级
+	_execute_transition(current_state, new_state)
 
 
 ## 获取当前状态名称
@@ -154,6 +191,28 @@ func get_current_state_name() -> String:
 ## 检查是否处于某个状态
 func is_in_state(state_name: String) -> bool:
 	return current_state and current_state.name.to_lower() == state_name.to_lower()
+
+
+## 从眩晕状态恢复（供外部调用，如技能结束后）
+## 会停止 stun timer、重置 owner 的 stunned 标志、并转换到恢复状态
+func recover_from_stun() -> void:
+	# 停止当前状态的 timer（如果有）
+	if current_state and current_state.has_method("stop_timer"):
+		current_state.stop_timer()
+
+	# 重置 owner 的状态标志
+	if owner_node:
+		if "stunned" in owner_node:
+			owner_node.stunned = false
+		if "can_move" in owner_node:
+			owner_node.can_move = true
+
+	# 转换到恢复状态（优先 wander，其次 idle）
+	var recovery_state = "wander" if states.has("wander") else "idle"
+	if states.has(recovery_state):
+		force_transition(recovery_state)
+		DebugConfig.debug("[StateMachine] 从眩晕恢复 -> %s" % recovery_state, "", "state_machine")
+
 
 # ============ 工具方法 ============
 ## 检查 node 是否是当前场景树的祖先

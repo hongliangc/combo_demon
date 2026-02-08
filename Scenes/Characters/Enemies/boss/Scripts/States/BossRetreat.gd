@@ -16,6 +16,11 @@ var retreat_attack_timer := 0.0
 var escape_skill_cooldown := 0.0
 const ESCAPE_SKILL_CD := 3.0  # 脱困技能3秒CD
 
+func _init():
+	priority = StatePriority.BEHAVIOR
+	can_be_interrupted = true
+	animation_state = "retreat"
+
 func enter():
 	#print("Boss: 进入撤退状态")
 	retreat_timer = 0.0

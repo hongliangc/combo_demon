@@ -75,15 +75,17 @@ func take_damage(damage_data: Damage, attacker_position: Vector2 = Vector2.ZERO)
 	health -= damage_amount
 	health = max(0, health)
 
-	# 发出信号（先发信号，让监听者可以响应）
-	health_changed.emit(health, max_health)
-	damaged.emit(damage_data, attacker_position)
-
 	# 显示伤害数字
 	display_damage_number(damage_data)
 
-	# 应用攻击特效（击退、击飞等）
+	# 应用攻击特效（击退、击飞等）- 必须在发出 damaged 信号之前
+	# 因为状态机响应 damaged 信号时会设置 velocity=0，
+	# 如果先发信号再应用特效，击退速度会被覆盖
 	apply_attack_effects(damage_data, attacker_position)
+
+	# 发出信号（让状态机等监听者响应）
+	health_changed.emit(health, max_health)
+	damaged.emit(damage_data, attacker_position)
 
 	# 检查死亡
 	if health <= 0:

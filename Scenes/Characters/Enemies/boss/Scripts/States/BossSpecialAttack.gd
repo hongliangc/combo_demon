@@ -7,6 +7,11 @@ extends BossState
 var attack_timer := 0.0
 var has_attacked := false
 
+func _init():
+	priority = StatePriority.BEHAVIOR
+	can_be_interrupted = true  # 第1-2阶段可被打断，第3阶段在 on_damaged 中处理
+	animation_state = "special_attack"
+
 func enter():
 	# print("Boss: 进入特殊攻击状态")
 	attack_timer = special_attack_duration

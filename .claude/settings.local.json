@@ -22,7 +22,10 @@
       "Bash(while read f)",
       "Bash(do echo \"$f\")",
       "Bash(do basename \"$f\")",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "mcp__godot__run_project",
+      "mcp__godot__get_debug_output",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

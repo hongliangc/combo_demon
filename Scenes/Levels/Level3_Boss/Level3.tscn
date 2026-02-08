@@ -1,0 +1,87 @@
+[gd_scene load_steps=10 format=4 uid="uid://clevel3boss"]
+
+[ext_resource type="Script" uid="uid://dw13oybg3horx" path="res://Scenes/Levels/Level3_Boss/Level3.gd" id="1_level"]
+[ext_resource type="Texture2D" uid="uid://brwots7x3rhye" path="res://Assets/Art/HighForest/Assets/Tiles.png" id="2_tiles"]
+[ext_resource type="Texture2D" uid="uid://crjfjiyaqtnk2" path="res://Assets/Art/HighForest/Background/Background.png" id="3_bg"]
+[ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="4_spawn"]
+[ext_resource type="PackedScene" uid="uid://bw51dsuf1pism" path="res://Scenes/Levels/Components/LevelHUD.tscn" id="5_hud"]
+[ext_resource type="PackedScene" uid="uid://cqu5qcubrlemt" path="res://Scenes/Characters/Enemies/Boss/Boss.tscn" id="6_boss"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_boss"]
+texture = ExtResource("2_tiles")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:1/0 = 0
+1:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+3:1/0 = 0
+3:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[sub_resource type="TileSet" id="TileSet_boss"]
+physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 0
+sources/0 = SubResource("TileSetAtlasSource_boss")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(16, 400)
+
+[node name="Level3" type="Node2D" groups=["level"]]
+script = ExtResource("1_level")
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.2, 0.2)
+
+[node name="Background" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
+modulate = Color(0.6, 0.3, 0.3, 1)
+position = Vector2(400, 250)
+scale = Vector2(3, 3)
+texture = ExtResource("3_bg")
+
+[node name="TileMap" type="Node2D" parent="."]
+
+[node name="Ground" type="TileMapLayer" parent="TileMap" groups=["tilemap"]]
+tile_map_data = PackedByteArray("AAD4/xkAAAABAAAA+f8ZAAAAAQAAAP//GQAAAAEAGQAAAAEAAAAAAQAAAAAZAAAAAQAAAAACABsAAAABAAAAAwAbAAAAAQAAAAQAGwAAAAEAAAAdABsAAAABAAAA//8aAAAAAAAIABsAAAABAAAACQAbAAAAAQAAAAoAAAAOABsAAAABAAAADwAbAAAAAQAAABAAAAAUABsAAAABAAAAFQAbAAAAAQAAABYAAAAaABsAAAABAAAAGwAbAAAAAQAAABwAAAAgABsAAAABAAAA+P8aAAAAAQAAAPn/GgAAAAEAAAD6/xo=")
+tile_set = SubResource("TileSet_boss")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(300, 350)
+zoom = Vector2(2, 2)
+limit_left = 0
+limit_right = 600
+limit_bottom = 500
+
+[node name="PlayerSpawn" type="Node2D" parent="." groups=["player_spawn"]]
+position = Vector2(64, 400)
+script = ExtResource("4_spawn")
+
+[node name="Boss" parent="." instance=ExtResource("6_boss")]
+position = Vector2(450, 400)
+
+[node name="LevelHUD" parent="." instance=ExtResource("5_hud")]
+
+[node name="ArenaWalls" type="Node2D" parent="."]
+
+[node name="LeftWall" type="StaticBody2D" parent="ArenaWalls"]
+position = Vector2(-8, 300)
+collision_layer = 128
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ArenaWalls/LeftWall"]
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="RightWall" type="StaticBody2D" parent="ArenaWalls"]
+position = Vector2(608, 300)
+collision_layer = 128
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ArenaWalls/RightWall"]
+shape = SubResource("RectangleShape2D_wall")

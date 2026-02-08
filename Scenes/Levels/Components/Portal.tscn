@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://dh5portal001"]
+
+[ext_resource type="Script" path="res://Scenes/Levels/Components/Portal.gd" id="1_portal"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_portal"]
+radius = 32.0
+
+[node name="Portal" type="Area2D"]
+collision_layer = 64
+collision_mask = 2
+script = ExtResource("1_portal")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(2, 2)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_portal")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+color = Color(0.5, 0.8, 1, 1)
+energy = 0.5
+texture_scale = 2.0

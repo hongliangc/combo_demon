@@ -4,6 +4,11 @@ extends BossState
 
 @export var circle_speed_multiplier := 0.8
 
+func _init():
+	priority = StatePriority.BEHAVIOR
+	can_be_interrupted = true
+	animation_state = "circle"
+
 func enter():
 	pass
 	# print("Boss: 进入绕圈状态")

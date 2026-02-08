@@ -70,7 +70,14 @@ func start_game() -> void:
 		return
 
 	current_state = GameState.PLAYING
-	UIManager.transition_to_scene(main_scene, "fade")
+	# 使用LevelManager启动关卡系统
+	LevelManager.start_game()
+
+
+## 开始冒险模式（多关卡）
+func start_adventure() -> void:
+	current_state = GameState.PLAYING
+	LevelManager.start_game()
 
 
 ## 返回主菜单

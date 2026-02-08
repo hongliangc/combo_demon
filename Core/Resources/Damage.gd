@@ -22,9 +22,9 @@ static var _rng: RandomNumberGenerator = null
 @export var effects: Array[AttackEffect] = []
 
 ## 应用所有特效到目标敌人
-## @param enemy: 受到攻击的敌人节点
+## @param enemy: 受到攻击的敌人节点（Enemy 类型）
 ## @param damage_source_position: 伤害来源位置（用于计算击退方向等）
-func apply_effects(enemy: Enemy, damage_source_position: Vector2) -> void:
+func apply_effects(enemy: Node, damage_source_position: Vector2) -> void:
 	for effect in effects:
 		if effect != null:
 			effect.apply_effect(enemy, damage_source_position)

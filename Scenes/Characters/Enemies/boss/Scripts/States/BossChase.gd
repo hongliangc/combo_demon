@@ -7,6 +7,11 @@ extends BossState
 # 追击时攻击冷却计时器
 var chase_attack_timer := 0.0
 
+func _init():
+	priority = StatePriority.BEHAVIOR
+	can_be_interrupted = true
+	animation_state = "chase"
+
 func enter():
 	DebugConfig.debug("Boss: 进入追击状态", "", "ai")
 	chase_attack_timer = 0.0

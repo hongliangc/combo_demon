@@ -1,5 +1,4 @@
 extends CharacterBody2D
-class_name Enemy
 
 ## Enemy 基类 - 使用组件化架构
 ## 伤害处理由 HealthComponent 负责
@@ -37,10 +36,16 @@ var alive: bool = true
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var damage_numbers_anchor: Node2D = $DamageNumbersAnchor
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
+@onready var anim_tree: AnimationTree = $AnimationTree
 @onready var health_component: HealthComponent = $HealthComponent
 
 func _ready() -> void:
 	sprite.texture = textures.pick_random()
+
+	# 激活 AnimationTree
+	if anim_tree:
+		anim_tree.active = true
+
 	_setup_signals()
 
 ## 设置信号连接
@@ -68,4 +73,16 @@ func _on_health_component_damaged(damage: Damage, attacker_position: Vector2) ->
 func on_death() -> void:
 	alive = false
 	velocity = Vector2.ZERO
+
+	# 停止状态机
+	var state_machine = get_node_or_null("EnemyStateMachine")
+	if state_machine:
+		state_machine.set_physics_process(false)
+		state_machine.set_process(false)
+
+	# 停止 AnimationTree（避免与 AnimationPlayer 冲突）
+	if anim_tree:
+		anim_tree.active = false
+
+	# 直接使用 AnimationPlayer 播放死亡动画
 	anim_player.play("death")
