@@ -309,7 +309,7 @@ architecture/
 ```
 
 **问题**:
-- Hitbox/Hurtbox内容与战斗系统重叠
+- HitBoxComponent/Hurtbox内容与战斗系统重叠
 - Player架构在多处重复描述
 - 缺少统一的导航索引
 - Token消耗高（一次加载 >2000 tokens）

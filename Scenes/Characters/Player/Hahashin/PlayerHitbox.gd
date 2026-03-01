@@ -1,11 +1,11 @@
-extends Hitbox
+extends HitBoxComponent
 class_name PlayerHitbox
 
-## 玩家专用 Hitbox - 从 CombatComponent 动态获取伤害类型
+## 玩家专用 HitBoxComponent - 从 CombatComponent 动态获取伤害类型
 ## 只需重写钩子方法，通用逻辑由基类处理
 ## 注意：不覆盖 _ready()，完全依赖基类的信号连接和初始化
 
-@onready var player: Hahashin = get_owner()
+@onready var player: PlayerBase = get_owner()
 
 ## 重写：从 CombatComponent 获取当前伤害类型
 func update_attack() -> void:

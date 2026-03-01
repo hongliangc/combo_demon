@@ -1,0 +1,116 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Core/Characters/BossBase.gd" id="1_bossbase"]
+[ext_resource type="Script" uid="uid://3cpq40uop66w" path="res://Core/Components/HurtBoxComponent.gd" id="2_hurtbox"]
+[ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="3_health"]
+[ext_resource type="Script" uid="uid://cugytepllupd0" path="res://Scenes/Characters/Enemies/Boss/Scripts/BossAttackManager.gd" id="4_attackmanager"]
+[ext_resource type="Script" uid="uid://do3eyt0kvgbl2" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossStateMachine.gd" id="5_statemachine"]
+[ext_resource type="Script" uid="uid://cgmwp25e3hbwy" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossIdle.gd" id="6_idle"]
+[ext_resource type="Script" uid="uid://d1g6tjh1c6c8r" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossPatrol.gd" id="7_patrol"]
+[ext_resource type="Script" uid="uid://b4gclxub8a2pv" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossChase.gd" id="8_chase"]
+[ext_resource type="Script" uid="uid://cls180jwdct2v" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossCircle.gd" id="9_circle"]
+[ext_resource type="Script" uid="uid://b52hi0ynhj6yf" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossAttack.gd" id="10_attack"]
+[ext_resource type="Script" uid="uid://d3rrlgdbbgerj" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossRetreat.gd" id="11_retreat"]
+[ext_resource type="Script" uid="uid://bdwlrfjvq2fiw" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossStun.gd" id="12_stun"]
+[ext_resource type="Script" uid="uid://b0y33arqsugby" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossEnrage.gd" id="13_enrage"]
+[ext_resource type="Script" uid="uid://dppt8hsh15huj" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossSpecialAttack.gd" id="14_special"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(40, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
+size = Vector2(40, 56)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill"]
+bg_color = Color(0.8, 0.1, 0.1, 1)
+
+[sub_resource type="GDScript" id="GDScript_boss_healthbar"]
+script/source = "extends ProgressBar
+
+## Boss 血条 - 兼容 HealthComponent 的 health_changed 信号
+
+func on_health_changed(current_health: float, max_health: float) -> void:
+	if max_health > 0:
+		value = current_health / max_health
+"
+
+[node name="BossBase" type="CharacterBody2D" groups=["enemy"]]
+collision_layer = 8
+collision_mask = 128
+script = ExtResource("1_bossbase")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="DamageNumbersAnchor" type="Node2D" parent="."]
+position = Vector2(0, -40)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="HurtBoxComponent" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("2_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBoxComponent"]
+shape = SubResource("RectangleShape2D_hurtbox")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -25.0
+offset_top = -50.0
+offset_right = 25.0
+offset_bottom = -44.0
+grow_horizontal = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+script = SubResource("GDScript_boss_healthbar")
+
+[node name="BossAttackManager" type="Node" parent="."]
+script = ExtResource("4_attackmanager")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("init_state")]
+script = ExtResource("5_statemachine")
+init_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource("6_idle")
+
+[node name="Patrol" type="Node" parent="StateMachine"]
+script = ExtResource("7_patrol")
+
+[node name="Chase" type="Node" parent="StateMachine"]
+script = ExtResource("8_chase")
+
+[node name="Circle" type="Node" parent="StateMachine"]
+script = ExtResource("9_circle")
+
+[node name="Attack" type="Node" parent="StateMachine"]
+script = ExtResource("10_attack")
+
+[node name="Retreat" type="Node" parent="StateMachine"]
+script = ExtResource("11_retreat")
+
+[node name="Stun" type="Node" parent="StateMachine"]
+script = ExtResource("12_stun")
+
+[node name="Enrage" type="Node" parent="StateMachine"]
+script = ExtResource("13_enrage")
+
+[node name="SpecialAttack" type="Node" parent="StateMachine"]
+script = ExtResource("14_special")
+
+[connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

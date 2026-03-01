@@ -1,4 +1,4 @@
-# Hahashin Hitbox/Hurtbox 架构设计文档
+# Hahashin HitBoxComponent/HurtBoxComponent 架构设计文档
 
 **日期**: 2026-01-19
 **组件**: Player (Hahashin) 战斗系统
@@ -8,14 +8,14 @@
 
 ## 1. 架构概览
 
-Hahashin 的战斗系统采用基于 Area2D 的碰撞检测机制，通过 Hitbox（攻击区域）和 Hurtbox（受击区域）实现伤害判定。整个系统遵循信号驱动的解耦设计，各组件通过信号进行通信。
+Hahashin 的战斗系统采用基于 Area2D 的碰撞检测机制，通过 HitBoxComponent（攻击区域）和 HurtBoxComponent（受击区域）实现伤害判定。整个系统遵循信号驱动的解耦设计，各组件通过信号进行通信。
 
 ### 核心组件
 
 | 组件 | 类型 | 碰撞层/掩码 | 职责 |
 |------|------|-------------|------|
-| **Hurtbox** | Area2D | Layer: 2, Mask: 0 | 接收伤害，发出 damaged 信号 |
-| **Hitbox** | Area2D | Layer: 4, Mask: 8 | 检测敌人，传递伤害数据 |
+| **HurtBoxComponent** | Area2D | Layer: 2, Mask: 0 | 接收伤害，发出 damaged 信号 |
+| **HitBoxComponent** | Area2D | Layer: 4, Mask: 8 | 检测敌人，传递伤害数据 |
 | **HealthComponent** | Node | N/A | 处理生命值、死亡逻辑 |
 | **CombatComponent** | Node | N/A | 管理攻击技能、伤害切换 |
 
@@ -47,7 +47,7 @@ Hahashin 的战斗系统采用基于 Area2D 的碰撞检测机制，通过 Hitbo
     │            │            │
     ▼            ▼            ▼
 ┌─────────┐  ┌─────────┐  ┌──────────────┐
-│ Hurtbox │  │ Hitbox  │  │HealthComponent│
+│ HurtBoxComponent │  │ HitBoxComponent  │  │HealthComponent│
 │(Area2D) │  │(Area2D) │  │   (Node)      │
 └─────────┘  └─────────┘  └───────────────┘
     │            │              │
@@ -70,7 +70,7 @@ Hahashin 的战斗系统采用基于 Area2D 的碰撞检测机制，通过 Hitbo
               ┌─────────────┴─────────────┐
               │                           │
 ┌─────────────┴──────────────┐  ┌────────┴──────────────────────┐
-│         Hurtbox             │  │      Hitbox (Base)            │
+│         HurtBoxComponent             │  │      HitBoxComponent (Base)            │
 │    (Util/Components)        │  │   (Util/Components)           │
 ├─────────────────────────────┤  ├───────────────────────────────┤
 │ Signals:                    │  │ @export damage: Damage        │
@@ -251,9 +251,9 @@ Player     AnimationPlayer    PlayerHitbox    敌人Hurtbox    敌人HealthCompo
                             ▼
     ┌───────────────────────────────────────────────────┐
     │                                                   │
-    │  【连接1】Hurtbox → HealthComponent                │
+    │  【连接1】HurtBoxComponent → HealthComponent                │
     │  ───────────────────────────────────────────────  │
-    │  var hurtbox = get_node_or_null("Hurtbox")        │
+    │  var hurtbox = get_node_or_null("HurtBoxComponent")        │
     │  hurtbox.damaged.connect(                         │
     │      health_component.take_damage                 │
     │  )                                                │
@@ -294,7 +294,7 @@ Player     AnimationPlayer    PlayerHitbox    敌人Hurtbox    敌人HealthCompo
 
     ┌───────────────────────────────────────────────────┐
     │                                                   │
-    │  【连接4】Hitbox → area_entered (内部)             │
+    │  【连接4】HitBoxComponent → area_entered (内部)             │
     │  ───────────────────────────────────────────────  │
     │  area_entered.connect(                            │
     │      _on_hitbox_area_entered_                     │
@@ -309,9 +309,9 @@ Player     AnimationPlayer    PlayerHitbox    敌人Hurtbox    敌人HealthCompo
 
 ---
 
-## 6. 动画驱动的 Hitbox 控制
+## 6. 动画驱动的 HitBoxComponent 控制
 
-Hahashin 的攻击判定完全由 AnimationPlayer 控制，通过动画轨道实时调整 Hitbox 的状态。
+Hahashin 的攻击判定完全由 AnimationPlayer 控制，通过动画轨道实时调整 HitBoxComponent 的状态。
 
 ### 动画轨道示例 - atk_1 攻击
 
@@ -324,7 +324,7 @@ Hahashin 的攻击判定完全由 AnimationPlayer 控制，通过动画轨道实
 ┌──────────────────────────────────────────────────────────┐
 │ Track 1: AnimatedSprite2D:animation = "atk_1"            │
 ├──────────────────────────────────────────────────────────┤
-│ Track 2: Hitbox/CollisionShape2D:disabled                │
+│ Track 2: HitBoxComponent/CollisionShape2D:disabled                │
 │                                                          │
 │  时间      │ 状态      │ 说明                           │
 │  ─────────┼──────────┼────────────────────────────────│
@@ -333,12 +333,12 @@ Hahashin 的攻击判定完全由 AnimationPlayer 控制，通过动画轨道实
 │  0.1333s  │ false    │ 启用攻击判定（第二段）         │
 │  0.2s     │ true     │ 关闭判定                       │
 ├──────────────────────────────────────────────────────────┤
-│ Track 3: Hitbox/CollisionShape2D:position                │
+│ Track 3: HitBoxComponent/CollisionShape2D:position                │
 │                                                          │
 │  0.0s     │ (20.5, -9.5)  │ 第一段攻击位置            │
 │  0.1333s  │ (0, -2.5)     │ 第二段攻击位置            │
 ├──────────────────────────────────────────────────────────┤
-│ Track 4: Hitbox/CollisionShape2D:shape:size              │
+│ Track 4: HitBoxComponent/CollisionShape2D:shape:size              │
 │                                                          │
 │  0.0s     │ (42, 19)      │ 第一段攻击范围            │
 │  0.1333s  │ (60, 27)      │ 第二段攻击范围（更大）    │
@@ -358,7 +358,7 @@ Hahashin 的攻击判定完全由 AnimationPlayer 控制，通过动画轨道实
 # 包含多段连续攻击 + 伤害类型切换
 
 ┌──────────────────────────────────────────────────────────┐
-│ Track: Hitbox/CollisionShape2D:disabled                  │
+│ Track: HitBoxComponent/CollisionShape2D:disabled                  │
 │                                                          │
 │  时间      │ 状态      │ 说明                           │
 │  ─────────┼──────────┼────────────────────────────────│
@@ -393,7 +393,7 @@ Hahashin 的攻击判定完全由 AnimationPlayer 控制，通过动画轨道实
 │  0.4s     │ perform_special_attack()   │ 触发特殊技能  │
 │  2.9s     │ switch_to_physical()       │ 恢复普通伤害  │
 ├──────────────────────────────────────────────────────────┤
-│ Track: Hitbox/CollisionShape2D:disabled                  │
+│ Track: HitBoxComponent/CollisionShape2D:disabled                  │
 │                                                          │
 │  0.4329s  │ false    │ 启用攻击判定（长时间）         │
 │  2.9304s  │ true     │ 关闭判定                       │
@@ -427,13 +427,13 @@ Godot 的碰撞检测基于 **Layer（层）** 和 **Mask（掩码）** 系统�
 
 ```
 Layer 1: 地面/墙壁（环境物体）
-Layer 2: 玩家受击区域 (Hurtbox)
+Layer 2: 玩家受击区域 (HurtBoxComponent)
 Layer 3: [未使用]
-Layer 4: 玩家攻击区域 (Hitbox)
+Layer 4: 玩家攻击区域 (HitBoxComponent)
 Layer 5: [未使用]
 Layer 6: [未使用]
 Layer 7: [未使用]
-Layer 8: 敌人受击区域 (Enemy Hurtbox)
+Layer 8: 敌人受击区域 (Enemy HurtBoxComponent)
 ```
 
 ### 配置表
@@ -441,19 +441,19 @@ Layer 8: 敌人受击区域 (Enemy Hurtbox)
 | 节点 | collision_layer | collision_mask | 说明 |
 |------|----------------|----------------|------|
 | **Hahashin (CharacterBody2D)** | 1 | 128 (第8层) | 玩家身体在第1层，碰撞地面 |
-| **Hahashin/Hurtbox** | 2 | 0 | 玩家受击区在第2层，被动接收 |
-| **Hahashin/Hitbox** | 4 | 8 (第4层) | 玩家攻击区在第4层，检测敌人 |
-| **Enemy/Hurtbox** | 8 | 0 | 敌人受击区在第8层，被动接收 |
-| **Enemy/Hitbox** | [敌人定义] | 2 (第2层) | 敌人攻击区检测玩家 |
+| **Hahashin/HurtBoxComponent** | 2 | 0 | 玩家受击区在第2层，被动接收 |
+| **Hahashin/HitBoxComponent** | 4 | 8 (第4层) | 玩家攻击区在第4层，检测敌人 |
+| **Enemy/HurtBoxComponent** | 8 | 0 | 敌人受击区在第8层，被动接收 |
+| **Enemy/HitBoxComponent** | [敌人定义] | 2 (第2层) | 敌人攻击区检测玩家 |
 
 ### 碰撞检测流程
 
 ```
-玩家 Hitbox (Layer 4, Mask 8)
+玩家 HitBoxComponent (Layer 4, Mask 8)
     │
     │ 检测 Mask 8 的物体
     ▼
-敌人 Hurtbox (Layer 8, Mask 0)
+敌人 HurtBoxComponent (Layer 8, Mask 0)
     │
     │ 被 Layer 4 的物体检测到
     ▼
@@ -498,7 +498,7 @@ effects = [
 
 ### 8.2 动态伤害切换
 
-玩家的 Hitbox 不存储固定伤害，而是从 CombatComponent 动态获取：
+玩家的 HitBoxComponent 不存储固定伤害，而是从 CombatComponent 动态获取：
 
 ```gdscript
 # Scenes/charaters/hitbox.gd:12-15
@@ -527,7 +527,7 @@ func update_attack():
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 1. Hitbox 碰撞检测                                          │
+│ 1. HitBoxComponent 碰撞检测                                          │
 ├─────────────────────────────────────────────────────────────┤
 │   _on_hitbox_area_entered_(area)                            │
 │       ↓                                                     │
@@ -537,9 +537,9 @@ func update_attack():
 └─────────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 2. Hurtbox 接收伤害                                         │
+│ 2. HurtBoxComponent 接收伤害                                         │
 ├─────────────────────────────────────────────────────────────┤
-│   Hurtbox.take_damage(damage, attacker_position)            │
+│   HurtBoxComponent.take_damage(damage, attacker_position)            │
 │       ↓                                                     │
 │   damaged.emit(damage, attacker_position)                   │
 └─────────────────────────────────────────────────────────────┘
@@ -574,14 +574,14 @@ func update_attack():
 ### 9.1 信号驱动解耦
 
 **优点**：
-- Hurtbox 不需要知道 HealthComponent 的存在
+- HurtBoxComponent 不需要知道 HealthComponent 的存在
 - 组件可以独立测试和替换
 - 易于扩展（添加新的信号监听者）
 
 **实现**：
 ```gdscript
 # hahashin.gd:27-29
-var hurtbox = get_node_or_null("Hurtbox")
+var hurtbox = get_node_or_null("HurtBoxComponent")
 if hurtbox and hurtbox.has_signal("damaged"):
     hurtbox.damaged.connect(health_component.take_damage)
 ```
@@ -594,8 +594,8 @@ if hurtbox and hurtbox.has_signal("damaged"):
 - 支持复杂的多段攻击
 
 **实现**：
-- 动画轨道控制 Hitbox 的 disabled 属性
-- 动画轨道控制 Hitbox 的 position 和 size
+- 动画轨道控制 HitBoxComponent 的 disabled 属性
+- 动画轨道控制 HitBoxComponent 的 position 和 size
 - 动画轨道调用方法切换伤害类型
 
 ### 9.3 组件化架构
@@ -613,8 +613,8 @@ Hahashin
 ├─ CombatComponent      # 战斗/技能管理
 ├─ AnimationComponent   # 动画状态机
 ├─ SkillManager         # 特殊技能管理
-├─ Hurtbox              # 受击区域（被动）
-└─ Hitbox               # 攻击区域（主动）
+├─ HurtBoxComponent              # 受击区域（被动）
+└─ HitBoxComponent               # 攻击区域（主动）
 ```
 
 ### 9.4 策略模式 - 攻击特效
@@ -637,12 +637,12 @@ func apply_effects(enemy: Enemy, damage_source_position: Vector2):
 
 ## 10. 代码示例
 
-### 10.1 玩家 Hitbox 实现
+### 10.1 玩家 HitBoxComponent 实现
 
 **文件**: Scenes/charaters/hitbox.gd
 
 ```gdscript
-extends Hitbox
+extends HitBoxComponent
 
 @onready var player : Hahashin = get_owner()
 
@@ -661,19 +661,19 @@ func update_attack():
 func _on_hitbox_area_entered_(area: Area2D):
     # 更新攻击伤害（获取玩家当前技能的伤害）
     update_attack()
-    if area is Hurtbox:
+    if area is HurtBoxComponent:
         # 传递伤害数据和攻击者位置（用于计算击飞/击退方向）
         player.debug_print()  # 调试输出
         area.take_damage(damage, player.global_position)
 ```
 
-### 10.2 Hurtbox 实现
+### 10.2 HurtBoxComponent 实现
 
 **文件**: Util/Components/hurtbox.gd
 
 ```gdscript
 extends Area2D
-class_name Hurtbox
+class_name HurtBoxComponent
 
 # 受到伤害时发出的信号
 # @param damage: 伤害数据
@@ -688,7 +688,7 @@ func take_damage(damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
 ```
 
 **设计要点**：
-- Hurtbox 只负责接收伤害和发出信号
+- HurtBoxComponent 只负责接收伤害和发出信号
 - 不处理具体的伤害逻辑（交给 HealthComponent）
 - 传递攻击者位置，用于计算击退方向
 
@@ -742,8 +742,8 @@ func _ready() -> void:
     # 连接组件信号
     _connect_component_signals()
 
-    # 连接 Hurtbox 的受伤信号到 HealthComponent
-    var hurtbox = get_node_or_null("Hurtbox")
+    # 连接 HurtBoxComponent 的受伤信号到 HealthComponent
+    var hurtbox = get_node_or_null("HurtBoxComponent")
     if hurtbox and hurtbox.has_signal("damaged"):
         hurtbox.damaged.connect(health_component.take_damage)
 
@@ -776,14 +776,14 @@ func _on_died() -> void:
 ```gdscript
 # 每帧都查找节点
 func _process(delta):
-    var hitbox = get_node("Hitbox")
+    var hitbox = get_node("HitBoxComponent")
     hitbox.do_something()
 ```
 
 **正确做法**：
 ```gdscript
 # 使用 @onready 缓存节点引用
-@onready var hitbox = $Hitbox
+@onready var hitbox = $HitBoxComponent
 
 func _process(delta):
     hitbox.do_something()
@@ -796,8 +796,8 @@ func _process(delta):
    - 简单形状（Circle, Rectangle）性能最好
    - 避免使用复杂的 Polygon
 3. **动态启用/禁用碰撞**：
-   - 攻击结束后立即禁用 Hitbox
-   - 无敌状态时禁用 Hurtbox
+   - 攻击结束后立即禁用 HitBoxComponent
+   - 无敌状态时禁用 HurtBoxComponent
 
 ### 11.3 信号优化
 
@@ -838,7 +838,7 @@ shapes/collision/draw_2d_outlines=true
 
 ```gdscript
 # 战斗调试
-DebugConfig.debug("Hitbox 碰撞检测", area.name, "combat")
+DebugConfig.debug("HitBoxComponent 碰撞检测", area.name, "combat")
 
 # 伤害调试
 damage.debug_print()  # 输出伤害详细信息
@@ -920,9 +920,9 @@ func calculate_final_damage() -> float:
 
 ## 14. 常见问题 (FAQ)
 
-### Q1: 为什么 Hitbox 要在动画中启用/禁用？
+### Q1: 为什么 HitBoxComponent 要在动画中启用/禁用？
 
-**A**: 为了精确控制攻击判定的时机。如果 Hitbox 一直启用，会导致：
+**A**: 为了精确控制攻击判定的时机。如果 HitBoxComponent 一直启用，会导致：
 - 攻击前摇阶段就能造成伤害（不合理）
 - 一次攻击造成多次伤害（连续碰撞）
 - 无法实现多段攻击
@@ -934,9 +934,9 @@ func calculate_final_damage() -> float:
 - 计算聚集方向（朝向攻击者）
 - 判断攻击来自哪个方向（用于防御检测）
 
-### Q3: 为什么 Hurtbox 的 collision_mask 是 0？
+### Q3: 为什么 HurtBoxComponent 的 collision_mask 是 0？
 
-**A**: Hurtbox 是被动接收区域，不需要主动检测任何物体。碰撞由 Hitbox 的 `collision_mask` 检测触发。
+**A**: HurtBoxComponent 是被动接收区域，不需要主动检测任何物体。碰撞由 HitBoxComponent 的 `collision_mask` 检测触发。
 
 ### Q4: 一次攻击如何避免多次伤害？
 
@@ -961,10 +961,10 @@ func _on_hitbox_area_entered_(area):
 ### Q5: 如何调试碰撞不触发的问题？
 
 **A**: 检查清单：
-1. ✅ Hitbox 的 `collision_mask` 是否包含目标的 `layer`
-2. ✅ Hitbox 的 `CollisionShape2D.disabled` 是否为 `false`
-3. ✅ Hitbox 的 `CollisionShape2D.shape` 是否有效（size > 0）
-4. ✅ 目标 Hurtbox 的 `collision_layer` 是否正确
+1. ✅ HitBoxComponent 的 `collision_mask` 是否包含目标的 `layer`
+2. ✅ HitBoxComponent 的 `CollisionShape2D.disabled` 是否为 `false`
+3. ✅ HitBoxComponent 的 `CollisionShape2D.shape` 是否有效（size > 0）
+4. ✅ 目标 HurtBoxComponent 的 `collision_layer` 是否正确
 5. ✅ 使用 "Visible Collision Shapes" 可视化检查
 
 ---
@@ -984,9 +984,9 @@ func _on_hitbox_area_entered_(area):
 |---------|------|
 | `Scenes/charaters/hahashin.gd` | 玩家主类，组件协调 |
 | `Scenes/charaters/hahashin.tscn` | 场景配置，动画轨道 |
-| `Scenes/charaters/hitbox.gd` | 玩家 Hitbox 实现 |
-| `Util/Components/hitbox.gd` | Hitbox 基类 |
-| `Util/Components/hurtbox.gd` | Hurtbox 组件 |
+| `Scenes/charaters/hitbox.gd` | 玩家 HitBoxComponent 实现 |
+| `Util/Components/hitbox.gd` | HitBoxComponent 基类 |
+| `Util/Components/hurtbox.gd` | HurtBoxComponent 组件 |
 | `Util/Components/HealthComponent.gd` | 生命值管理 |
 | `Util/Components/CombatComponent.gd` | 战斗/技能管理 |
 | `Util/Classes/Damage.gd` | 伤害数据类 |

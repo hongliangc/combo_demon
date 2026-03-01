@@ -1,8 +1,8 @@
-[gd_scene load_steps=11 format=3 uid="uid://ditwc2cijrjbn"]
+[gd_scene format=3 uid="uid://ditwc2cijrjbn"]
 
 [ext_resource type="Script" uid="uid://8keih068iktu" path="res://Scenes/Weapons/bullet/fire/FireBullet.gd" id="1_hr483"]
 [ext_resource type="Texture2D" uid="uid://cr8v60ue1jsl7" path="res://Assets/Art/Bitlytic/bullet.png" id="2_f0lmi"]
-[ext_resource type="Script" uid="uid://c8wsmfs0k6c64" path="res://Core/Components/Hitbox.gd" id="2_hitbox"]
+[ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="2_hitbox"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xdfer"]
 radius = 8.0
@@ -43,12 +43,12 @@ target_speed = 200.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_xdfer")
 
-[node name="Hitbox" type="Area2D" parent="." groups=["player_bullet"]]
+[node name="HitBoxComponent" type="Area2D" parent="." groups=["player_bullet"]]
 script = ExtResource("2_hitbox")
 destroy_owner_on_hit = true
 ignore_collision_groups = Array[String](["player_bullet"])
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent"]
 shape = SubResource("CircleShape2D_n6m7u")
 
 [node name="SpriteGroup" type="Node2D" parent="."]

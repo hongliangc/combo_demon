@@ -73,7 +73,7 @@ parameters/output/blend_amount = 0.0 (0=正常行为, 1=控制状态)
 
 ```
 Enemy (CharacterBody2D)
-├── ✅ Hurtbox (Area2D) - 受伤判定
+├── ✅ HurtBoxComponent (Area2D) - 受伤判定
 ├── ✅ Sprite2D - 精灵渲染
 ├── ✅ AnimationPlayer - 动画播放器
 ├── ✅ AnimationTree - 动画树（已优化）

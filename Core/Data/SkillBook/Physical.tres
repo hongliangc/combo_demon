@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Damage" load_steps=5 format=3 uid="uid://o7affn3td02p"]
+[gd_resource type="Resource" script_class="Damage" format=3 uid="uid://o7affn3td02p"]
 
 [ext_resource type="Script" uid="uid://dhptij5yeksrr" path="res://Core/Resources/Damage.gd" id="1_rvmpu"]
 [ext_resource type="Script" uid="uid://bngu63cnq7ltu" path="res://Core/Resources/AttackEffect.gd" id="1_u5inb"]
@@ -6,15 +6,11 @@
 
 [sub_resource type="Resource" id="StunEffect_physical"]
 script = ExtResource("2_stuneffect")
-stun_duration = 1.5
 effect_name = "眩晕"
 duration = 1.5
-show_debug_info = false
 
 [resource]
 script = ExtResource("1_rvmpu")
-max_amount = 50.0
-min_amount = 1.0
 amount = 50.0
 effects = Array[ExtResource("1_u5inb")]([SubResource("StunEffect_physical")])
 metadata/_custom_type_script = "uid://dhptij5yeksrr"

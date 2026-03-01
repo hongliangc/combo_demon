@@ -174,7 +174,8 @@ func add_animation(anim_sprite: NodePath, anim: String, sprite_frames: SpriteFra
 		var frame_duration_multiplier = sprite_frames.get_frame_duration(anim, i)
 		next_key_time += frame_duration_multiplier * spf
 
-	global_animation_library.add_animation(sanitized_anim_name, animation)
+	# Animation was already added to library at line 128 for new animations
+	# No need to add it again here
 
 	return updated
 

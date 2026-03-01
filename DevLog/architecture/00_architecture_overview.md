@@ -43,7 +43,7 @@
   - 可重用状态基类
 
 - **战斗系统如何工作** → [02_combat_system_architecture.md](02_combat_system_architecture.md)
-  - Hitbox/Hurtbox碰撞检测
+  - HitBoxComponent/Hurtbox碰撞检测
   - Damage伤害系统
   - AttackEffect攻击特效
   - 血量显示和伤害通知

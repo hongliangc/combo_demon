@@ -1,56 +1,62 @@
-[gd_scene load_steps=19 format=3 uid="uid://cforestbee01"]
+[gd_scene load_steps=25 format=3 uid="uid://cforestbee01"]
 
-[ext_resource type="Script" uid="uid://dtnwc2hs6cmfl" path="res://Scenes/Characters/Enemies/ForestBee/ForestBee.gd" id="1_bee"]
-[ext_resource type="Texture2D" uid="uid://xy6jlu8yc8cw" path="res://Assets/Art/HighForest/Mob/Small Bee/Fly/Fly-Sheet.png" id="2_fly"]
-[ext_resource type="Texture2D" uid="uid://cr0ndkk1a04uf" path="res://Assets/Art/HighForest/Mob/Small Bee/Attack/Attack-Sheet.png" id="3_attack"]
-[ext_resource type="Texture2D" uid="uid://b3hrcqby6bx7f" path="res://Assets/Art/HighForest/Mob/Small Bee/Hit/Hit-Sheet.png" id="4_hit"]
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://dtnwc2hs6cmfl" path="res://Scenes/Characters/Enemies/ForestBee/ForestBee.gd" id="2_bee"]
+[ext_resource type="Texture2D" uid="uid://xy6jlu8yc8cw" path="res://Assets/Art/HighForest/Mob/Small Bee/Fly/Fly-Sheet.png" id="3_fly"]
+[ext_resource type="Texture2D" uid="uid://cr0ndkk1a04uf" path="res://Assets/Art/HighForest/Mob/Small Bee/Attack/Attack-Sheet.png" id="4_attack"]
+[ext_resource type="Texture2D" uid="uid://b3hrcqby6bx7f" path="res://Assets/Art/HighForest/Mob/Small Bee/Hit/Hit-Sheet.png" id="5_hit"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeIdle.gd" id="6_idle"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeWander.gd" id="7_wander"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeChase.gd" id="8_chase"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeAttack.gd" id="9_attack"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeStun.gd" id="10_stun"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_t68r2"]
-atlas = ExtResource("3_attack")
+atlas = ExtResource("4_attack")
 region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fkjce"]
-atlas = ExtResource("3_attack")
+atlas = ExtResource("4_attack")
 region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qt4ro"]
-atlas = ExtResource("3_attack")
+atlas = ExtResource("4_attack")
 region = Rect2(128, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_uyw5h"]
-atlas = ExtResource("3_attack")
+atlas = ExtResource("4_attack")
 region = Rect2(192, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_o1a7o"]
-atlas = ExtResource("2_fly")
+atlas = ExtResource("3_fly")
 region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nfbvj"]
-atlas = ExtResource("2_fly")
+atlas = ExtResource("3_fly")
 region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7bkb3"]
-atlas = ExtResource("2_fly")
+atlas = ExtResource("3_fly")
 region = Rect2(128, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1li58"]
-atlas = ExtResource("2_fly")
+atlas = ExtResource("3_fly")
 region = Rect2(192, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_db7bl"]
-atlas = ExtResource("4_hit")
+atlas = ExtResource("5_hit")
 region = Rect2(0, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cakhl"]
-atlas = ExtResource("4_hit")
+atlas = ExtResource("5_hit")
 region = Rect2(64, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_e3a85"]
-atlas = ExtResource("4_hit")
+atlas = ExtResource("5_hit")
 region = Rect2(128, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_eiaf0"]
-atlas = ExtResource("4_hit")
+atlas = ExtResource("5_hit")
 region = Rect2(192, 0, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_bee"]
@@ -110,24 +116,38 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_bee"]
 radius = 12.0
 
-[node name="ForestBee" type="CharacterBody2D" groups=["enemy"]]
-collision_layer = 8
+[node name="ForestBee" instance=ExtResource("1_base")]
 collision_mask = 129
-script = ExtResource("1_bee")
+script = ExtResource("2_bee")
+max_health = 30
+health = 30
+min_wander_time = 2.0
+max_wander_time = 5.0
+wander_speed = 40.0
+detection_radius = 150.0
+chase_radius = 250.0
+follow_radius = 20.0
+chase_speed = 80
+use_animation_tree = false
+
+[node name="FloorCollision" parent="."]
+shape = SubResource("CircleShape2D_bee")
+
+[node name="Idle" parent="EnemyStateMachine"]
+script = ExtResource("6_idle")
+
+[node name="Wander" parent="EnemyStateMachine"]
+script = ExtResource("7_wander")
+
+[node name="Chase" parent="EnemyStateMachine"]
+script = ExtResource("8_chase")
+
+[node name="Attack" parent="EnemyStateMachine"]
+script = ExtResource("9_attack")
+
+[node name="Stun" parent="EnemyStateMachine"]
+script = ExtResource("10_stun")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_bee")
-animation = &"hit"
 autoplay = "fly"
-frame = 3
-frame_progress = 1.0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_bee")
-
-[node name="Hitbox" type="Area2D" parent="."]
-collision_layer = 8
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-shape = SubResource("CircleShape2D_bee")

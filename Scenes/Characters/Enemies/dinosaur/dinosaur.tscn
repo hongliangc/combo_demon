@@ -1,11 +1,11 @@
-[gd_scene load_steps=50 format=3 uid="uid://bdlfsfk1fijtw"]
+[gd_scene format=3 uid="uid://bb3gfgyu0hmh8"]
 
 [ext_resource type="Script" uid="uid://dgky8ue0t0cn3" path="res://Scenes/Characters/Enemies/Dinosaur/Scripts/Dinosaur.gd" id="1_sr341"]
 [ext_resource type="Texture2D" uid="uid://drfyuy8w6p057" path="res://Assets/Art/Arks/DinoSprites - doux.png" id="2_4vyqg"]
 [ext_resource type="Texture2D" uid="uid://eb28cx5toii3" path="res://Assets/Art/Arks/DinoSprites - vita.png" id="2_gdhss"]
 [ext_resource type="Texture2D" uid="uid://c5cbe07dk5lyn" path="res://Assets/Art/Arks/DinoSprites - mort.png" id="3_ueu0g"]
 [ext_resource type="Texture2D" uid="uid://cqcr6ctruxfn5" path="res://Assets/Art/Arks/DinoSprites - tard.png" id="4_i6tsu"]
-[ext_resource type="Script" uid="uid://5jjwbr0mlmjx" path="res://Core/Components/Hurtbox.gd" id="6_ueu0g"]
+[ext_resource type="Script" uid="uid://3cpq40uop66w" path="res://Core/Components/HurtBoxComponent.gd" id="6_ueu0g"]
 [ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="7_health"]
 [ext_resource type="Script" uid="uid://dsjbtj1p1xp0w" path="res://Scenes/Characters/Enemies/Dinosaur/Scripts/States/EnemyChase.gd" id="9_6b5td"]
 [ext_resource type="Script" uid="uid://bld00ovrfhbi4" path="res://Scenes/Characters/Enemies/Dinosaur/Scripts/States/EnemyStateMachine.gd" id="9_o6n8k"]
@@ -88,7 +88,7 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Hurtbox/CollisionShape2D:disabled")
+tracks/5/path = NodePath("HurtBoxComponent/CollisionShape2D:disabled")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -169,7 +169,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Hurtbox/CollisionShape2D:disabled")
+tracks/4/path = NodePath("HurtBoxComponent/CollisionShape2D:disabled")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -410,6 +410,7 @@ blend_mode = 1
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_root"]
 graph_offset = Vector2(-292.08, 132.925)
+nodes/output/position = Vector2(680, 400)
 nodes/attack_oneshot/node = SubResource("AnimationNodeOneShot_attack")
 nodes/attack_oneshot/position = Vector2(900, 320)
 nodes/control_blend/node = SubResource("AnimationNodeBlend2_control")
@@ -422,8 +423,7 @@ nodes/loco_timescale/node = SubResource("AnimationNodeTimeScale_loco")
 nodes/loco_timescale/position = Vector2(260, 260)
 nodes/locomotion/node = SubResource("AnimationNodeBlendSpace2D_locomotion")
 nodes/locomotion/position = Vector2(-60, 260)
-nodes/output/position = Vector2(680, 400)
-node_connections = [&"control_blend", 0, &"loco_timescale", &"control_blend", 1, &"ctrl_timescale", &"ctrl_timescale", 0, &"control_sm", &"loco_timescale", 0, &"locomotion", &"output", 0, &"control_blend"]
+node_connections = [&"output", 0, &"control_blend", &"control_blend", 0, &"loco_timescale", &"control_blend", 1, &"ctrl_timescale", &"ctrl_timescale", 0, &"control_sm", &"loco_timescale", 0, &"locomotion"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ueu0g"]
 bg_color = Color(0, 0, 0, 1)
@@ -441,7 +441,7 @@ func on_health_changed(current_health: float, max_health: float) -> void:
 		value = current_health / max_health
 "
 
-[node name="Dinosaur" type="CharacterBody2D" groups=["enemy"]]
+[node name="Dinosaur" type="CharacterBody2D" unique_id=1543874825 groups=["enemy"]]
 light_mask = 8
 visibility_layer = 192
 collision_layer = 8
@@ -451,30 +451,28 @@ textures = Array[Texture2D]([ExtResource("2_4vyqg"), ExtResource("3_ueu0g"), Ext
 max_health = 1000
 health = 1000
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="HurtBoxComponent" type="Area2D" parent="." unique_id=1721847576]
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("6_ueu0g")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBoxComponent" unique_id=2109771211]
 shape = SubResource("CircleShape2D_xb68c")
 
-[node name="FloorCollision" type="CollisionShape2D" parent="."]
+[node name="FloorCollision" type="CollisionShape2D" parent="." unique_id=717380048]
 rotation = 3.14159
 shape = SubResource("CapsuleShape2D_4vyqg")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=891170356]
 texture = ExtResource("2_gdhss")
 hframes = 24
 frame = 4
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_xb68c")
-}
-autoplay = "idle"
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1704350831]
+libraries/ = SubResource("AnimationLibrary_xb68c")
+autoplay = &"idle"
 
-[node name="AnimationTree" type="AnimationTree" parent="."]
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1247843968]
 tree_root = SubResource("AnimationNodeBlendTree_root")
 anim_player = NodePath("../AnimationPlayer")
 parameters/attack_oneshot/active = false
@@ -485,35 +483,35 @@ parameters/ctrl_timescale/scale = 1.0
 parameters/loco_timescale/scale = 1.0
 parameters/locomotion/blend_position = Vector2(-0.177843, 0.748527)
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1299860414]
 script = ExtResource("7_health")
 
-[node name="EnemyStateMachine" type="Node" parent="." node_paths=PackedStringArray("init_state")]
+[node name="EnemyStateMachine" type="Node" parent="." unique_id=1161678027 node_paths=PackedStringArray("init_state")]
 script = ExtResource("9_o6n8k")
 init_state = NodePath("Idle")
 
-[node name="Chase" type="Node" parent="EnemyStateMachine"]
+[node name="Chase" type="Node" parent="EnemyStateMachine" unique_id=901999205]
 script = ExtResource("9_6b5td")
 
-[node name="Idle" type="Node" parent="EnemyStateMachine"]
+[node name="Idle" type="Node" parent="EnemyStateMachine" unique_id=1021220087]
 script = ExtResource("11_m53w6")
 
-[node name="Wander" type="Node" parent="EnemyStateMachine"]
+[node name="Wander" type="Node" parent="EnemyStateMachine" unique_id=231789051]
 script = ExtResource("12_nltsn")
 
-[node name="Stun" type="Node" parent="EnemyStateMachine"]
+[node name="Stun" type="Node" parent="EnemyStateMachine" unique_id=269923157]
 script = ExtResource("13_lik7o")
 
-[node name="Attack" type="Node" parent="EnemyStateMachine"]
+[node name="Attack" type="Node" parent="EnemyStateMachine" unique_id=1515897196]
 script = ExtResource("14_e2cp7")
 
-[node name="Hit" type="Node" parent="EnemyStateMachine"]
+[node name="Hit" type="Node" parent="EnemyStateMachine" unique_id=946157992]
 script = ExtResource("15_hit")
 
-[node name="Knockback" type="Node" parent="EnemyStateMachine"]
+[node name="Knockback" type="Node" parent="EnemyStateMachine" unique_id=1650094293]
 script = ExtResource("16_knockback")
 
-[node name="HealthBar" type="ProgressBar" parent="."]
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=932980834]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -529,9 +527,9 @@ value = 0.5
 show_percentage = false
 script = SubResource("GDScript_w3mkh")
 
-[node name="DamageNumbersAnchor" type="Node2D" parent="."]
+[node name="DamageNumbersAnchor" type="Node2D" parent="." unique_id=464167303]
 position = Vector2(0, -11)
 
-[node name="AttackAnchor" type="Node2D" parent="."]
+[node name="AttackAnchor" type="Node2D" parent="." unique_id=92261399]
 
 [connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

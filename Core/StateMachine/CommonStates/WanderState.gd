@@ -83,7 +83,7 @@ func physics_process_state(_delta: float) -> void:
 		var max_speed = get_owner_property("chase_speed", 100.0)
 		var blend_y = clampf(speed / max_speed, 0.0, 0.5)  # Wander 限制在 0.5（walk 速度）
 		set_locomotion(Vector2(blend_x, blend_y))
-		print("[ANIMATION] Wander: speed=%.1f blend_x=%.1f blend_y=%.2f" % [speed, blend_x, blend_y])
+		#print("[ANIMATION] Wander: speed=%.1f blend_x=%.1f blend_y=%.2f" % [speed, blend_x, blend_y])
 
 
 func _on_wander_timeout() -> void:

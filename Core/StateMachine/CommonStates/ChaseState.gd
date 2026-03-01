@@ -91,4 +91,4 @@ func _update_animation_locomotion() -> void:
 
 	var blend_pos = Vector2(blend_x, blend_y)
 	set_locomotion(blend_pos)
-	print("[ANIMATION Chase speed=%.1f blend_x=%.1f blend_y=%.2f" % [speed, blend_x, blend_y])
+	#print("[ANIMATION] Chase speed=%.1f blend_x=%.1f blend_y=%.2f" % [speed, blend_x, blend_y])

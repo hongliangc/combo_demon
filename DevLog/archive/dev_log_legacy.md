@@ -17,7 +17,7 @@
 - [x] 角色基础移动系统 (hahashin.gd)
 - [x] 敌人AI状态机 (enemy_state_machine.gd)
 - [x] 伤害类型系统 (Damage.gd: Physical, KnockUp, KnockBack)
-- [x] Hitbox/Hurtbox 碰撞系统
+- [x] HitBoxComponent/HurtBoxComponent 碰撞系统
 - [x] 武器系统 (近战爪击, 远程弹药)
 - [x] 音效管理器 (SoundManager)
 - [x] MCP Godot 集成
@@ -1142,7 +1142,7 @@ $Panel.self_modulate = Color.RED  # 可以动态变色
 **完成内容**:
 
 #### 重构目标
-统一玩家和敌人的伤害管理系统，让所有 Hitbox 都使用相同的 `Damage` 类，支持通过编辑器 export 配置伤害参数。
+统一玩家和敌人的伤害管理系统，让所有 HitBoxComponent 都使用相同的 `Damage` 类，支持通过编辑器 export 配置伤害参数。
 
 #### 核心改进
 
@@ -1164,7 +1164,7 @@ func randomize_damage() -> void:
 - 使用静态 RNG，所有实例共享，避免重复创建对象
 - 使用 `randf_range` 支持浮点数伤害，避免类型转换
 
-##### 2. Hitbox 基类支持 export 配置
+##### 2. HitBoxComponent 基类支持 export 配置
 在 [Util/Components/hitbox.gd](Util/Components/hitbox.gd) 重构：
 
 ```gdscript
@@ -1193,7 +1193,7 @@ func update_attack():
 2. **高级配置**：拖入预先配置的 `.tres` Damage 资源（支持复杂特效）
 
 ##### 3. 简化所有子类代码
-移除所有子弹/武器 Hitbox 中的重复代码，每个子类减少 5-10 行重复逻辑。
+移除所有子弹/武器 HitBoxComponent 中的重复代码，每个子类减少 5-10 行重复逻辑。
 
 **影响的文件**：
 - [Weapons/bullet/bubble/hitbox.gd](Weapons/bullet/bubble/hitbox.gd) - 移除 7 行重复代码
@@ -1226,7 +1226,7 @@ func update_attack():
 
 #### 架构优势
 1. ✅ **消除重复代码** - 每个子类减少 5-10 行重复逻辑
-2. ✅ **单一职责** - 伤害计算归属 `Damage` 类，Hitbox 只负责碰撞检测
+2. ✅ **单一职责** - 伤害计算归属 `Damage` 类，HitBoxComponent 只负责碰撞检测
 3. ✅ **编辑器友好** - 策划可以在编辑器中直接调整伤害，无需改代码
 4. ✅ **性能优化** - 静态 RNG 避免重复创建对象
 5. ✅ **统一管理** - 玩家和敌人使用相同的伤害系统
@@ -1320,7 +1320,7 @@ description: Godot 4.x GDScript 编码规范。当编写、审查、修改 Godot
 ### Godot 最佳实践
 1. 使用 Resource 管理数据，方便复用和编辑
 2. 使用 AutoLoad 单例管理全局系统
-3. 组件化设计（Health, Hitbox, Hurtbox）
+3. 组件化设计（Health, HitBoxComponent, HurtBoxComponent）
 4. 状态机模式管理复杂行为
 
 ### Claude Code 最佳实践

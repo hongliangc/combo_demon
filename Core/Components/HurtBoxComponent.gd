@@ -1,8 +1,8 @@
 extends Area2D
-class_name Hurtbox
+class_name HurtBoxComponent
 
 ############################################################
-# Hurtbox component - this gets hit by the bullet's hitbox.
+# HurtBoxComponent component - this gets hit by the bullet's hitbox.
 # Only used by enemies by default, but can be referenced by
 # health components to receive damage
 ############################################################

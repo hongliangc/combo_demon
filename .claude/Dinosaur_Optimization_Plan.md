@@ -67,7 +67,7 @@ AnimationPlayer
 Enemy (CharacterBody2D)
 ├── Sprite2D
 ├── CollisionShape2D
-├── Hurtbox (Area2D)
+├── HurtBoxComponent (Area2D)
 │   └── CollisionShape2D
 ├── AnimationPlayer
 │   └── AnimationLibrary

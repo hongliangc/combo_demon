@@ -1,102 +1,114 @@
 extends Node2D
 class_name GhostExpandEffect
 
-## 残影放大消失效果 - 在原地创建角色残影，放大后渐隐消失
-## 用于技能释放时的蓄力/释放视觉效果
+## 金色边框高亮闪动效果 - 在源精灵上叠加金色描边并脉冲闪烁
+## 用于V技能释放时的蓄力/释放视觉效果
 
 # ============ 信号 ============
 signal effect_finished()
 
 # ============ 配置参数 ============
-## 放大倍数
-@export var scale_multiplier: float = 2.0
 ## 效果持续时间
-@export var duration: float = 1.0
-## 残影颜色
-@export var ghost_color: Color = Color(0.8, 0.9, 1.0, 0.8)
-## 是否添加发光效果
-@export var enable_glow: bool = true
+@export var duration: float = 0.8
+## 描边宽度（像素），对应 shader 的 thickness
+@export var thickness: float = 1
+## 金色边框颜色
+@export var outline_color: Color = Color(1.0, 0.84, 0.0, 1.0)
 
 # ============ 运行时变量 ============
-var _ghost_sprite: Sprite2D = null
+var _source_sprite: Node2D = null
+var _original_material: Material = null
+var _shader_material: ShaderMaterial = null
+
+static var _shader: Shader = null
 
 # ============ 公共 API ============
-## 从目标精灵创建残影效果
+
+## 对目标精灵应用金色边框高亮闪动效果
 ## @param source_sprite: 源精灵（AnimatedSprite2D 或 Sprite2D）
-## @param spawn_position: 生成位置
-func create_from_sprite(source_sprite: Node2D, spawn_position: Vector2) -> void:
-	global_position = spawn_position
+## @param _spawn_position: 未使用，保留接口兼容
+func create_from_sprite(source_sprite: Node2D, _spawn_position: Vector2) -> void:
+	_source_sprite = source_sprite
 
-	# 创建残影精灵
-	_ghost_sprite = Sprite2D.new()
+	# 懒加载 shader
+	if _shader == null:
+		_shader = load("res://Assets/Shaders/golden_outline_flash.gdshader")
 
-	# 复制纹理
-	if source_sprite is AnimatedSprite2D:
-		var animated = source_sprite as AnimatedSprite2D
-		var frames = animated.sprite_frames
-		if frames:
-			_ghost_sprite.texture = frames.get_frame_texture(animated.animation, animated.frame)
-			_ghost_sprite.flip_h = animated.flip_h
-			_ghost_sprite.flip_v = animated.flip_v
-			# 复制centered和offset属性，确保锚点一致
-			_ghost_sprite.centered = animated.centered
-			_ghost_sprite.offset = animated.offset
-	elif source_sprite is Sprite2D:
-		var sprite = source_sprite as Sprite2D
-		_ghost_sprite.texture = sprite.texture
-		_ghost_sprite.flip_h = sprite.flip_h
-		_ghost_sprite.flip_v = sprite.flip_v
-		_ghost_sprite.region_enabled = sprite.region_enabled
-		_ghost_sprite.region_rect = sprite.region_rect
-		# 复制centered和offset属性，确保锚点一致
-		_ghost_sprite.centered = sprite.centered
-		_ghost_sprite.offset = sprite.offset
+	# 保存原始 material 以便恢复
+	_original_material = source_sprite.material
 
-	# 设置初始状态
-	_ghost_sprite.modulate = ghost_color
-	_ghost_sprite.z_index = source_sprite.z_index + 1
+	# 创建并应用 ShaderMaterial
+	_shader_material = ShaderMaterial.new()
+	_shader_material.shader = _shader
+	_shader_material.set_shader_parameter("outline_color", outline_color)
+	_shader_material.set_shader_parameter("thickness", 0.0)
+	source_sprite.material = _shader_material
 
-	# 设置精灵位置为(0,0)，确保缩放以 GhostExpandEffect 的中心点（hahashin位置）为基准
-	_ghost_sprite.position = Vector2.ZERO
+	# 开始闪动动画
+	_play_flash_animation()
 
-	add_child(_ghost_sprite)
-
-	# 开始动画
-	_play_expand_animation()
-
-## 播放放大后缩小动画
-func _play_expand_animation() -> void:
+## 播放金色边框脉冲闪动动画
+func _play_flash_animation() -> void:
 	var tween = create_tween()
 
-	# 阶段1：快速放大
-	tween.set_ease(Tween.EASE_OUT)
-	tween.set_trans(Tween.TRANS_BACK)
-	tween.tween_property(_ghost_sprite, "scale", Vector2.ONE * scale_multiplier, duration * 0.5)
+	var peak := thickness
 
-	# 阶段2：缩小回原始大小并渐隐
+	# 阶段1：快速亮起
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.tween_method(_set_thickness, 0.0, peak, duration * 0.12)
+
+	# 阶段2：脉冲闪烁 (3次闪动)
+	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.tween_method(_set_thickness, peak, peak * 0.4, duration * 0.12)
+	tween.tween_method(_set_thickness, peak * 0.4, peak * 1.2, duration * 0.12)
+	tween.tween_method(_set_thickness, peak * 1.2, peak * 0.3, duration * 0.12)
+	tween.tween_method(_set_thickness, peak * 0.3, peak * 1.4, duration * 0.12)
+
+	# 阶段3：最强闪光后渐隐
 	tween.set_ease(Tween.EASE_IN)
 	tween.set_trans(Tween.TRANS_QUAD)
-	tween.tween_property(_ghost_sprite, "scale", Vector2.ONE, duration * 0.5)
-	tween.parallel().tween_property(_ghost_sprite, "modulate:a", 0.0, duration * 0.5)
+	tween.tween_method(_set_thickness, peak * 1.4, 0.0, duration * 0.28)
 
-	# 完成后删除
-	tween.tween_callback(func():
-		effect_finished.emit()
-		queue_free()
-	)
+	# 完成后清理
+	tween.tween_callback(_cleanup)
+
+func _set_thickness(value: float) -> void:
+	if _shader_material:
+		_shader_material.set_shader_parameter("thickness", value)
+
+func _cleanup() -> void:
+	# 恢复原始 material
+	if is_instance_valid(_source_sprite):
+		_source_sprite.material = _original_material
+	_source_sprite = null
+	_original_material = null
+	# 断开 shader 引用，确保 ShaderMaterial RID 被释放
+	if _shader_material:
+		_shader_material.shader = null
+	_shader_material = null
+	effect_finished.emit()
+	queue_free()
+
+func _exit_tree() -> void:
+	# 防止效果被中断时 ShaderMaterial 泄漏
+	if is_instance_valid(_source_sprite) and _source_sprite.material == _shader_material:
+		_source_sprite.material = _original_material
+	if _shader_material:
+		_shader_material.shader = null
+	_shader_material = null
 
 # ============ 静态工厂方法 ============
-## 在指定位置创建残影放大效果（使用call_deferred避免节点繁忙错误）
+## 在源精灵上创建金色边框闪动效果（使用call_deferred避免节点繁忙错误）
 ## @param source_sprite: 源精灵
-## @param spawn_position: 生成位置
+## @param spawn_position: 保留参数（未使用）
 ## @param parent: 父节点
 ## @return: GhostExpandEffect 实例
 static func create(source_sprite: Node2D, spawn_position: Vector2, parent: Node) -> GhostExpandEffect:
 	var effect = GhostExpandEffect.new()
-	# 保存参数，在 _ready 中初始化
 	effect._pending_source_sprite = source_sprite
 	effect._pending_spawn_position = spawn_position
-	# 使用 call_deferred 避免 "Parent node is busy" 错误
 	parent.call_deferred("add_child", effect)
 	return effect
 
@@ -105,7 +117,6 @@ var _pending_source_sprite: Node2D = null
 var _pending_spawn_position: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
-	# 如果有待初始化的参数，执行初始化
 	if _pending_source_sprite:
 		create_from_sprite(_pending_source_sprite, _pending_spawn_position)
 		_pending_source_sprite = null

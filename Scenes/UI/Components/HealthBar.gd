@@ -10,6 +10,7 @@ class_name HealthBar
 
 var max_value: float = 100.0
 var current_value: float = 100.0
+var _fill_style: StyleBoxFlat = null
 
 @onready var progress_bar: ProgressBar = $ProgressBar
 @onready var label: Label = $Label
@@ -42,11 +43,12 @@ func update_display() -> void:
 	elif label:
 		label.visible = false
 
-	# 更新颜色
-	var style = StyleBoxFlat.new()
-	style.bg_color = bar_color
-	style.border_color = border_color
-	progress_bar.add_theme_stylebox_override("fill", style)
+	# 更新颜色（复用缓存的 StyleBoxFlat，避免重复创建导致资源泄漏）
+	if not _fill_style:
+		_fill_style = StyleBoxFlat.new()
+		progress_bar.add_theme_stylebox_override("fill", _fill_style)
+	_fill_style.bg_color = bar_color
+	_fill_style.border_color = border_color
 
 ## 平滑更新到目标值
 func tween_to_value(target_value: float, duration: float = 0.3) -> void:

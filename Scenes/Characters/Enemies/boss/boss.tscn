@@ -1,132 +1,37 @@
-[gd_scene load_steps=27 format=3 uid="uid://cqu5qcubrlemt"]
+[gd_scene format=3 uid="uid://dg8ot3heoutwi"]
 
-[ext_resource type="Script" uid="uid://c4vwkhayrop5f" path="res://Scenes/Characters/Enemies/Boss/Scripts/Boss.gd" id="1_boss"]
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/BossBase.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://c4vwkhayrop5f" path="res://Scenes/Characters/Enemies/Boss/Scripts/boss.gd" id="1_boss"]
 [ext_resource type="Texture2D" uid="uid://d2mr0oginn5kf" path="res://Assets/Art/Ninja_Adventure/Actor/Boss/DemonCyclop/Sprite.png" id="2_sprite"]
-[ext_resource type="Script" uid="uid://do3eyt0kvgbl2" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossStateMachine.gd" id="3_statemachine"]
-[ext_resource type="Script" uid="uid://cugytepllupd0" path="res://Scenes/Characters/Enemies/Boss/Scripts/BossAttackManager.gd" id="4_attackmanager"]
 [ext_resource type="PackedScene" uid="uid://bqw7xc3ykn8r1" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossProjectile.tscn" id="5_projectile"]
 [ext_resource type="PackedScene" uid="uid://cvx8p4n2mh1ld" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossLaser.tscn" id="6_laser"]
 [ext_resource type="PackedScene" uid="uid://d0ow3j5sx53nq" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossAoe.tscn" id="7_aoe"]
 [ext_resource type="Resource" uid="uid://blfx5oww3g2r4" path="res://Scenes/Characters/Enemies/Boss/Resources/BossProjectileDamage.tres" id="8_proj_dmg"]
 [ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Boss/Resources/BossLaserDamage.tres" id="9_laser_dmg"]
 [ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Boss/Resources/BossAoeDamage.tres" id="10_aoe_dmg"]
-[ext_resource type="Script" uid="uid://cgmwp25e3hbwy" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossIdle.gd" id="11_idle"]
-[ext_resource type="Script" uid="uid://d1g6tjh1c6c8r" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossPatrol.gd" id="12_patrol"]
-[ext_resource type="Script" uid="uid://b4gclxub8a2pv" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossChase.gd" id="13_chase"]
-[ext_resource type="Script" uid="uid://cls180jwdct2v" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossCircle.gd" id="14_circle"]
-[ext_resource type="Script" uid="uid://b52hi0ynhj6yf" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossAttack.gd" id="15_attack"]
-[ext_resource type="Script" uid="uid://d3rrlgdbbgerj" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossRetreat.gd" id="16_retreat"]
-[ext_resource type="Script" uid="uid://bdwlrfjvq2fiw" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossStun.gd" id="17_stun"]
-[ext_resource type="Script" uid="uid://b0y33arqsugby" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossEnrage.gd" id="18_enrage"]
-[ext_resource type="Script" uid="uid://dppt8hsh15huj" path="res://Scenes/Characters/Enemies/Boss/Scripts/States/BossSpecialAttack.gd" id="19_special"]
-[ext_resource type="Script" uid="uid://5jjwbr0mlmjx" path="res://Core/Components/Hurtbox.gd" id="20_hurtbox"]
-[ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="21_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_collision"]
 size = Vector2(48, 64)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
-size = Vector2(40, 56)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
-bg_color = Color(0, 0, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill"]
-bg_color = Color(0.8, 0.1, 0.1, 1)
-
-[sub_resource type="GDScript" id="GDScript_boss_healthbar"]
-script/source = "extends ProgressBar
-
-func on_health_changed(current_health: float, max_health: float) -> void:
-	if max_health > 0:
-		value = current_health / max_health
-"
-
-[node name="Boss" type="CharacterBody2D" groups=["enemy"]]
-collision_layer = 8
-collision_mask = 128
+[node name="Boss" instance=ExtResource("1_base")]
 script = ExtResource("1_boss")
 max_health = 1001
 health = 1001
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" parent="." index="0"]
 texture = ExtResource("2_sprite")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource("RectangleShape2D_boss_collision")
 
-[node name="DamageNumbersAnchor" type="Node2D" parent="."]
-position = Vector2(0, -40)
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-
-[node name="Hurtbox" type="Area2D" parent="."]
-collision_layer = 8
-collision_mask = 0
-script = ExtResource("20_hurtbox")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
-shape = SubResource("RectangleShape2D_hurtbox")
-
-[node name="HealthComponent" type="Node" parent="."]
-script = ExtResource("21_health")
+[node name="HealthComponent" parent="." index="6"]
 max_health = 1000.0
 health = 1000.0
 
-[node name="HealthBar" type="ProgressBar" parent="."]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -25.0
-offset_top = -50.0
-offset_right = 25.0
-offset_bottom = -44.0
-grow_horizontal = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
-max_value = 1.0
-value = 1.0
-show_percentage = false
-script = SubResource("GDScript_boss_healthbar")
-
-[node name="BossAttackManager" type="Node" parent="."]
-script = ExtResource("4_attackmanager")
+[node name="BossAttackManager" parent="." index="8"]
 projectile_scene = ExtResource("5_projectile")
 laser_scene = ExtResource("6_laser")
 aoe_scene = ExtResource("7_aoe")
 projectile_damage = ExtResource("8_proj_dmg")
 laser_damage = ExtResource("9_laser_dmg")
 aoe_damage = ExtResource("10_aoe_dmg")
-
-[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("init_state")]
-script = ExtResource("3_statemachine")
-init_state = NodePath("Idle")
-
-[node name="Idle" type="Node" parent="StateMachine"]
-script = ExtResource("11_idle")
-
-[node name="Patrol" type="Node" parent="StateMachine"]
-script = ExtResource("12_patrol")
-
-[node name="Chase" type="Node" parent="StateMachine"]
-script = ExtResource("13_chase")
-
-[node name="Circle" type="Node" parent="StateMachine"]
-script = ExtResource("14_circle")
-
-[node name="Attack" type="Node" parent="StateMachine"]
-script = ExtResource("15_attack")
-
-[node name="Retreat" type="Node" parent="StateMachine"]
-script = ExtResource("16_retreat")
-
-[node name="Stun" type="Node" parent="StateMachine"]
-script = ExtResource("17_stun")
-
-[node name="Enrage" type="Node" parent="StateMachine"]
-script = ExtResource("18_enrage")
-
-[node name="SpecialAttack" type="Node" parent="StateMachine"]
-script = ExtResource("19_special")
-
-[connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

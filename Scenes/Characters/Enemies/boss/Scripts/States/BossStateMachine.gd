@@ -32,12 +32,12 @@ func _on_phase_changed(new_phase: int):
 	is_transitioning_phase = true
 
 	# 根据阶段智能切换状态
-	if owner_node is Boss and target_node is Hahashin:
-		var boss = owner_node as Boss
-		var player = target_node as Hahashin
+	if owner_node is BossBase and target_node is PlayerBase:
+		var boss = owner_node as BossBase
+		var player = target_node as PlayerBase
 
 		match new_phase:
-			Boss.Phase.PHASE_2:
+			BossBase.Phase.PHASE_2:
 				# 第二阶段：根据当前距离选择合适的战斗状态
 				if player and player.alive:
 					var distance = boss.global_position.distance_to(player.global_position)
@@ -49,7 +49,7 @@ func _on_phase_changed(new_phase: int):
 						# 距离较远，进入追击
 						if states.has("chase"):
 							force_transition("chase")
-			Boss.Phase.PHASE_3:
+			BossBase.Phase.PHASE_3:
 				# 第三阶段立即进入狂暴状态
 				if states.has("enrage"):
 					force_transition("enrage")

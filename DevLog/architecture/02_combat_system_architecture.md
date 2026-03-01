@@ -10,7 +10,7 @@
 ## 📋 目录
 
 1. [架构概览](#1-架构概览)
-2. [Hitbox/Hurtbox 碰撞系统](#2-hitboxhurtbox-碰撞系统)
+2. [HitBoxComponent/HurtBoxComponent 碰撞系统](#2-hitboxhurtbox-碰撞系统)
 3. [Damage 伤害系统](#3-damage-伤害系统)
 4. [AttackEffect 攻击特效](#4-attackeffect-攻击特效)
 5. [HealthComponent 生命值管理](#5-healthcomponent-生命值管理)
@@ -36,11 +36,11 @@
 ```mermaid
 graph TB
     subgraph "攻击方"
-        A[Hitbox<br/>Area2D] --> D[Damage<br/>Resource]
+        A[HitBoxComponent<br/>Area2D] --> D[Damage<br/>Resource]
     end
 
     subgraph "受击方"
-        B[Hurtbox<br/>Area2D] --> C[HealthComponent<br/>Node]
+        B[HurtBoxComponent<br/>Area2D] --> C[HealthComponent<br/>Node]
     end
 
     subgraph "特效系统"
@@ -71,21 +71,21 @@ graph TB
 
 | 层级 | 名称 | 用途 | 代表组件 |
 |-----|------|------|---------|
-| **Layer 2** | Player Hurtbox | 玩家受击区域 | Hahashin/Hurtbox |
-| **Layer 4** | Player Hitbox | 玩家攻击区域 | Hahashin/Hitbox |
-| **Layer 8** | Enemy Hurtbox | 敌人受击区域 | Enemy/Hurtbox |
-| **Layer 16** | Enemy Hitbox | 敌人攻击区域 | Enemy/Hitbox |
+| **Layer 2** | Player HurtBoxComponent | 玩家受击区域 | Hahashin/HurtBoxComponent |
+| **Layer 4** | Player HitBoxComponent | 玩家攻击区域 | Hahashin/HitBoxComponent |
+| **Layer 8** | Enemy HurtBoxComponent | 敌人受击区域 | Enemy/HurtBoxComponent |
+| **Layer 16** | Enemy HitBoxComponent | 敌人攻击区域 | Enemy/HitBoxComponent |
 
 **规则**:
-- Player Hitbox (Layer 4) 检测 Enemy Hurtbox (Mask 8)
-- Enemy Hitbox (Layer 16) 检测 Player Hurtbox (Mask 2)
+- Player HitBoxComponent (Layer 4) 检测 Enemy HurtBoxComponent (Mask 8)
+- Enemy HitBoxComponent (Layer 16) 检测 Player HurtBoxComponent (Mask 2)
 - 同阵营不互相伤害
 
 ---
 
-## 2. Hitbox/Hurtbox 碰撞系统
+## 2. HitBoxComponent/HurtBoxComponent 碰撞系统
 
-### 2.1 Hitbox 设计
+### 2.1 HitBoxComponent 设计
 
 **职责**: 检测攻击范围内的敌人，传递伤害数据
 
@@ -102,19 +102,19 @@ graph TB
 
 **工作流程**:
 ```gdscript
-func _on_hitbox_area_entered(hurtbox: Hurtbox):
+func _on_hitbox_area_entered(hurtbox: HurtBoxComponent):
     # 1. 检查忽略组
     # 2. 创建/获取Damage实例
     # 3. hurtbox.take_damage(dmg, pos)
     # 4. 可选：销毁自身（子弹）
 ```
 
-### 2.2 Hurtbox 设计
+### 2.2 HurtBoxComponent 设计
 
 **职责**: 接收伤害，发出damaged信号
 
 ```gdscript
-class_name Hurtbox
+class_name HurtBoxComponent
 extends Area2D
 
 signal damaged(damage: Damage, attacker_position: Vector2)
@@ -133,26 +133,26 @@ classDiagram
         <<Godot Built-in>>
     }
 
-    class Hitbox {
+    class HitBoxComponent {
         +Damage damage
         +float min_damage
         +float max_damage
         +bool destroy_on_hit
         +Array~String~ ignore_groups
-        +_on_hitbox_area_entered(Hurtbox)
+        +_on_hitbox_area_entered(HurtBoxComponent)
         -_get_damage() Damage
     }
 
-    class Hurtbox {
+    class HurtBoxComponent {
         +signal damaged
         +take_damage(Damage, Vector2)
     }
 
-    Area2D <|-- Hitbox
-    Area2D <|-- Hurtbox
+    Area2D <|-- HitBoxComponent
+    Area2D <|-- HurtBoxComponent
 
-    Hitbox --> Hurtbox : area_entered
-    Hurtbox ..> Damage : emits
+    HitBoxComponent --> HurtBoxComponent : area_entered
+    HurtBoxComponent ..> Damage : emits
 ```
 
 ---
@@ -343,7 +343,7 @@ func die():
 ```gdscript
 func _ready():
     # 自动连接Hurtbox的damaged信号
-    var hurtbox = get_parent().get_node_or_null("Hurtbox")
+    var hurtbox = get_parent().get_node_or_null("HurtBoxComponent")
     if hurtbox:
         hurtbox.damaged.connect(take_damage)
 ```
@@ -374,15 +374,15 @@ func setup_health_bar():
 ```
 Player攻击Enemy
    │
-   Player/Hitbox.area_entered
+   Player/HitBoxComponent.area_entered
    └─→ Enemy/Hurtbox检测到碰撞
        │
-       ├─→ Hitbox._on_hitbox_area_entered()
+       ├─→ HitBoxComponent._on_hitbox_area_entered()
        │   ├─→ 检查ignore_groups
        │   ├─→ 创建/获取Damage实例
        │   └─→ hurtbox.take_damage(damage, pos)
        │
-       └─→ Hurtbox.take_damage()
+       └─→ HurtBoxComponent.take_damage()
            └─→ emit damaged(damage, pos)
                │
                └─→ HealthComponent.take_damage()
@@ -409,8 +409,8 @@ Player攻击Enemy
 
 ```mermaid
 sequenceDiagram
-    participant P as Player/Hitbox
-    participant EH as Enemy/Hurtbox
+    participant P as Player/HitBoxComponent
+    participant EH as Enemy/HurtBoxComponent
     participant HC as Enemy/HealthComponent
     participant D as Damage
     participant E as AttackEffect
@@ -490,7 +490,7 @@ target.velocity = direction * force  # target可能已经free
 
 ✅ **推荐**:
 ```gdscript
-# Hurtbox -> Signal -> HealthComponent
+# HurtBoxComponent -> Signal -> HealthComponent
 hurtbox.damaged.connect(health_component.take_damage)
 ```
 

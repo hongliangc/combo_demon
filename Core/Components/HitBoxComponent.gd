@@ -1,9 +1,9 @@
 extends Area2D
-class_name Hitbox
+class_name HitBoxComponent
 
 ############################################################
-# Hitbox component - 用于检测攻击对象(如子弹、武器)的碰撞区域
-# 是否与敌人的 Hurtbox 区域重叠。如果重叠，则调用受击区域的伤害方法。
+# HitBoxComponent component - 用于检测攻击对象(如子弹、武器)的碰撞区域
+# 是否与敌人的 HurtBoxComponent 区域重叠。如果重叠，则调用受击区域的伤害方法。
 ############################################################
 
 @export_group("伤害配置")
@@ -63,7 +63,7 @@ func _on_hitbox_area_entered_(area: Area2D) -> void:
 	# 更新攻击伤害（子类可重写 update_attack）
 	update_attack()
 
-	if area is Hurtbox:
+	if area is HurtBoxComponent:
 		# 传递攻击者位置（子类可重写 get_attacker_position）
 		area.take_damage(damage, get_attacker_position())
 

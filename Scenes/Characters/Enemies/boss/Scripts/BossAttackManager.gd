@@ -13,7 +13,7 @@ class_name BossAttackManager
 @export var laser_damage: Damage
 @export var aoe_damage: Damage
 
-@onready var boss: Boss = get_owner()
+@onready var boss: BossBase = get_owner()
 
 # ============ 连击攻击 ============
 

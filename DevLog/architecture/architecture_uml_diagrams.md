@@ -591,8 +591,8 @@ graph TD
 
     subgraph DamageSystem["伤害系统"]
         DMG[Damage Resource]
-        HB[Hitbox]
-        HR[Hurtbox]
+        HB[HitBoxComponent]
+        HR[HurtBoxComponent]
         EF[AttackEffect]
     end
 
@@ -684,7 +684,7 @@ graph TD
 │  ┌──────────────── 工具/系统层 ─────────────────┐          │
 │  │                                                │          │
 │  │  StateMachine/       Components/              │          │
-│  │  - BaseStateMachine  - Hitbox/Hurtbox         │          │
+│  │  - BaseStateMachine  - HitBoxComponent/HurtBoxComponent         │          │
 │  │  - BaseState         - HealthComponent        │          │
 │  │  - CommonStates/     - MovementComponent      │          │
 │  │                                                │          │

@@ -59,6 +59,11 @@ func start_expansion() -> void:
 
 	queue_free()
 
+func _exit_tree() -> void:
+	# 显式释放动态创建的 CircleShape2D，防止物理形状 RID 泄漏
+	if collision_shape:
+		collision_shape.shape = null
+
 func _process(_delta: float) -> void:
 	# 更新碰撞半径
 	var shape = collision_shape.shape as CircleShape2D
@@ -66,8 +71,8 @@ func _process(_delta: float) -> void:
 		shape.radius = current_radius
 
 func _on_area_entered(area: Area2D) -> void:
-	# 检测 Hurtbox
-	if area is Hurtbox and area not in damaged_targets:
+	# 检测 HurtBoxComponent
+	if area is HurtBoxComponent and area not in damaged_targets:
 		damaged_targets.append(area)
 
 		# 造成伤害

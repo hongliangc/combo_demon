@@ -233,7 +233,7 @@ State.enter()
 
 - [ ] **Enemy 节点**：
   - [ ] 添加 HealthComponent
-  - [ ] 添加 Hurtbox (Area2D)
+  - [ ] 添加 HurtBoxComponent (Area2D)
 - [ ] **AnimationPlayer**：
   - [ ] 所有必需的动画已添加
   - [ ] 动画名称与代码匹配

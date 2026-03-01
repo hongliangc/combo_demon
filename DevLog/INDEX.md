@@ -20,6 +20,7 @@
 
 | 日期 | 标题 | 问题 | Token |
 |------|------|------|-------|
+| 2026-02-26 | [Level1重力与位置修复](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md) | 重力系统、位置设置、敌人死亡等6个问题 | ~2500 |
 | 2026-01-19 | [特殊攻击后无法移动](bug-fixes/player_autonomous_components_implementation_2026-01-19.md#问题发现) | SkillManager未恢复can_move | ~800 |
 | 2026-01-18 | [await内存泄漏修复](bug-fixes/await_memory_leak_fix_2026-01-18.md) | Effect使用await可能泄漏 | ~800 |
 
@@ -57,13 +58,15 @@
 | 4 | **信号驱动** | [信号驱动](architecture/04_signal_driven_architecture.md) | ~900 |
 | 5 | **Autoload** | [Autoload系统](architecture/05_autoload_system_architecture.md) | ~800 |
 | 6 | **技能系统** | [技能系统](architecture/06_skill_system_architecture.md) | ~1000 |
+| 7 | **角色模板** | [角色模板系统](architecture/07_character_template_architecture.md) | ~5000 |
+| 8 | **Player状态机** | [Player状态机与AnimationTree](architecture/08_player_statemachine_architecture.md) | ~3500 |
 
 #### 原有架构文档
 
 | 日期 | 标题 | 内容 | Token |
 |------|------|------|-------|
 | 2026-01-19 | [UML架构图](architecture/architecture_uml_diagrams.md) | 5类UML图表 | ~2000 |
-| 2026-01-19 | [Hitbox/Hurtbox架构](architecture/hitbox_hurtbox_architecture_2026-01-19.md) | 战斗系统详细设计 | ~2000 |
+| 2026-01-19 | [HitBoxComponent/Hurtbox架构](architecture/hitbox_hurtbox_architecture_2026-01-19.md) | 战斗系统详细设计 | ~2000 |
 | 2026-01-18 | [架构评审](architecture/architecture_review_2026-01-18.md) | 11项优化建议 | ~800 |
 | 2026-01-18 | [组件架构设计](refactoring/autonomous_component_architecture_2026-01-18.md) | 自治组件模式 | ~800 |
 - **生命周期**: 完整的状态管理
@@ -89,6 +92,29 @@
 ---
 
 ## 📅 按日期浏览
+
+### 2026-02-27
+- 📐 [Player状态机与AnimationTree架构](architecture/08_player_statemachine_architecture.md) - Player 状态机重构为 BaseState 统一框架
+  - ✅ 重构 AnimationTree 为 BlendTree 模式（locomotion SM + control_sm + control_blend）
+  - ✅ 5 个状态脚本使用 BaseState 内置 helper（set_locomotion_state, enter_control_state 等）
+  - ✅ PlayerStateMachine 移入 PlayerBase.tscn 模板场景
+  - ✅ 三层优先级系统: Hit(CONTROL=2) > Combat/Roll(REACTION=1) > Ground/Air(BEHAVIOR=0)
+
+### 2026-02-26
+- 📐 [角色模板系统架构](architecture/07_character_template_architecture.md) - 新增 PlayerBase 和 BossBase 模板
+  - ✅ 创建 PlayerBase.tscn (玩家模板，包含 5 个组件 + HealthBar)
+  - ✅ 重构 Hahashin.tscn 为继承场景
+  - ✅ 创建 BossBase.gd + BossBase.tscn (Boss 模板，阶段系统 + 9 状态)
+  - ✅ 重构 Boss.gd + Boss.tscn 为继承场景
+  - ✅ 更新类型引用 (BossAttackManager, BossBaseState, BossStateMachine)
+  - 🔧 完善三层继承体系: BaseCharacter → PlayerBase/EnemyBase/BossBase → 具体角色
+- 🐛 [Level1场景修复](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md) - 修复6个关键问题
+  - ✅ 修复敌人死亡后不消失（添加 queue_free()）
+  - ✅ 修复敌人移动朝向反了（精灵翻转逻辑）
+  - ✅ 修复 Hahashin 没有重力（PlayerBase 重力系统 + MovementComponent 职责分离）
+  - ✅ 修复 Hahashin 初始位置不正确（调整到地面）
+  - ✅ 修复 PlayerSpawn 位置设置顺序（先 add_child 再设置 global_position）
+  - ✅ 优化敌人动画系统（统一使用 AnimationTree）
 
 ### 2026-01-25
 - ✨ [V技能特殊攻击完整实现](features/special_attack_v_skill.md)
@@ -121,7 +147,16 @@
 | **特殊攻击** | [V技能完整文档](features/special_attack_v_skill.md), [Bug修复](bug-fixes/player_autonomous_components_implementation_2026-01-19.md#问题发现), [流程图](architecture/architecture_uml_diagrams.md#2-特殊攻击流程时序图) |
 | **信号通信** | [架构设计](refactoring/autonomous_component_architecture_2026-01-18.md#信号通信), [UML图](architecture/architecture_uml_diagrams.md#3-信号通信架构图) |
 | **await问题** | [V技能-call_deferred](features/special_attack_v_skill.md#问题7-按v时没有残影效果), [内存泄漏](bug-fixes/await_memory_leak_fix_2026-01-18.md), [特殊攻击Bug](bug-fixes/player_autonomous_components_implementation_2026-01-19.md#技术细节) |
-| **状态机** | [架构评审](architecture/architecture_review_2026-01-18.md#状态机系统), [优化计划](planning/optimization_work_plan.md#5-重构stunstate---职责分离) |
+| **状态机** | [架构评审](architecture/architecture_review_2026-01-18.md#状态机系统), [优化计划](planning/optimization_work_plan.md#5-重构stunstate---职责分离), [Player状态机架构](architecture/08_player_statemachine_architecture.md) |
+| **Player状态机** | [Player状态机与AnimationTree](architecture/08_player_statemachine_architecture.md), [角色模板](architecture/07_character_template_architecture.md) |
+| **BlendTree** | [Player状态机架构](architecture/08_player_statemachine_architecture.md#3-animationtree-blendtree-架构), [Enemy BlendTree](architecture/07_character_template_architecture.md#5-animationtree-混合树架构) |
+| **角色模板** | [模板系统架构](architecture/07_character_template_architecture.md), [模板规划](planning/charactor_template.md) |
+| **EnemyBase** | [模板系统架构](architecture/07_character_template_architecture.md#4-模板场景设计), [EnemyBase.tscn 节点树](architecture/07_character_template_architecture.md#41-enemybasetscn-节点树) |
+| **AnimationTree** | [BlendTree架构](architecture/07_character_template_architecture.md#5-animationtree-混合树架构), [两种动画方案](architecture/07_character_template_architecture.md#55-两种动画方案), [Player AnimationTree](architecture/08_player_statemachine_architecture.md#3-animationtree-blendtree-架构) |
+| **场景继承** | [覆盖模式](architecture/07_character_template_architecture.md#8-场景继承与覆盖模式), [使用示例](architecture/07_character_template_architecture.md#9-使用示例) |
+| **重力系统** | [Level1修复-重力问题](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md#问题-4-hahashin-没有重力影响核心问题), [组件职责分离](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md#核心设计原则组件职责分离) |
+| **节点生命周期** | [Level1修复-位置设置](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md#问题-5-playerspawn-位置设置顺序错误), [节点初始化模式](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md#节点初始化的正确模式) |
+| **queue_free** | [Level1修复-敌人死亡](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md#问题-1-敌人死亡后不消失), [生命周期管理](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md#知识点queue_free-vs-free) |
 
 ### 按组件
 
@@ -130,7 +165,7 @@
 | **SkillManager** | [V技能完整实现](features/special_attack_v_skill.md), [Bug修复](bug-fixes/player_autonomous_components_implementation_2026-01-19.md), [UML图](architecture/architecture_uml_diagrams.md) |
 | **MovementComponent** | [架构设计](refactoring/autonomous_component_architecture_2026-01-18.md#movementcomponent), [类图](architecture/architecture_uml_diagrams.md#1-player组件类图) |
 | **CombatComponent** | [架构设计](refactoring/autonomous_component_architecture_2026-01-18.md#combatcomponent), [信号图](architecture/architecture_uml_diagrams.md#3-信号通信架构图) |
-| **Hitbox** | [优化计划](planning/optimization_work_plan.md#1-统一hitbox实现), [架构评审](architecture/architecture_review_2026-01-18.md) |
+| **HitBoxComponent** | [优化计划](planning/optimization_work_plan.md#1-统一hitbox实现), [架构评审](architecture/architecture_review_2026-01-18.md) |
 
 ---
 
@@ -188,6 +223,9 @@
 
 | 日期 | 变更 |
 |------|------|
+| 2026-02-27 | ✅ 新增 Player 状态机与 AnimationTree 架构文档（BlendTree、状态优先级、时序图） |
+| 2026-02-26 | ✅ 新增 Level1 场景修复文档（重力系统、位置设置、节点生命周期等6个问题） |
+| 2026-02-26 | ✅ 新增角色模板系统架构文档（三层继承、AnimationTree、状态机集成） |
 | 2026-01-25 | ✅ 完成V技能特殊攻击完整实现文档 |
 | 2026-01-25 | ✅ 修复所有V技能相关问题（残影、聚集、镜头、漩涡） |
 | 2026-01-19 | ✅ 创建索引系统，优化文档组织 |
@@ -198,6 +236,6 @@
 
 ---
 
-**最后更新**: 2026-01-25
+**最后更新**: 2026-02-27
 **维护者**: Claude + 用户
-**版本**: v1.1
+**版本**: v1.3

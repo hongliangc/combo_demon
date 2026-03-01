@@ -52,7 +52,7 @@ texture = ExtResource("3_bg")
 [node name="TileMap" type="Node2D" parent="."]
 
 [node name="Ground" type="TileMapLayer" parent="TileMap" groups=["tilemap"]]
-tile_map_data = PackedByteArray("AAD8/xkAAAABAAAA/f8ZAAAAAQAAAP7/GQAAAAEAAAAvABsAAAABAAAAMAAbAAAAAQACABsAAAABAAAAAwAbAAAAAQAAAC4AGwAAAAcAGwAAAAEAAAAIABsAAAABAAAACQAAAA0AGwAAAAEAAAAOABsAAAABAAAADwAAABMAGwAAAAEAAAAUABsAAAABAAAAFQAAABkAGwAAAAEAAAAaABsAAAABAAAAGwAAAB8AGwAAAAEAAAAgABsAAAABAAAAIQAAACUAGwAAAAEAAAAmABsAAAABAAAAJwAAACsAGwAAAAEAAAAsABsAAAABAAAALQAAADEAGwAAAAEAAAA=")
+tile_map_data = PackedByteArray("AAA=")
 tile_set = SubResource("TileSet_maze")
 
 [node name="Camera2D" type="Camera2D" parent="."]

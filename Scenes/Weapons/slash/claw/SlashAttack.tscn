@@ -1,9 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://ioio8r0jx8id"]
+[gd_scene format=3 uid="uid://ioio8r0jx8id"]
 
 [ext_resource type="Script" uid="uid://d0vk6m36usnma" path="res://Scenes/Weapons/slash/claw/SlashAttack.gd" id="1_6xjui"]
 [ext_resource type="Texture2D" uid="uid://c3tuh851evv7g" path="res://Assets/Art/FX/SlashFx/ClawDouble/SpriteSheet.png" id="1_nxfdm"]
 [ext_resource type="Texture2D" uid="uid://1tvd7wartb0e" path="res://Assets/Art/FX/SlashFx/Claw/SpriteSheet.png" id="2_f6rvh"]
-[ext_resource type="Script" uid="uid://c8wsmfs0k6c64" path="res://Core/Components/Hitbox.gd" id="3_f6rvh"]
+[ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="3_f6rvh"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jslvt"]
 atlas = ExtResource("1_nxfdm")
@@ -77,20 +77,20 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_6xjui"]
 radius = 9.05539
 
-[node name="SlashAttack" type="Node2D"]
+[node name="SlashAttack" type="Node2D" unique_id=800541500]
 script = ExtResource("1_6xjui")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1508899944]
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_6xjui")
 animation = &"attack2"
 frame = 3
 frame_progress = 1.0
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="HitBoxComponent" type="Area2D" parent="." unique_id=1696920311]
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("3_f6rvh")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent" unique_id=895366006]
 shape = SubResource("CircleShape2D_6xjui")

@@ -145,7 +145,7 @@ func _execute_special_attack_flow():
 **功能**：
 - ✅ 自动处理输入更新（`_process`）
 - ✅ 自动处理移动和加速度（`_physics_process`）
-- ✅ 自动翻转精灵和 Hitbox
+- ✅ 自动翻转精灵和 HitBoxComponent
 - ✅ 发射信号（`direction_changed`, `velocity_changed`, `sprite_flipped`）
 
 **配置参数**：
@@ -153,7 +153,7 @@ func _execute_special_attack_flow():
 @export var max_speed: float = 100.0
 @export var acceleration_time: float = 0.1
 @export var sprite_node_path: NodePath = ^"AnimatedSprite2D"
-@export var hitbox_node_path: NodePath = ^"%Hitbox"
+@export var hitbox_node_path: NodePath = ^"%HitBoxComponent"
 ```
 
 **可重载方法**：
@@ -393,7 +393,7 @@ Hahashin (CharacterBody2D)
 max_speed: 100
 acceleration_time: 0.1
 sprite_node_path: "AnimatedSprite2D"
-hitbox_node_path: "%Hitbox"
+hitbox_node_path: "%HitBoxComponent"
 ```
 
 **AnimationComponent**：

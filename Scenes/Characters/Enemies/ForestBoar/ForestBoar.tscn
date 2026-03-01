@@ -1,16 +1,31 @@
-[gd_scene load_steps=29 format=3 uid="uid://cforestboar01"]
+[gd_scene load_steps=38 format=3 uid="uid://cforestboar01"]
 
-[ext_resource type="Script" uid="uid://cbhw4q2rokly8" path="res://Scenes/Characters/Enemies/ForestBoar/ForestBoar.gd" id="1_boar"]
-[ext_resource type="Texture2D" uid="uid://dnet8nm0rwid8" path="res://Assets/Art/HighForest/Mob/Boar/Idle/Idle-Sheet.png" id="2_idle"]
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/EnemyBase.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://cbhw4q2rokly8" path="res://Scenes/Characters/Enemies/ForestBoar/ForestBoar.gd" id="2_boar"]
+[ext_resource type="Texture2D" uid="uid://dnet8nm0rwid8" path="res://Assets/Art/HighForest/Mob/Boar/Idle/Idle-Sheet.png" id="3_idle"]
 [ext_resource type="Texture2D" uid="uid://d6ucaibhfaqy" path="res://Assets/Art/HighForest/Mob/Boar/Run/Run-Sheet.png" id="4_run"]
 [ext_resource type="Texture2D" uid="uid://b5q0wuf16jyhr" path="res://Assets/Art/HighForest/Mob/Boar/Hit-Vanish/Hit-Sheet.png" id="5_hit"]
 [ext_resource type="Texture2D" uid="uid://cuqe7qfxwqybn" path="res://Assets/Art/HighForest/Mob/Boar/Walk/Walk-Base-Sheet.png" id="6_walk"]
+[ext_resource type="Script" uid="uid://dhptij5yeksrr" path="res://Core/Resources/Damage.gd" id="7_damage"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarIdle.gd" id="8_idle"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarWander.gd" id="9_wander"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarChase.gd" id="10_chase"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarAttack.gd" id="11_attack"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarStun.gd" id="12_stun"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(32, 24)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
 size = Vector2(36, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
+size = Vector2(36, 26)
+
+[sub_resource type="Resource" id="Resource_damage"]
+script = ExtResource("7_damage")
+max_amount = 10.0
+metadata/_custom_type_script = "uid://dhptij5yeksrr"
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nauev"]
 atlas = ExtResource("5_hit")
@@ -29,19 +44,19 @@ atlas = ExtResource("5_hit")
 region = Rect2(144, 0, 48, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_6t8hf"]
-atlas = ExtResource("2_idle")
+atlas = ExtResource("3_idle")
 region = Rect2(0, 0, 48, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ia0rv"]
-atlas = ExtResource("2_idle")
+atlas = ExtResource("3_idle")
 region = Rect2(48, 0, 48, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jursk"]
-atlas = ExtResource("2_idle")
+atlas = ExtResource("3_idle")
 region = Rect2(96, 0, 48, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_rpadi"]
-atlas = ExtResource("2_idle")
+atlas = ExtResource("3_idle")
 region = Rect2(144, 0, 48, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_immcn"]
@@ -175,22 +190,67 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="ForestBoar" type="CharacterBody2D" groups=["enemy"]]
-collision_layer = 8
+[node name="ForestBoar" instance=ExtResource("1_base")]
 collision_mask = 129
-script = ExtResource("1_boar")
+script = ExtResource("2_boar")
+max_health = 50
+health = 50
+min_wander_time = 2.5
+max_wander_time = 6.0
+wander_speed = 40.0
+detection_radius = 200.0
+chase_radius = 300.0
+follow_radius = 25.0
+chase_speed = 100
+has_gravity = true
+gravity = 800.0
+use_animation_tree = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="FloorCollision" parent="."]
 position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_body")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="HurtBoxComponent" parent="."]
 collision_layer = 8
-collision_mask = 2
+collision_mask = 4
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" parent="HurtBoxComponent"]
+position = Vector2(1, -10)
+shape = SubResource("RectangleShape2D_hurtbox")
+
+[node name="Idle" parent="EnemyStateMachine"]
+script = ExtResource("8_idle")
+
+[node name="Wander" parent="EnemyStateMachine"]
+script = ExtResource("9_wander")
+
+[node name="Chase" parent="EnemyStateMachine"]
+script = ExtResource("10_chase")
+
+[node name="Attack" parent="EnemyStateMachine"]
+script = ExtResource("11_attack")
+
+[node name="Stun" parent="EnemyStateMachine"]
+script = ExtResource("12_stun")
+
+[node name="HitBoxComponent" parent="."]
+damage = SubResource("Resource_damage")
+destroy_owner_on_hit = true
+
+[node name="CollisionShape2D" parent="HitBoxComponent"]
 position = Vector2(0, -12)
 shape = SubResource("RectangleShape2D_hitbox")
+
+[node name="HealthBar" parent="."]
+offset_left = -20.0
+offset_top = -35.0
+offset_right = 20.0
+offset_bottom = -30.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -12)
+sprite_frames = SubResource("SpriteFrames_boar")
+autoplay = "idle"
 
 [node name="RayGround" type="RayCast2D" parent="."]
 position = Vector2(20, 0)
@@ -198,18 +258,3 @@ target_position = Vector2(0, 20)
 
 [node name="RayWall" type="RayCast2D" parent="."]
 target_position = Vector2(25, 0)
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(0, -12)
-sprite_frames = SubResource("SpriteFrames_boar")
-animation = &"walk"
-autoplay = "idle"
-frame_progress = 0.727609
-
-[node name="HealthBar" type="ProgressBar" parent="."]
-offset_left = -20.0
-offset_top = -35.0
-offset_right = 20.0
-offset_bottom = -30.0
-value = 100.0
-show_percentage = false

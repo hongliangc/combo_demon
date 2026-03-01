@@ -83,7 +83,7 @@ class_name Damage
 ### 钩子方法模式
 ```gdscript
 # 基类 - 提供钩子方法
-class_name Hitbox
+class_name HitBoxComponent
 extends Area2D
 
 ## 钩子方法：子类可重写以定制伤害获取逻辑
@@ -98,14 +98,14 @@ func get_attacker_position() -> Vector2:
 ## 通用逻辑在基类实现，调用钩子方法
 func _on_hitbox_area_entered_(area: Area2D) -> void:
     update_attack()
-    if area is Hurtbox:
+    if area is HurtBoxComponent:
         area.take_damage(damage, get_attacker_position())
 ```
 
 ```gdscript
 # 子类 - 只重写钩子方法
 class_name PlayerHitbox
-extends Hitbox
+extends HitBoxComponent
 
 @onready var player: Hahashin = get_owner()
 
@@ -141,6 +141,67 @@ sprite.texture = load("res://icon.png")
 add_child(sprite)
 ```
 
+## 状态机 + AnimationTree BlendTree 规范
+
+### 统一 BlendTree 架构
+
+所有角色（Enemy、Player、Boss）的 AnimationTree 统一使用 BlendTree 根节点，结构如下：
+
+```
+AnimationNodeBlendTree (root)  ← 编辑器配置
+├── locomotion  → loco_timescale → control_blend[0]
+├── control_sm  → ctrl_timescale → control_blend[1]
+└── control_blend → output
+```
+
+- **locomotion**: 移动动画层（BlendSpace2D 或 StateMachine）
+- **control_sm**: 控制动画层（攻击、受击、眩晕、死亡等一次性/打断动画）
+- **control_blend** (Blend2): `blend_amount` 控制两层混合（0=locomotion, 1=control）
+- **loco_timescale / ctrl_timescale**: 各层独立的动画速度控制
+
+### 编辑器 vs 代码职责划分
+
+| 编辑器配置（.tscn） | 代码控制（.gd） |
+|-------------------|----------------|
+| BlendTree 节点创建与连接 | `parameters/control_blend/blend_amount` 切换 |
+| locomotion / control_sm 内部状态和过渡 | `playback.travel()` / `playback.start()` |
+| 过渡条件（advance_mode, switch_mode） | `parameters/*/scale` 动画速度 |
+| 动画资源绑定 | `animation_finished` 信号监听 |
+| 状态机子节点 + 脚本绑定 + 优先级 | 状态 enter/exit 逻辑 |
+
+```gdscript
+# ✅ 正确：编辑器配置 BlendTree 结构，代码只切换参数
+func enter_control_state(state_name: String) -> void:
+    tree.set("parameters/control_blend/blend_amount", 1.0)
+    tree.get("parameters/control_sm/playback").start(state_name, true)
+
+# ✅ 正确：locomotion 用 StateMachine 时通过 travel 切换
+func set_locomotion_state(state_name: String) -> void:
+    tree.set("parameters/control_blend/blend_amount", 0.0)
+    tree.get("parameters/locomotion/playback").travel(state_name)
+
+# ❌ 错误：代码中创建 AnimationNode 对象
+var sm = AnimationNodeStateMachine.new()
+sm.add_node("idle", AnimationNodeAnimation.new())  # 应在编辑器中配置
+```
+
+### 状态脚本规范
+
+1. **继承 BaseState**：所有状态继承 `BaseState`，使用内置 helper 控制动画
+2. **不直接操作 AnimationTree**：通过 `set_locomotion()` / `enter_control_state()` / `exit_control_state()` 等 helper
+3. **优先级三层**: `BEHAVIOR(0)` < `REACTION(1)` < `CONTROL(2)`
+4. **动画完成检测**: connect `animation_finished` 信号，在 `exit()` 中必须 disconnect
+5. **状态机定义在模板场景**: PlayerBase.tscn / EnemyBase.tscn 中配置，角色场景继承
+
+### locomotion 两种模式
+
+| 模式 | 节点类型 | 调用方法 | 适用场景 |
+|------|---------|---------|---------|
+| 多维混合 | BlendSpace2D | `set_locomotion(Vector2)` | Enemy（方向+速度） |
+| 二元切换 | StateMachine | `set_locomotion_state("idle"/"run")` | Player（只有 idle/run） |
+
+> 详细架构文档: [Player状态机与AnimationTree](../../DevLog/architecture/08_player_statemachine_architecture.md)
+
 ## 架构检查要点
 
 - **通用性**：是否使用 `@export` 配置化？能否跨场景复用？
@@ -150,3 +211,5 @@ add_child(sprite)
 - **继承设计**：基类是否提供钩子方法？子类是否只重写必要方法？
 - **信号连接**：子类是否重复连接了基类已连接的信号？是否遗漏 `super()` 调用？
 - **编辑器优先**：是否有在代码中 `new()` Node 派生对象的情况？是否应该改为编辑器配置或场景实例化？
+- **状态机规范**：状态是否继承 BaseState？是否使用内置 helper 而非直接操作 AnimationTree？animation_finished 信号是否在 exit() 中断开？
+- **BlendTree 规范**：AnimationTree 是否使用统一 BlendTree 结构（locomotion + control_sm + control_blend）？节点结构是否在编辑器中配置？

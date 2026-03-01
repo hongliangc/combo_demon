@@ -34,8 +34,8 @@
 - 删除重复的子类脚本
 
 **执行步骤**:
-- [x] 在 Hitbox 基类添加 `destroy_owner_on_hit: bool`
-- [x] 在 Hitbox 基类添加 `ignore_collision_groups: Array[String]`
+- [x] 在 HitBoxComponent 基类添加 `destroy_owner_on_hit: bool`
+- [x] 在 HitBoxComponent 基类添加 `ignore_collision_groups: Array[String]`
 - [x] 更新 `_on_hitbox_area_entered_` 方法实现新功能
 - [x] 更新 `fire_bullet.tscn` 使用基类并配置参数
 - [x] 更新 `bubble_bullet.tscn` 使用基类并配置参数
@@ -143,7 +143,7 @@ timer.timeout.connect(func():
 
 ### 4. 添加碰撞层配置到Hitbox ✅ COMPLETED
 
-**问题**: Hitbox 无法在编辑器中灵活配置碰撞层和掩码
+**问题**: HitBoxComponent 无法在编辑器中灵活配置碰撞层和掩码
 
 **影响**: 需要在场景文件中手动配置，不够灵活
 
@@ -408,8 +408,8 @@ Util/
 │   └── CommonStates/
 ├── Components/
 │   ├── Health/
-│   ├── Hitbox/
-│   └── Hurtbox/
+│   ├── HitBoxComponent/
+│   └── HurtBoxComponent/
 ├── Classes/
 │   ├── Damage/
 │   └── Effects/

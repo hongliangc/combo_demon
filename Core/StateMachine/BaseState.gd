@@ -354,12 +354,10 @@ func get_anim_tree() -> AnimationTree:
 ## blend_position.y: 0(idle) 到 1(run) 的速度比例
 func set_locomotion(blend: Vector2) -> void:
 	var tree = get_anim_tree()
-	if tree:
-		tree.set("parameters/control_blend/blend_amount", 0.0)
-		tree.set("parameters/locomotion/blend_position", blend)
-		print("[ANIMATION] set_locomotion: blend=(%.2f, %.2f) owner=%s" % [blend.x, blend.y, owner_node.name if owner_node else "null"])
-	else:
-		print("[ANIMATION] set_locomotion FAILED: no anim_tree for %s" % (owner_node.name if owner_node else "null"))
+	if not tree:
+		return
+	tree.set("parameters/control_blend/blend_amount", 0.0)
+	tree.set("parameters/locomotion/blend_position", blend)
 
 
 ## 触发攻击动画（使用 OneShot）
@@ -421,6 +419,18 @@ func set_control_time_scale(scale: float) -> void:
 func reset_time_scale() -> void:
 	set_locomotion_time_scale(1.0)
 	set_control_time_scale(1.0)
+
+
+## 切换 locomotion 状态机动画（适用于 StateMachine 类型的 locomotion 节点）
+## 同时确保 control_blend 切回 locomotion 层
+func set_locomotion_state(state_name: String) -> void:
+	var tree = get_anim_tree()
+	if not tree:
+		return
+	tree.set("parameters/control_blend/blend_amount", 0.0)
+	var pb = tree.get("parameters/locomotion/playback")
+	if pb:
+		pb.travel(state_name)
 
 
 ## 直接播放 AnimationPlayer 中的动画（用于特殊情况）

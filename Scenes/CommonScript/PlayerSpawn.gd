@@ -3,7 +3,7 @@ class_name player_spawn
 
 ## 角色场景预加载（用于编辑器测试和备用）
 var player_selection: Dictionary = {
-	"hahashin": preload("res://Scenes/Characters/Player/Hahashin.tscn"),
+	"hahashin": preload("res://Scenes/Characters/Player/Hahashin/Hahashin.tscn"),
 }
 
 @export_group("Character Selection")
@@ -33,8 +33,8 @@ func _spawn_player() -> void:
 	if use_game_manager and GameManager and GameManager.has_selected_character():
 		player = GameManager.create_player()
 		if player:
-			player.global_position = self.global_position
 			add_child(player)
+			player.global_position = self.global_position
 			print("PlayerSpawn: Spawned character from GameManager - ", GameManager.selected_character.display_name)
 			return
 
@@ -42,8 +42,8 @@ func _spawn_player() -> void:
 	if player_selection.has(player_name):
 		var scene: PackedScene = player_selection[player_name]
 		player = scene.instantiate()
-		player.global_position = self.global_position
 		add_child(player)
+		player.global_position = self.global_position
 		print("PlayerSpawn: Spawned default character - ", player_name)
 	else:
 		push_error("PlayerSpawn: Character not found - ", player_name)

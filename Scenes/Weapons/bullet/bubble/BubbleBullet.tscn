@@ -1,8 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://ckasmubexmp8i"]
+[gd_scene format=3 uid="uid://ckasmubexmp8i"]
 
 [ext_resource type="Script" uid="uid://dg6wjnib4rfd2" path="res://Scenes/Weapons/bullet/bubble/BubbleBullet.gd" id="1_n0ouu"]
 [ext_resource type="Texture2D" uid="uid://dsyrrxu8wclm4" path="res://Assets/Art/Bitlytic/blue_bubble.png" id="2_70vwq"]
-[ext_resource type="Script" uid="uid://c8wsmfs0k6c64" path="res://Core/Components/Hitbox.gd" id="3_hitbox"]
+[ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="3_hitbox"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_n0ouu"]
 radius = 8.0
@@ -60,12 +60,12 @@ texture = ExtResource("2_70vwq")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_n0ouu")
 
-[node name="Hitbox" type="Area2D" parent="." groups=["player_bullet"]]
+[node name="HitBoxComponent" type="Area2D" parent="." groups=["player_bullet"]]
 script = ExtResource("3_hitbox")
 destroy_owner_on_hit = true
 ignore_collision_groups = Array[String](["player_bullet"])
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent"]
 shape = SubResource("CircleShape2D_70vwq")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

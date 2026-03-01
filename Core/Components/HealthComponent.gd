@@ -6,12 +6,12 @@ class_name HealthComponent
 ##
 ## 使用方法:
 ##   1. 将此组件添加为 CharacterBody2D 的子节点
-##   2. 连接 Hurtbox.damaged 信号到 take_damage 方法
+##   2. 连接 HurtBoxComponent.damaged 信号到 take_damage 方法
 ##   3. 监听 health_changed 信号更新血条 UI
 ##   4. 监听 damaged/died 信号处理后续逻辑
 ##
 ## 信号流:
-##   Hurtbox.damaged → HealthComponent.take_damage()
+##   HurtBoxComponent.damaged → HealthComponent.take_damage()
 ##       ├─→ 扣血
 ##       ├─→ 显示伤害数字
 ##       ├─→ 应用攻击特效

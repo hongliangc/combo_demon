@@ -12,18 +12,18 @@ func _init():
 
 ## 获取 Boss 的攻击管理器（子类共用）
 func get_attack_manager() -> BossAttackManager:
-	if owner_node is Boss:
-		for child in (owner_node as Boss).get_children():
+	if owner_node is BossBase:
+		for child in (owner_node as BossBase).get_children():
 			if child is BossAttackManager:
 				return child
 	return null
 
 ## 获取当前 Boss 引用（便捷方法）
-func get_boss() -> Boss:
-	return owner_node as Boss if owner_node is Boss else null
+func get_boss() -> BossBase:
+	return owner_node as BossBase if owner_node is BossBase else null
 
 ## Boss 特有的 on_damaged 实现：第三阶段不会被击晕
 func on_damaged(_damage: Damage, _attacker_position: Vector2 = Vector2.ZERO) -> void:
 	var boss = get_boss()
-	if boss and boss.current_phase != Boss.Phase.PHASE_3:
+	if boss and boss.current_phase != BossBase.Phase.PHASE_3:
 		transitioned.emit(self, "stun")

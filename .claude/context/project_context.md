@@ -58,7 +58,7 @@ AutoLoad 单例
 │
 ├── 伤害系统 (Core/Resources/)
 │   ├── Damage (Resource)    - 伤害值 + effects: Array[AttackEffect]
-│   ├── Hitbox/Hurtbox       - 碰撞检测
+│   ├── HitBoxComponent/HurtBoxComponent       - 碰撞检测
 │   └── AttackEffect子类     - StunEffect/KnockUp/KnockBack/Gather/ForceStun
 │
 ├── Boss战
@@ -182,7 +182,7 @@ Core/
 │   ├── CommonStates/    - 7个通用状态
 │   └── ForestEnemyStates/ - 地面敌人状态
 ├── Resources/       - Damage, AttackEffect, StunEffect 等
-├── Components/      - Health, Hitbox, Hurtbox, Combat, Movement, Animation, SkillManager
+├── Components/      - Health, HitBoxComponent, HurtBoxComponent, Combat, Movement, Animation, SkillManager
 ├── Data/SkillBook/  - .tres 资源文件（Physical, KnockUp, SpecialAttack）
 └── Effects/         - 视觉特效（AfterImage, Highlight, Vortex）
 

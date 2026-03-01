@@ -8,11 +8,11 @@ class_name AfterImageEffect
 ## 残影生成间隔（秒）
 @export var spawn_interval: float = 0.03
 ## 残影持续时间（秒）
-@export var fade_duration: float = 0.3
+@export var fade_duration: float = 0.8
 ## 残影初始透明度
-@export var initial_alpha: float = 0.6
+@export var initial_alpha: float = 1
 ## 残影颜色调制（可以设置为蓝色、白色等）
-@export var color_tint: Color = Color(0.5, 0.7, 1.0, 1.0)
+@export var color_tint: Color = Color(1.0, 0.84, 0.0, 1.0)
 ## 最大同时存在的残影数量
 @export var max_after_images: int = 10
 
@@ -20,7 +20,7 @@ class_name AfterImageEffect
 var _is_active: bool = false
 var _target_sprite: Node2D = null
 var _spawn_timer: float = 0.0
-var _after_images: Array[Sprite2D] = []
+var _after_images: Array[Node2D] = []
 
 # ============ 公共 API ============
 ## 开始生成残影
@@ -65,8 +65,8 @@ func _process(delta: float) -> void:
 		_create_after_image()
 
 # ============ 内部方法 ============
-## 创建一个残影
-## 使用 duplicate() 方法复制精灵，添加到当前场景根节点
+## 创建一个残影（参考 whak-a-mole 的 spawn_dash_trail 实现）
+## 使用 duplicate() 复制精灵，直接添加到场景根节点
 func _create_after_image() -> void:
 	if not _target_sprite:
 		return
@@ -77,78 +77,31 @@ func _create_after_image() -> void:
 		if is_instance_valid(oldest):
 			oldest.queue_free()
 
-	# 获取角色的全局位置（用于残影位置）
-	# 优先使用角色的 CharacterBody2D 位置，确保残影在角色位置
-	var owner_node = _target_sprite.get_owner()
-	var after_image_position = _target_sprite.global_position
-	if owner_node and owner_node is CharacterBody2D:
-		after_image_position = owner_node.global_position
-
-	# 使用 duplicate() 创建精灵副本（参考 whak-a-mole 实现）
-	var after_image: Sprite2D = null
-
-	if _target_sprite is AnimatedSprite2D:
-		# AnimatedSprite2D 需要提取当前帧纹理创建 Sprite2D
-		var animated_sprite = _target_sprite as AnimatedSprite2D
-		var frames = animated_sprite.sprite_frames
-		if frames:
-			after_image = Sprite2D.new()
-			var anim_name = animated_sprite.animation
-			var frame_idx = animated_sprite.frame
-			after_image.texture = frames.get_frame_texture(anim_name, frame_idx)
-			after_image.flip_h = animated_sprite.flip_h
-			after_image.flip_v = animated_sprite.flip_v
-			# 复制 centered 和 offset 确保锚点一致
-			after_image.centered = animated_sprite.centered
-			after_image.offset = animated_sprite.offset
-	elif _target_sprite is Sprite2D:
-		# Sprite2D 直接 duplicate
-		after_image = _target_sprite.duplicate() as Sprite2D
-
-	if not after_image:
+	# 直接 duplicate 精灵（适用于 Sprite2D 和 AnimatedSprite2D）
+	var effect: Node2D = _target_sprite.duplicate()
+	if not effect:
 		return
 
-	# 设置残影位置（使用角色位置，而非精灵位置）
-	after_image.global_position = after_image_position
-	after_image.global_rotation = _target_sprite.global_rotation
-	after_image.scale = _target_sprite.scale
+	# AnimatedSprite2D 需要停止动画播放，冻结在当前帧
+	if effect is AnimatedSprite2D:
+		(effect as AnimatedSprite2D).pause()
 
-	# 设置初始外观
-	after_image.modulate = Color(color_tint.r, color_tint.g, color_tint.b, initial_alpha)
-	after_image.z_index = _target_sprite.z_index
+	# 设置位置和外观
+	effect.global_position = _target_sprite.global_position
+	effect.modulate = Color(color_tint.r, color_tint.g, color_tint.b, initial_alpha)
 
-	# 添加到当前场景根节点（而非角色父节点，避免跟随角色移动）
-	# 使用 call_deferred 避免 "Parent node is busy" 错误
-	var current_scene = _target_sprite.get_tree().current_scene
-	if current_scene:
-		# 先记录到数组，防止在 call_deferred 执行前被清理
-		_after_images.append(after_image)
-		# 延迟添加到场景
-		current_scene.call_deferred("add_child", after_image)
-		# 延迟启动渐隐动画（等待节点添加到场景后）
-		_start_fade_deferred(after_image)
+	# 添加到场景根节点
+	_target_sprite.get_tree().current_scene.add_child(effect)
+	_after_images.append(effect)
 
-## 延迟启动渐隐动画（等待节点添加到场景后）
-func _start_fade_deferred(after_image: Sprite2D) -> void:
-	# 使用 call_deferred 确保在节点添加到场景后再创建 tween
-	call_deferred("_fade_out_after_image", after_image)
-
-## 残影渐隐动画
-func _fade_out_after_image(after_image: Sprite2D) -> void:
-	if not is_instance_valid(after_image) or not after_image.is_inside_tree():
-		return
-	var tween = after_image.create_tween()
-	tween.set_ease(Tween.EASE_OUT)
-	tween.set_trans(Tween.TRANS_QUAD)
-
-	# 渐隐
-	tween.tween_property(after_image, "modulate:a", 0.0, fade_duration)
-
-	# 完成后删除
-	tween.tween_callback(func():
-		if is_instance_valid(after_image):
-			_after_images.erase(after_image)
-			after_image.queue_free()
+	# 使用场景树级别的 tween 渐隐
+	var fade_tween: Tween = _target_sprite.get_tree().create_tween()
+	fade_tween.set_ease(Tween.EASE_OUT)
+	fade_tween.tween_property(effect, "modulate", Color(color_tint.r, color_tint.g, color_tint.b, 0.0), fade_duration)
+	fade_tween.chain().tween_callback(func():
+		if is_instance_valid(effect):
+			_after_images.erase(effect)
+			effect.queue_free()
 	)
 
 # ============ 静态工厂方法 ============

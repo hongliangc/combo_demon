@@ -1,7 +1,7 @@
 extends Area2D
 class_name BossProjectile
 
-## Boss 弹幕 - 使用 Hitbox 组件系统
+## Boss 弹幕 - 使用 HitBoxComponent 组件系统
 
 @export var speed := 300.0
 @export var lifetime := 5.0
@@ -10,7 +10,7 @@ class_name BossProjectile
 var direction := Vector2.RIGHT
 var velocity := Vector2.ZERO
 
-@onready var hitbox: Hitbox = $Hitbox
+@onready var hitbox: HitBoxComponent = $HitBoxComponent
 @onready var sprite: Sprite2D = $Sprite2D
 
 func _ready() -> void:
@@ -18,7 +18,7 @@ func _ready() -> void:
 	var timer = get_tree().create_timer(lifetime)
 	timer.timeout.connect(_on_lifetime_expired)
 
-	# 如果有配置的伤害，应用到 Hitbox
+	# 如果有配置的伤害，应用到 HitBoxComponent
 	if damage_config and hitbox:
 		hitbox.damage = damage_config
 
@@ -35,7 +35,7 @@ func set_direction(dir: Vector2) -> void:
 func _on_lifetime_expired() -> void:
 	queue_free()
 
-## Hitbox 碰撞到 Hurtbox 后的回调
+## HitBoxComponent 碰撞到 HurtBoxComponent 后的回调
 func _on_hitbox_hit() -> void:
 	# 弹幕命中后销毁
 	queue_free()

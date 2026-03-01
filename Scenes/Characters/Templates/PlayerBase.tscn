@@ -1,0 +1,144 @@
+[gd_scene format=3 uid="uid://dhm2ajbsbff8e"]
+
+[ext_resource type="Script" uid="uid://xfv1xep6ki8c" path="res://Core/Characters/PlayerBase.gd" id="1_player_base"]
+[ext_resource type="Script" uid="uid://3cpq40uop66w" path="res://Core/Components/HurtBoxComponent.gd" id="2_hurtbox"]
+[ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="3_health"]
+[ext_resource type="Script" uid="uid://wgmi45hwmslf" path="res://Core/Components/MovementComponent.gd" id="4_movement"]
+[ext_resource type="Script" uid="uid://djmeifitglu7e" path="res://Core/Components/CombatComponent.gd" id="6_combat"]
+[ext_resource type="Script" uid="uid://cdsgggqiqgpu5" path="res://Core/Components/SkillManager.gd" id="7_skill"]
+[ext_resource type="Script" uid="uid://b005ddipbd5go" path="res://Core/Components/CameraManager.gd" id="8_camera"]
+[ext_resource type="Script" uid="uid://bon4e8kgewqlq" path="res://Scenes/Characters/Player/Hahashin/PlayerHitbox.gd" id="9_player_hitbox"]
+[ext_resource type="Script" path="res://Core/StateMachine/BaseStateMachine.gd" id="10_sm_base"]
+[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerGroundState.gd" id="11_sm_ground"]
+[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerAirState.gd" id="12_sm_air"]
+[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerCombatState.gd" id="13_sm_combat"]
+[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerRollState.gd" id="14_sm_roll"]
+[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerHitState.gd" id="15_sm_hit"]
+[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerSpecialAttackState.gd" id="16_sm_special"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_floor"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill"]
+bg_color = Color(1, 0, 0, 1)
+
+[sub_resource type="GDScript" id="GDScript_healthbar"]
+script/source = "extends ProgressBar
+
+## Player 血条 - 兼容 HealthComponent 的 health_changed 信号
+
+func on_health_changed(current_health: float, max_health: float) -> void:
+	if max_health > 0:
+		value = current_health / max_health
+"
+
+[node name="PlayerBase" type="CharacterBody2D" unique_id=1179767488 groups=["player"]]
+collision_layer = 2
+collision_mask = 128
+script = ExtResource("1_player_base")
+
+[node name="FloorCollision" type="CollisionShape2D" parent="." unique_id=925843210]
+shape = SubResource("CircleShape2D_floor")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1572817713]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1344461801]
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1041004894]
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="HurtBoxComponent" type="Area2D" parent="." unique_id=458801128]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("2_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBoxComponent" unique_id=972932508]
+shape = SubResource("CircleShape2D_hurtbox")
+
+[node name="DamageNumbersAnchor" type="Node2D" parent="." unique_id=664598285]
+
+[node name="HitBoxComponent" type="Area2D" parent="." unique_id=424478430]
+unique_name_in_owner = true
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("9_player_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent" unique_id=1269556426]
+shape = SubResource("RectangleShape2D_hitbox")
+disabled = true
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1971167533]
+script = ExtResource("3_health")
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=107527890]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -15.0
+offset_top = -20.0
+offset_right = 14.0
+offset_bottom = -16.0
+grow_horizontal = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
+max_value = 1.0
+value = 0.5
+show_percentage = false
+script = SubResource("GDScript_healthbar")
+
+[node name="MovementComponent" type="Node" parent="." unique_id=1866148992]
+script = ExtResource("4_movement")
+
+[node name="CombatComponent" type="Node" parent="." unique_id=1903333573]
+script = ExtResource("6_combat")
+
+[node name="SkillManager" type="Node" parent="." unique_id=898319711]
+script = ExtResource("7_skill")
+
+[node name="CameraManager" type="Node" parent="." unique_id=39447627]
+script = ExtResource("8_camera")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=299757769]
+
+[node name="PlayerStateMachine" type="Node" parent="." node_paths=PackedStringArray("init_state")]
+script = ExtResource("10_sm_base")
+init_state = NodePath("Ground")
+
+[node name="Ground" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("11_sm_ground")
+priority = 0
+can_be_interrupted = true
+
+[node name="Air" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("12_sm_air")
+priority = 0
+can_be_interrupted = true
+
+[node name="Combat" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("13_sm_combat")
+priority = 1
+can_be_interrupted = false
+
+[node name="Roll" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("14_sm_roll")
+priority = 1
+can_be_interrupted = false
+
+[node name="Hit" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("15_sm_hit")
+priority = 2
+can_be_interrupted = false
+
+[node name="SpecialAttack" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("16_sm_special")
+priority = 1
+can_be_interrupted = false
+
+[connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

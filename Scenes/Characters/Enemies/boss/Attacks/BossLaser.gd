@@ -83,8 +83,8 @@ func _on_area_entered(area: Area2D) -> void:
 	if state != "firing":
 		return
 
-	# 检测 Hurtbox
-	if area is Hurtbox and area not in damaged_targets:
+	# 检测 HurtBoxComponent
+	if area is HurtBoxComponent and area not in damaged_targets:
 		damaged_targets.append(area)
 
 		# 造成伤害

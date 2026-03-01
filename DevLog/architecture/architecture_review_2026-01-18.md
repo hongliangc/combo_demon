@@ -103,7 +103,7 @@
 
 ---
 
-### 2. Hitbox/Hurtbox 系统 ⭐⭐⭐⭐
+### 2. HitBoxComponent/HurtBoxComponent 系统 ⭐⭐⭐⭐
 
 **位置**: `Util/Components/hitbox.gd`, `hurtbox.gd`
 
@@ -384,8 +384,8 @@ project_root/
 │   │
 │   ├── Components/           # 可复用组件
 │   │   ├── Health.gd
-│   │   ├── Hitbox.gd
-│   │   ├── Hurtbox.gd
+│   │   ├── HitBoxComponent.gd
+│   │   ├── HurtBoxComponent.gd
 │   │   └── Movement/
 │   │
 │   ├── Classes/              # 数据类 (Resource)
@@ -485,8 +485,8 @@ graph TB
 
     subgraph "战斗系统"
         DMG[Damage Resource]
-        HB[Hitbox]
-        HTB[Hurtbox]
+        HB[HitBoxComponent]
+        HTB[HurtBoxComponent]
         AE[AttackEffect]
         KU[KnockUpEffect]
         KB[KnockBackEffect]
@@ -532,18 +532,18 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant Player
-    participant Hitbox
+    participant HitBoxComponent
     participant Damage
     participant AttackEffect
     participant Enemy
-    participant Hurtbox
+    participant HurtBoxComponent
     participant StateMachine
 
-    Player->>Hitbox: 触发攻击
-    Hitbox->>Hitbox: update_attack()
-    Hitbox->>Damage: randomize_damage()
-    Hitbox->>Hurtbox: area_entered
-    Hurtbox->>Damage: receive damage
+    Player->>HitBoxComponent: 触发攻击
+    HitBoxComponent->>HitBoxComponent: update_attack()
+    HitBoxComponent->>Damage: randomize_damage()
+    HitBoxComponent->>HurtBoxComponent: area_entered
+    HurtBoxComponent->>Damage: receive damage
     Damage->>AttackEffect: apply_effects()
     AttackEffect->>Enemy: apply_effect(enemy, source_pos)
     Enemy->>Enemy: velocity update
@@ -649,7 +649,7 @@ static func return_timer(timer: Timer):
 
 ### 短期计划（1-2周）
 
-1. 统一 Hitbox 实现
+1. 统一 HitBoxComponent 实现
 2. 拆分 Player 类为组件
 3. 修复 AttackEffect await 问题
 4. 添加碰撞层配置

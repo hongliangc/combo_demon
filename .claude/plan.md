@@ -15,7 +15,7 @@ Dinosaur (CharacterBody2D)
 │   ├── Chase                # 继承 CommonStates/ChaseState
 │   ├── Attack               # 继承 CommonStates/AttackState
 │   └── Stun                 # 继承 CommonStates/StunState
-├── Hurtbox
+├── HurtBoxComponent
 ├── HealthBar
 └── AttackAnchor
 ```
