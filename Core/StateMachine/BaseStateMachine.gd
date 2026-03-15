@@ -185,7 +185,7 @@ func force_transition(new_state_name: String) -> void:
 
 ## 获取当前状态名称
 func get_current_state_name() -> String:
-	return current_state.name if current_state else ""
+	return str(current_state.name) if current_state else ""
 
 
 ## 检查是否处于某个状态

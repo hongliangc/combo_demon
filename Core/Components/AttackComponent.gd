@@ -13,8 +13,8 @@ class_name AttackComponent
 	}
 }
 
-func perform_attack(name: String, facing_direction: Vector2 , anchor: Node2D):
-	if not attack_data.has(name):
+func perform_attack(attack_name: String, facing_direction: Vector2 , anchor: Node2D):
+	if not attack_data.has(attack_name):
 		return
 
 	# 获取方向
@@ -24,7 +24,7 @@ func perform_attack(name: String, facing_direction: Vector2 , anchor: Node2D):
 	else:
 		dir = Vector2.DOWN if facing_direction.y > 0.0 else Vector2.UP
 		
-	var config = attack_data[name]
+	var config = attack_data[attack_name]
 	var scene: PackedScene = config["scene"]
 	var node = scene.instantiate()
 	# 设置偏移

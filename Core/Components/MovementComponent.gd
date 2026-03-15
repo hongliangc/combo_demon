@@ -88,7 +88,7 @@ func _ready() -> void:
 	if hitbox_node_path:
 		hitbox_node = owner_body.get_node_or_null(hitbox_node_path)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	# 自动处理输入更新
 	update_input_direction()
 

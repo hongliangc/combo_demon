@@ -1,15 +1,214 @@
-[gd_scene load_steps=25 format=3 uid="uid://cforestbee01"]
+[gd_scene format=3 uid="uid://cforestbee01"]
 
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/EnemyBase.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://bbpsfxynbhnpn" path="res://Scenes/Characters/Templates/EnemyBase.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://dtnwc2hs6cmfl" path="res://Scenes/Characters/Enemies/ForestBee/ForestBee.gd" id="2_bee"]
 [ext_resource type="Texture2D" uid="uid://xy6jlu8yc8cw" path="res://Assets/Art/HighForest/Mob/Small Bee/Fly/Fly-Sheet.png" id="3_fly"]
 [ext_resource type="Texture2D" uid="uid://cr0ndkk1a04uf" path="res://Assets/Art/HighForest/Mob/Small Bee/Attack/Attack-Sheet.png" id="4_attack"]
 [ext_resource type="Texture2D" uid="uid://b3hrcqby6bx7f" path="res://Assets/Art/HighForest/Mob/Small Bee/Hit/Hit-Sheet.png" id="5_hit"]
-[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeIdle.gd" id="6_idle"]
-[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeWander.gd" id="7_wander"]
-[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeChase.gd" id="8_chase"]
-[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeAttack.gd" id="9_attack"]
-[ext_resource type="Script" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeStun.gd" id="10_stun"]
+[ext_resource type="Script" uid="uid://d0fnj08f30kyf" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeIdle.gd" id="6_idle"]
+[ext_resource type="Script" uid="uid://c2g4sd80013wq" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeWander.gd" id="7_wander"]
+[ext_resource type="Script" uid="uid://hdv15migumde" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeChase.gd" id="8_chase"]
+[ext_resource type="Script" uid="uid://cmdcbin3ei58f" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeAttack.gd" id="9_attack"]
+[ext_resource type="Script" uid="uid://c6asbaaqtflf6" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeStun.gd" id="10_stun"]
+
+[sub_resource type="Animation" id="Animation_bee_hit"]
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:animation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["hit"]
+}
+
+[sub_resource type="Animation" id="Animation_bee_fly"]
+length = 0.333
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.083, 0.167, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:animation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["fly"]
+}
+
+[sub_resource type="Animation" id="Animation_bee_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_bee_death"]
+resource_name = "death"
+length = 0.3
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:animation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": ["hit"]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bee"]
+_data = {
+&"RESET": SubResource("Animation_bee_reset"),
+&"death": SubResource("Animation_bee_death"),
+&"hit": SubResource("Animation_bee_hit"),
+&"idle": SubResource("Animation_bee_fly"),
+&"left_run": SubResource("Animation_bee_fly"),
+&"left_walk": SubResource("Animation_bee_fly"),
+&"right_run": SubResource("Animation_bee_fly"),
+&"right_walk": SubResource("Animation_bee_fly"),
+&"stunned": SubResource("Animation_bee_hit")
+}
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_boar_attack"]
+fadein_time = 0.1
+fadeout_time = 0.2
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_boar_control"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_boar_death"]
+animation = &"death"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_boar_hit"]
+animation = &"hit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_boar_stunned"]
+animation = &"stunned"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_boar_h2s"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_boar_s2d"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_boar_h2d"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_boar_control"]
+states/death/node = SubResource("AnimationNodeAnimation_boar_death")
+states/death/position = Vector2(658, 100)
+states/hit/node = SubResource("AnimationNodeAnimation_boar_hit")
+states/hit/position = Vector2(346, 100)
+states/stunned/node = SubResource("AnimationNodeAnimation_boar_stunned")
+states/stunned/position = Vector2(504, 304)
+transitions = ["hit", "stunned", SubResource("AnimationNodeStateMachineTransition_boar_h2s"), "stunned", "death", SubResource("AnimationNodeStateMachineTransition_boar_s2d"), "hit", "death", SubResource("AnimationNodeStateMachineTransition_boar_h2d")]
+graph_offset = Vector2(-96, 0)
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_boar_ctrl"]
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_boar_loco"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_boar_idle"]
+animation = &"idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_boar_left_walk"]
+animation = &"left_walk"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_boar_right_walk"]
+animation = &"right_walk"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_boar_left_run"]
+animation = &"left_run"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_boar_right_run"]
+animation = &"right_run"
+
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_boar_loco"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_boar_idle")
+blend_point_0/pos = Vector2(0, 0)
+blend_point_1/node = SubResource("AnimationNodeAnimation_boar_left_walk")
+blend_point_1/pos = Vector2(-1, 0.5)
+blend_point_2/node = SubResource("AnimationNodeAnimation_boar_right_walk")
+blend_point_2/pos = Vector2(1, 0.5)
+blend_point_3/node = SubResource("AnimationNodeAnimation_boar_left_run")
+blend_point_3/pos = Vector2(-1, 1)
+blend_point_4/node = SubResource("AnimationNodeAnimation_boar_right_run")
+blend_point_4/pos = Vector2(1, 1)
+min_space = Vector2(-1, 0)
+blend_mode = 1
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_7bkb3"]
+graph_offset = Vector2(47.699646, 338.4218)
+nodes/output/position = Vector2(680, 400)
+nodes/attack_oneshot/node = SubResource("AnimationNodeOneShot_boar_attack")
+nodes/attack_oneshot/position = Vector2(900, 320)
+nodes/control_blend/node = SubResource("AnimationNodeBlend2_boar_control")
+nodes/control_blend/position = Vector2(500, 340)
+nodes/control_sm/node = SubResource("AnimationNodeStateMachine_boar_control")
+nodes/control_sm/position = Vector2(20, 560)
+nodes/ctrl_timescale/node = SubResource("AnimationNodeTimeScale_boar_ctrl")
+nodes/ctrl_timescale/position = Vector2(260, 560)
+nodes/loco_timescale/node = SubResource("AnimationNodeTimeScale_boar_loco")
+nodes/loco_timescale/position = Vector2(260, 260)
+nodes/locomotion/node = SubResource("AnimationNodeBlendSpace2D_boar_loco")
+nodes/locomotion/position = Vector2(-60, 260)
+node_connections = [&"output", 0, &"control_blend", &"control_blend", 0, &"loco_timescale", &"control_blend", 1, &"ctrl_timescale", &"ctrl_timescale", 0, &"control_sm", &"loco_timescale", 0, &"locomotion"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bee"]
+radius = 12.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_t68r2"]
 atlas = ExtResource("4_attack")
@@ -113,14 +312,9 @@ animations = [{
 "speed": 8.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_bee"]
-radius = 12.0
-
-[node name="ForestBee" instance=ExtResource("1_base")]
+[node name="ForestBee" unique_id=1864681720 instance=ExtResource("1_base")]
 collision_mask = 129
 script = ExtResource("2_bee")
-max_health = 30
-health = 30
 min_wander_time = 2.0
 max_wander_time = 5.0
 wander_speed = 40.0
@@ -128,26 +322,34 @@ detection_radius = 150.0
 chase_radius = 250.0
 follow_radius = 20.0
 chase_speed = 80
-use_animation_tree = false
+max_health = 30
+health = 30
 
-[node name="FloorCollision" parent="."]
+[node name="AnimationPlayer" parent="." index="1" unique_id=1378411187]
+libraries/ = SubResource("AnimationLibrary_bee")
+
+[node name="AnimationTree" parent="." index="2" unique_id=1204784248]
+tree_root = SubResource("AnimationNodeBlendTree_7bkb3")
+
+[node name="FloorCollision" parent="." index="4" unique_id=458168996]
 shape = SubResource("CircleShape2D_bee")
 
-[node name="Idle" parent="EnemyStateMachine"]
+[node name="Idle" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="0" unique_id=376414692]
 script = ExtResource("6_idle")
 
-[node name="Wander" parent="EnemyStateMachine"]
+[node name="Wander" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="1" unique_id=123025604]
 script = ExtResource("7_wander")
 
-[node name="Chase" parent="EnemyStateMachine"]
+[node name="Chase" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="2" unique_id=1244169998]
 script = ExtResource("8_chase")
 
-[node name="Attack" parent="EnemyStateMachine"]
+[node name="Attack" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="3" unique_id=1291631262]
 script = ExtResource("9_attack")
 
-[node name="Stun" parent="EnemyStateMachine"]
+[node name="Stun" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="5" unique_id=283105885]
 script = ExtResource("10_stun")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="11" unique_id=1726594857]
 sprite_frames = SubResource("SpriteFrames_bee")
+animation = &"fly"
 autoplay = "fly"

@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://bw51dsuf1pism" path="res://Scenes/Levels/Components/LevelHUD.tscn" id="8_hud"]
 [ext_resource type="PackedScene" uid="uid://cforestboar01" path="res://Scenes/Characters/Enemies/ForestBoar/ForestBoar.tscn" id="9_boar"]
 [ext_resource type="PackedScene" uid="uid://d4fp6s833uuea" path="res://Scenes/Characters/Enemies/ForestSnail/ForestSnail.tscn" id="10_snail"]
+[ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="11_camera"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_maze"]
 texture = ExtResource("2_tiles")
@@ -60,6 +61,7 @@ position = Vector2(400, 350)
 zoom = Vector2(2, 2)
 limit_left = 0
 limit_bottom = 500
+script = ExtResource("11_camera")
 
 [node name="PlayerSpawn" type="Node2D" parent="." groups=["player_spawn"]]
 position = Vector2(32, 400)

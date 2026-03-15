@@ -205,7 +205,7 @@ func exit():
 	pass
 
 # 攻击状态下仍然可以被打断
-func on_damaged(_damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
+func on_damaged(_damage: Damage, _attacker_position: Vector2 = Vector2.ZERO):
 	if owner_node is not Boss:
 		return
 

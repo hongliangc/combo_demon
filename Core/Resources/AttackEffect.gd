@@ -17,7 +17,7 @@ class_name AttackEffect
 ## 应用特效到目标角色
 ## @param target: 受到特效影响的角色节点（CharacterBody2D）
 ## @param damage_source_position: 伤害来源位置（用于计算击退方向等）
-func apply_effect(target: CharacterBody2D, damage_source_position: Vector2) -> void:
+func apply_effect(target: CharacterBody2D, _damage_source_position: Vector2) -> void:
 	if show_debug_info:
 		print("[GenericAttackEffect] Applying %s to %s" % [effect_name, target.name])
 	# 子类应该覆盖此方法实现具体逻辑

@@ -7,7 +7,6 @@ extends Node2D
 
 @onready var player_spawn: Node2D = $PlayerSpawn
 @onready var level_hud: LevelHUD = $LevelHUD
-@onready var camera: Camera2D = $Camera2D
 @onready var boss: Node2D = $Boss
 
 var boss_spawned: bool = false
@@ -36,10 +35,3 @@ func _setup_boss() -> void:
 func _on_boss_died() -> void:
 	print("Level3: Boss defeated!")
 	LevelManager.on_boss_defeated()
-
-
-func _physics_process(_delta: float) -> void:
-	# 摄像机跟随玩家
-	var player = get_tree().get_first_node_in_group("player")
-	if player and camera:
-		camera.global_position = camera.global_position.lerp(player.global_position, 0.1)

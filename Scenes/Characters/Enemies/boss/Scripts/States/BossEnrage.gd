@@ -94,7 +94,7 @@ func exit():
 	pass
 
 # 狂暴状态不会被击晕
-func on_damaged(_damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
+func on_damaged(_damage: Damage, _attacker_position: Vector2 = Vector2.ZERO):
 	pass
 	#print("Boss 狂暴中，无法击晕！")
 	# 不会切换到 stun 状态

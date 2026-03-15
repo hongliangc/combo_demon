@@ -8,7 +8,6 @@ extends Node2D
 @onready var player_spawn: Node2D = $PlayerSpawn
 @onready var portal: Portal = $Portal
 @onready var level_hud: LevelHUD = $LevelHUD
-@onready var camera: Camera2D = $Camera2D
 
 
 func _ready() -> void:
@@ -21,10 +20,3 @@ func _ready() -> void:
 	LevelManager.level_started.emit(1)
 
 	print("Level2: Maze Exploration started!")
-
-
-func _physics_process(_delta: float) -> void:
-	# 摄像机跟随玩家
-	var player = get_tree().get_first_node_in_group("player")
-	if player and camera:
-		camera.global_position = camera.global_position.lerp(player.global_position, 0.1)

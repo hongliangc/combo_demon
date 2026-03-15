@@ -6,15 +6,14 @@
 [ext_resource type="Script" uid="uid://wgmi45hwmslf" path="res://Core/Components/MovementComponent.gd" id="4_movement"]
 [ext_resource type="Script" uid="uid://djmeifitglu7e" path="res://Core/Components/CombatComponent.gd" id="6_combat"]
 [ext_resource type="Script" uid="uid://cdsgggqiqgpu5" path="res://Core/Components/SkillManager.gd" id="7_skill"]
-[ext_resource type="Script" uid="uid://b005ddipbd5go" path="res://Core/Components/CameraManager.gd" id="8_camera"]
 [ext_resource type="Script" uid="uid://bon4e8kgewqlq" path="res://Scenes/Characters/Player/Hahashin/PlayerHitbox.gd" id="9_player_hitbox"]
-[ext_resource type="Script" path="res://Core/StateMachine/BaseStateMachine.gd" id="10_sm_base"]
-[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerGroundState.gd" id="11_sm_ground"]
-[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerAirState.gd" id="12_sm_air"]
-[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerCombatState.gd" id="13_sm_combat"]
-[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerRollState.gd" id="14_sm_roll"]
-[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerHitState.gd" id="15_sm_hit"]
-[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerSpecialAttackState.gd" id="16_sm_special"]
+[ext_resource type="Script" uid="uid://ctargslpswrke" path="res://Core/StateMachine/BaseStateMachine.gd" id="10_sm_base"]
+[ext_resource type="Script" uid="uid://djpartimmyfeg" path="res://Core/StateMachine/PlayerStates/PlayerGroundState.gd" id="11_sm_ground"]
+[ext_resource type="Script" uid="uid://18pd8ugnl0d1" path="res://Core/StateMachine/PlayerStates/PlayerAirState.gd" id="12_sm_air"]
+[ext_resource type="Script" uid="uid://c6kgv2j2fpq7m" path="res://Core/StateMachine/PlayerStates/PlayerCombatState.gd" id="13_sm_combat"]
+[ext_resource type="Script" uid="uid://blfkf8nub1o60" path="res://Core/StateMachine/PlayerStates/PlayerRollState.gd" id="14_sm_roll"]
+[ext_resource type="Script" uid="uid://kkmnjkou0eie" path="res://Core/StateMachine/PlayerStates/PlayerHitState.gd" id="15_sm_hit"]
+[ext_resource type="Script" uid="uid://vyfwglbh5x83" path="res://Core/StateMachine/PlayerStates/PlayerSpecialAttackState.gd" id="16_sm_special"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_floor"]
 
@@ -42,6 +41,8 @@ func on_health_changed(current_health: float, max_health: float) -> void:
 [node name="PlayerBase" type="CharacterBody2D" unique_id=1179767488 groups=["player"]]
 collision_layer = 2
 collision_mask = 128
+floor_constant_speed = true
+floor_snap_length = 16.0
 script = ExtResource("1_player_base")
 
 [node name="FloorCollision" type="CollisionShape2D" parent="." unique_id=925843210]
@@ -102,41 +103,34 @@ script = ExtResource("6_combat")
 [node name="SkillManager" type="Node" parent="." unique_id=898319711]
 script = ExtResource("7_skill")
 
-[node name="CameraManager" type="Node" parent="." unique_id=39447627]
-script = ExtResource("8_camera")
-
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=299757769]
 
-[node name="PlayerStateMachine" type="Node" parent="." node_paths=PackedStringArray("init_state")]
+[node name="PlayerStateMachine" type="Node" parent="." unique_id=802477010 node_paths=PackedStringArray("init_state")]
 script = ExtResource("10_sm_base")
 init_state = NodePath("Ground")
 
-[node name="Ground" type="Node" parent="PlayerStateMachine"]
+[node name="Ground" type="Node" parent="PlayerStateMachine" unique_id=1970280776]
 script = ExtResource("11_sm_ground")
-priority = 0
-can_be_interrupted = true
 
-[node name="Air" type="Node" parent="PlayerStateMachine"]
+[node name="Air" type="Node" parent="PlayerStateMachine" unique_id=205575343]
 script = ExtResource("12_sm_air")
-priority = 0
-can_be_interrupted = true
 
-[node name="Combat" type="Node" parent="PlayerStateMachine"]
+[node name="Combat" type="Node" parent="PlayerStateMachine" unique_id=1556612127]
 script = ExtResource("13_sm_combat")
 priority = 1
 can_be_interrupted = false
 
-[node name="Roll" type="Node" parent="PlayerStateMachine"]
+[node name="Roll" type="Node" parent="PlayerStateMachine" unique_id=1542119215]
 script = ExtResource("14_sm_roll")
 priority = 1
 can_be_interrupted = false
 
-[node name="Hit" type="Node" parent="PlayerStateMachine"]
+[node name="Hit" type="Node" parent="PlayerStateMachine" unique_id=730543560]
 script = ExtResource("15_sm_hit")
 priority = 2
 can_be_interrupted = false
 
-[node name="SpecialAttack" type="Node" parent="PlayerStateMachine"]
+[node name="SpecialAttack" type="Node" parent="PlayerStateMachine" unique_id=1124944062]
 script = ExtResource("16_sm_special")
 priority = 1
 can_be_interrupted = false

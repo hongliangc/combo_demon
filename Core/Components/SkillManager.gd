@@ -81,8 +81,8 @@ var _gather_position: Vector2 = Vector2.ZERO
 var owner_node: Node = null
 ## MovementComponent 引用（用于获取朝向）
 var movement_component: MovementComponent = null
-## CameraManager 引用（使用 Node 避免循环依赖）
-var camera_manager: Node = null
+## FollowCamera 引用（统一相机组件）
+var camera: FollowCamera = null
 
 # ============ 生命周期 ============
 func _ready() -> void:
@@ -99,19 +99,16 @@ func _find_components() -> void:
 	# 查找 MovementComponent
 	movement_component = owner_node.get_node_or_null("MovementComponent")
 
-	# 查找 CameraManager（可能在角色上或场景中）
-	camera_manager = owner_node.get_node_or_null("CameraManager")
-	if not camera_manager:
-		# 尝试从场景中查找
-		var managers = owner_node.get_tree().get_nodes_in_group("camera_manager")
-		if not managers.is_empty():
-			camera_manager = managers[0]
+	# 查找 FollowCamera（通过 "camera" group）
+	var cameras = owner_node.get_tree().get_nodes_in_group("camera")
+	if not cameras.is_empty():
+		camera = cameras[0] as FollowCamera
 
-	# 设置 CameraManager 的配置
-	if camera_manager and enable_camera_effects:
-		camera_manager.focus_zoom = camera_focus_zoom
-		camera_manager.hold_duration = camera_hold_per_enemy
-		camera_manager.set_follow_target(owner_node)
+	# 设置 FollowCamera 的配置
+	if camera and enable_camera_effects:
+		camera.focus_zoom = camera_focus_zoom
+		camera.hold_duration = camera_hold_per_enemy
+		camera.set_follow_target(owner_node)
 
 # ============ Phase 1: 创建特效（残影放大 + 心跳 + 漩涡）============
 ## 创建技能释放特效：残影放大、心跳音效、漩涡生成
@@ -163,7 +160,7 @@ func detect_enemies(position: Vector2, face_direction: Vector2) -> bool:
 ## 镜头固定在漩涡位置 -> 开启子弹时间 -> 逐个聚集敌人 -> 关闭子弹时间 -> 镜头切换到玩家
 func gather_enemies() -> void:
 	# 镜头逐个切换到敌人和漩涡中间，同时聚集敌人到漩涡位置
-	if enable_camera_effects and camera_manager and special_attack_detected_enemies.size() > 0:
+	if enable_camera_effects and camera and special_attack_detected_enemies.size() > 0:
 		DebugConfig.debug("特殊攻击: 开始镜头切换并聚集到漩涡 %v" % _gather_position, "", "combat")
 		await _perform_camera_and_gather_sequence(special_attack_detected_enemies.duplicate(), _gather_position)
 
@@ -237,24 +234,24 @@ func cleanup() -> void:
 ## 执行镜头切换 + 聚集序列
 ## 流程：镜头固定在漩涡位置 -> 开启子弹时间 -> 逐个聚集敌人（每个1秒）-> 关闭子弹时间 -> 镜头切换到玩家
 func _perform_camera_and_gather_sequence(enemies: Array, vortex_pos: Vector2) -> void:
-	if not camera_manager or enemies.is_empty():
+	if not camera or enemies.is_empty():
 		return
 
 	var body = owner_node as CharacterBody2D
-	camera_manager.set_follow_target(body)
-	camera_manager._save_camera_state()
+	camera.set_follow_target(body)
+	camera.save_state()
 
-	# 关键：设置 is_transitioning 标志，阻止 player_spawn 的相机跟随
-	camera_manager.is_transitioning = true
+	# 关键：设置 is_transitioning 标志，暂停相机跟随
+	camera.is_transitioning = true
 
 	DebugConfig.info("镜头+聚集序列: %d 个敌人 -> %v" % [enemies.size(), vortex_pos], "", "camera")
 
 	# 第一步：镜头平滑移动到漩涡位置（不跟随敌人移动）
 	if enemies.size() > 0:
-		var initial_tween = camera_manager.create_tween()
+		var initial_tween = camera.create_tween()
 		initial_tween.set_ease(Tween.EASE_OUT)
 		initial_tween.set_trans(Tween.TRANS_CUBIC)
-		initial_tween.tween_property(camera_manager.camera, "global_position", vortex_pos, camera_to_vortex_duration)
+		initial_tween.tween_property(camera, "global_position", vortex_pos, camera_to_vortex_duration)
 		await initial_tween.finished
 
 	# ========== 开启子弹时间 ==========
@@ -296,25 +293,25 @@ func _perform_camera_and_gather_sequence(enemies: Array, vortex_pos: Vector2) ->
 		_end_bullet_time()
 
 	# 所有敌人聚集完成后，镜头从漩涡平滑切换到玩家
-	var final_tween = camera_manager.create_tween()
+	var final_tween = camera.create_tween()
 	final_tween.set_ease(Tween.EASE_IN_OUT)
 	final_tween.set_trans(Tween.TRANS_CUBIC)
-	final_tween.tween_property(camera_manager.camera, "global_position", body.global_position, camera_to_player_duration)
+	final_tween.tween_property(camera, "global_position", body.global_position, camera_to_player_duration)
 	await final_tween.finished
 
 	# 镜头序列完成
-	camera_manager.camera_sequence_finished.emit()
+	camera.camera_sequence_finished.emit()
 
 	# 恢复镜头缩放（位置已经在玩家，只恢复缩放）
-	if camera_manager.enable_zoom_effect:
-		var zoom_tween = camera_manager.create_tween()
+	if camera.enable_zoom_effect:
+		var zoom_tween = camera.create_tween()
 		zoom_tween.set_ease(Tween.EASE_OUT)
 		zoom_tween.set_trans(Tween.TRANS_QUAD)
-		zoom_tween.tween_property(camera_manager.camera, "zoom", camera_manager.original_zoom, 0.2)
+		zoom_tween.tween_property(camera, "zoom", camera.get_saved_zoom(), 0.2)
 		await zoom_tween.finished
 
-	camera_manager.is_transitioning = false
-	camera_manager.camera_restored.emit()
+	camera.is_transitioning = false
+	camera.camera_restored.emit()
 
 # ============ 内部方法：子弹时间 ============
 ## 开启子弹时间（内部方法）

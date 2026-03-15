@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="4_spawn"]
 [ext_resource type="PackedScene" uid="uid://bw51dsuf1pism" path="res://Scenes/Levels/Components/LevelHUD.tscn" id="5_hud"]
 [ext_resource type="PackedScene" uid="uid://cqu5qcubrlemt" path="res://Scenes/Characters/Enemies/Boss/Boss.tscn" id="6_boss"]
+[ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="7_camera"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_boss"]
 texture = ExtResource("2_tiles")
@@ -60,6 +61,7 @@ zoom = Vector2(2, 2)
 limit_left = 0
 limit_right = 600
 limit_bottom = 500
+script = ExtResource("7_camera")
 
 [node name="PlayerSpawn" type="Node2D" parent="." groups=["player_spawn"]]
 position = Vector2(64, 400)

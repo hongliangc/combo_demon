@@ -70,20 +70,20 @@ func _process(_delta: float) -> void:
 	if shape:
 		shape.radius = current_radius
 
-func _on_area_entered(area: Area2D) -> void:
+func _on_area_entered(entered_area: Area2D) -> void:
 	# 检测 HurtBoxComponent
-	if area is HurtBoxComponent and area not in damaged_targets:
-		damaged_targets.append(area)
+	if entered_area is HurtBoxComponent and entered_area not in damaged_targets:
+		damaged_targets.append(entered_area)
 
 		# 造成伤害
 		if damage_config:
 			var damage_copy = damage_config.duplicate(true)
 			damage_copy.randomize_damage()
-			area.take_damage(damage_copy)
+			entered_area.take_damage(damage_copy)
 		else:
 			# 默认伤害
 			var default_damage = Damage.new()
 			default_damage.min_amount = 30
 			default_damage.max_amount = 50
 			default_damage.randomize_damage()
-			area.take_damage(default_damage)
+			entered_area.take_damage(default_damage)

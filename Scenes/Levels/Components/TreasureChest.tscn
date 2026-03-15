@@ -13,6 +13,8 @@ script = ExtResource("1_chest")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_sprite")
+hframes = 2
+frame = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_chest")

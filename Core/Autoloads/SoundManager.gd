@@ -51,7 +51,7 @@ func play_spatial_sound_pitched(stream: AudioStream, pos: Vector2, pitch_range: 
 	player.volume_db = linear_to_db(vol)
 	player.stream = stream
 	player.global_position = pos
-	player.pitch_scale * randf_range(-pitch_range, pitch_range)
+	player.pitch_scale = 1 + randf_range(-pitch_range, pitch_range)
 	player.play()
 
 

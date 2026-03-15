@@ -20,6 +20,7 @@
 
 | 日期 | 标题 | 问题 | Token |
 |------|------|------|-------|
+| 2026-03-13 | [ForestBoar接触自毁修复](bug-fixes/forest_boar_self_destruct_fix_2026-03-13.md) | destroy_owner_on_hit误用导致敌人自毁 | ~300 |
 | 2026-02-26 | [Level1重力与位置修复](bug-fixes/level1_gravity_and_position_fixes_2026-02-26.md) | 重力系统、位置设置、敌人死亡等6个问题 | ~2500 |
 | 2026-01-19 | [特殊攻击后无法移动](bug-fixes/player_autonomous_components_implementation_2026-01-19.md#问题发现) | SkillManager未恢复can_move | ~800 |
 | 2026-01-18 | [await内存泄漏修复](bug-fixes/await_memory_leak_fix_2026-01-18.md) | Effect使用await可能泄漏 | ~800 |
@@ -60,6 +61,7 @@
 | 6 | **技能系统** | [技能系统](architecture/06_skill_system_architecture.md) | ~1000 |
 | 7 | **角色模板** | [角色模板系统](architecture/07_character_template_architecture.md) | ~5000 |
 | 8 | **Player状态机** | [Player状态机与AnimationTree](architecture/08_player_statemachine_architecture.md) | ~3500 |
+| 9 | **完整架构** | [项目完整架构总览](architecture/09_project_architecture_overview_2026-03.md) ⭐ | ~3500 |
 
 #### 原有架构文档
 
@@ -77,6 +79,7 @@
 
 | 日期 | 标题 | 用途 | Token |
 |------|------|------|-------|
+| 2026-03-07 | [项目开发路线图](planning/project_roadmap_2026-03.md) ⭐⭐⭐ | 完整产品规划与开发计划 | ~6000 |
 | 2026-01-18 | [优化工作计划](planning/optimization_work_plan.md) | 11项任务追踪 | ~1000 |
 | 2026-01-19 | [会话总结](sessions/session_summary_2026-01-19.md) | 本次会话记录 | ~400 |
 
@@ -92,6 +95,24 @@
 ---
 
 ## 📅 按日期浏览
+
+### 2026-03-13
+- 🐛 [ForestBoar接触自毁修复](bug-fixes/forest_boar_self_destruct_fix_2026-03-13.md) - `destroy_owner_on_hit` 误用导致 Boar 碰到玩家后自毁
+
+### 2026-03-07
+- 📋 [项目开发路线图](planning/project_roadmap_2026-03.md) ⭐⭐⭐ - 完整的3阶段开发计划
+  - ✅ 第一阶段：内容补充与体验优化（4-6周）
+  - ✅ 第二阶段：系统扩展与深度玩法（6-8周）
+  - ✅ 第三阶段：高级特性与商业化（4-6周）
+  - 📊 项目当前状态评估（88%完成度）
+  - 🎯 详细任务清单和工时估算
+  - 📈 资源需求和预算评估
+- 📐 [项目完整架构总览](architecture/09_project_architecture_overview_2026-03.md) ⭐⭐⭐ - 综合架构分析
+  - 📊 项目规模统计（11,222行代码）
+  - 🏗️ 核心架构设计（5大原则）
+  - 🎮 9大核心系统详解（完成度分析）
+  - 💡 技术亮点和创新设计
+  - 📚 完整技术文档索引
 
 ### 2026-02-27
 - 📐 [Player状态机与AnimationTree架构](architecture/08_player_statemachine_architecture.md) - Player 状态机重构为 BaseState 统一框架
@@ -223,6 +244,9 @@
 
 | 日期 | 变更 |
 |------|------|
+| 2026-03-13 | 🐛 修复 ForestBoar 接触玩家自毁问题（destroy_owner_on_hit 误用） |
+| 2026-03-07 | ⭐ 新增项目开发路线图（3阶段完整规划、任务清单、工时估算、资源评估） |
+| 2026-03-07 | ⭐ 新增项目完整架构总览（代码统计、9大系统详解、技术亮点、SWOT分析） |
 | 2026-02-27 | ✅ 新增 Player 状态机与 AnimationTree 架构文档（BlendTree、状态优先级、时序图） |
 | 2026-02-26 | ✅ 新增 Level1 场景修复文档（重力系统、位置设置、节点生命周期等6个问题） |
 | 2026-02-26 | ✅ 新增角色模板系统架构文档（三层继承、AnimationTree、状态机集成） |
@@ -236,6 +260,6 @@
 
 ---
 
-**最后更新**: 2026-02-27
+**最后更新**: 2026-03-13
 **维护者**: Claude + 用户
-**版本**: v1.3
+**版本**: v1.4

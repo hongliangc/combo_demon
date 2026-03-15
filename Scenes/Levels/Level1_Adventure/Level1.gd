@@ -8,7 +8,6 @@ extends Node2D
 @onready var player_spawn: Node2D = $PlayerSpawn
 @onready var portal: Portal = $Portal
 @onready var level_hud: LevelHUD = $LevelHUD
-@onready var camera: Camera2D = $Camera2D
 
 
 func _ready() -> void:
@@ -20,25 +19,4 @@ func _ready() -> void:
 	# 发出关卡开始信号
 	LevelManager.level_started.emit(0)
 
-	# 设置摄像机跟随玩家
-	_setup_camera_follow()
-
 	print("Level1: Forest Adventure started!")
-
-
-func _setup_camera_follow() -> void:
-	# 等待玩家生成
-	await get_tree().process_frame
-
-	var player = get_tree().get_first_node_in_group("player")
-	if player and camera:
-		# 摄像机跟随玩家
-		camera.position_smoothing_enabled = true
-		camera.position_smoothing_speed = 5.0
-
-
-func _physics_process(_delta: float) -> void:
-	# 摄像机跟随玩家
-	var player = get_tree().get_first_node_in_group("player")
-	if player and camera:
-		camera.global_position = camera.global_position.lerp(player.global_position, 0.1)

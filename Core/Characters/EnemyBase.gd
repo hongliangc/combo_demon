@@ -73,7 +73,7 @@ func _physics_process(delta: float) -> void:
 	# 自动翻转精灵朝向
 	_update_sprite_facing()
 
-## 死亡处理：停止状态机 → 通过 AnimationTree 播放死亡动画 → 删除节点
+## 死亡处理：停止状态机 → 播放死亡动画（优先使用death动画，否则使用白闪效果） → 删除节点
 func _handle_death() -> void:
 	# 停止状态机
 	var state_machine = get_node_or_null("EnemyStateMachine")
@@ -81,21 +81,48 @@ func _handle_death() -> void:
 		state_machine.set_physics_process(false)
 		state_machine.set_process(false)
 
-	# 通过 AnimationTree 播放死亡动画（而不是使用 AnimationPlayer）
-	if anim_tree:
-		# 切换到 death 状态（在 control_sm 状态机中）
-		anim_tree.set("parameters/control_sm/transition_request", "death")
+	# 检查是否有 death 动画
+	var has_death_animation = false
+	if anim_player and anim_player.has_animation("death"):
+		has_death_animation = true
 
-		# 等待动画结束
-		if anim_player:
-			await anim_player.animation_finished
-		else:
-			await get_tree().create_timer(0.3).timeout
+	# 方案1：有 death 动画，使用 AnimationTree 播放
+	if anim_tree and anim_tree.active and has_death_animation:
+		# 切换到 control 层，启动 death 状态
+		anim_tree.set("parameters/control_blend/blend_amount", 1.0)
+		var playback = anim_tree.get("parameters/control_sm/playback")
+		if playback:
+			playback.start("death", true)
+
+		# 等待动画结束（使用动画长度定时，避免 AnimationTree 下信号不触发）
+		var death_anim = anim_player.get_animation("death")
+		var wait_time = death_anim.length if death_anim else 0.5
+		await get_tree().create_timer(wait_time).timeout
 		queue_free()
+
+	# 方案2：没有 death 动画，使用白闪效果
 	else:
-		# 没有 AnimationTree 时，直接删除
-		await get_tree().create_timer(0.3).timeout
+		await _play_default_death_animation()
 		queue_free()
+
+
+## 默认死亡动画：白闪3次 + 淡出
+func _play_default_death_animation() -> void:
+	if not sprite:
+		await get_tree().create_timer(0.5).timeout
+		return
+
+	var tween = get_tree().create_tween()
+
+	# 白闪3次（每次0.1秒）
+	for i in range(3):
+		tween.tween_property(sprite, "modulate", Color(10, 10, 10, 1), 0.05)  # 变白
+		tween.tween_property(sprite, "modulate", Color(1, 1, 1, 1), 0.05)    # 恢复
+
+	# 最后淡出消失
+	tween.tween_property(sprite, "modulate:a", 0.0, 0.2)
+
+	await tween.finished
 
 # ============ 精灵管理 ============
 ## 自动查找精灵节点（优先 AnimatedSprite2D，其次 Sprite2D）
