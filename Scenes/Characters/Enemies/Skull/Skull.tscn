@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ct7bkafuwgae0"]
 
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/EnemyBase.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://bbpsfxynbhnpn" path="res://Scenes/Characters/Templates/EnemyBase.tscn" id="1_base"]
 [ext_resource type="Texture2D" uid="uid://bgqvcensuueh4" path="res://Assets/Art/Ninja_Adventure/Actor/Monsters/Skull/SpriteSheet.png" id="2_texture"]
 
 [sub_resource type="Animation" id="Animation_reset"]
@@ -334,6 +334,7 @@ radius = 8.0
 radius = 8.0
 
 [node name="Skull" unique_id=900953704 instance=ExtResource("1_base")]
+scale = Vector2(2, 2)
 collision_mask = 129
 min_wander_time = 2.0
 max_wander_time = 5.0
@@ -344,35 +345,35 @@ chase_speed = 70
 max_health = 40
 health = 40
 
-[node name="Sprite2D" parent="." index="0"]
+[node name="Sprite2D" parent="." index="0" unique_id=992887352]
 texture = ExtResource("2_texture")
 hframes = 4
 vframes = 4
 
-[node name="AnimationPlayer" parent="." index="1"]
+[node name="AnimationPlayer" parent="." index="1" unique_id=1378411187]
 libraries/ = SubResource("AnimationLibrary_skull")
 
-[node name="HurtBoxComponent" parent="." index="3"]
+[node name="HurtBoxComponent" parent="." index="3" unique_id=1540730912]
 position = Vector2(0, 8)
 
-[node name="CollisionShape2D" parent="HurtBoxComponent" index="0"]
+[node name="CollisionShape2D" parent="HurtBoxComponent" index="0" unique_id=318857879]
 position = Vector2(0, -8)
 shape = SubResource("CircleShape2D_hurtbox")
 
-[node name="FloorCollision" parent="." index="4"]
+[node name="FloorCollision" parent="." index="4" unique_id=458168996]
 shape = SubResource("CircleShape2D_floor")
 
-[node name="HitBoxComponent" parent="." index="7"]
+[node name="HitBoxComponent" parent="." index="7" unique_id=764109139]
 position = Vector2(0, 8)
 
-[node name="CollisionShape2D" parent="HitBoxComponent" index="0"]
+[node name="CollisionShape2D" parent="HitBoxComponent" index="0" unique_id=733792945]
 position = Vector2(0, -8)
 shape = SubResource("CircleShape2D_hitbox")
 
-[node name="HealthBar" parent="." index="8"]
+[node name="HealthBar" parent="." index="8" unique_id=553338694]
 offset_top = -14.0
 offset_bottom = -10.0
 metadata/_edit_use_anchors_ = true
 
-[node name="DamageNumbersAnchor" parent="." index="9"]
+[node name="DamageNumbersAnchor" parent="." index="9" unique_id=578664619]
 position = Vector2(0, -3)

@@ -29,7 +29,7 @@ func physics_process_state(_delta: float) -> void:
 	# 普通攻击 → Combat
 	for action in ["atk_1", "atk_2", "atk_3"]:
 		if Input.is_action_just_pressed(action):
-			owner_node.pending_combat_skill = action
+			owner_node.set_pending_skill(action)
 			transitioned.emit(self, "combat")
 			return
 

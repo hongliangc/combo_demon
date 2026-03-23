@@ -5,9 +5,7 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "e:\\workspace\\4.godot\\combo_demon\\Art",
-        "e:\\workspace\\4.godot\\combo_demon\\Scenes",
-        "e:\\workspace\\4.godot\\combo_demon\\Util"
+        "E:/workspace/4.godot/combo_demon"
       ],
       "env": {}
     },

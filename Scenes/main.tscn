@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="3_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://dg8ot3heoutwi" path="res://Scenes/Characters/Enemies/Boss/Boss.tscn" id="4_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://ct7bkafuwgae0" path="res://Scenes/Characters/Enemies/Skull/Skull.tscn" id="4_kry3j"]
+[ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="5_camera"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
 texture = ExtResource("1_jjgbg")
@@ -271,6 +272,8 @@ tile_set = SubResource("TileSet_8gbba")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1384912052]
 zoom = Vector2(2, 2)
+script = ExtResource("5_camera")
+follow_offset = Vector2(0, -50)
 
 [node name="PlayerSpawn" type="Node2D" parent="." unique_id=23947062]
 script = ExtResource("3_jjvhh")

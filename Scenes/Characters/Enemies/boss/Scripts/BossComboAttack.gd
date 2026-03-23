@@ -79,6 +79,22 @@ static func create_ultimate_combo() -> BossComboAttack:
 	combo.add_step(AttackStep.AttackType.LASER, 0.2, {})
 	return combo
 
+## 螺旋弹幕 -> AOE冲击波（第三阶段 compound）
+static func create_spiral_aoe() -> BossComboAttack:
+	var combo = BossComboAttack.new()
+	combo.combo_name = "Spiral + AOE"
+	combo.add_step(AttackStep.AttackType.PROJECTILE_SPIRAL, 0.0, {"count": 16})
+	combo.add_step(AttackStep.AttackType.AOE, 0.3, {})
+	return combo
+
+## 激光 -> 扇形弹幕（第三阶段 compound）
+static func create_laser_barrage() -> BossComboAttack:
+	var combo = BossComboAttack.new()
+	combo.combo_name = "Laser + Barrage"
+	combo.add_step(AttackStep.AttackType.LASER, 0.0, {})
+	combo.add_step(AttackStep.AttackType.PROJECTILE_FAN, 0.2, {"count": 6, "spread": PI / 4})
+	return combo
+
 ## 双重螺旋（第三阶段专用）
 static func create_double_spiral() -> BossComboAttack:
 	var combo = BossComboAttack.new()

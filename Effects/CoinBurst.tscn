@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://bod2lgv58rdvs"]
+
+[ext_resource type="Script" uid="uid://bc5qon6xjuuhb" path="res://Effects/CoinBurst.gd" id="1_coin"]
+[ext_resource type="Texture2D" uid="uid://cawxlvx5ps82t" path="res://Assets/Art/Ninja_Adventure/Items/Treasure/GoldCoin.png" id="2_tex"]
+
+[sub_resource type="Curve" id="Curve_awwp3"]
+_data = [Vector2(0, 0.71484804), 0.0, 0.0, 0, 0, Vector2(0.5085714, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.56130475), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_haorv"]
+curve = SubResource("Curve_awwp3")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_coin"]
+particle_flag_disable_z = true
+direction = Vector3(0, -1, 0)
+spread = 30.0
+initial_velocity_min = 150.0
+initial_velocity_max = 300.0
+gravity = Vector3(0, 400, 0)
+scale_curve = SubResource("CurveTexture_haorv")
+
+[node name="CoinBurst" type="Node2D" unique_id=2137227367]
+script = ExtResource("1_coin")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=565659650]
+z_index = 10
+emitting = false
+amount = 10
+texture = ExtResource("2_tex")
+lifetime = 0.8
+one_shot = true
+explosiveness = 0.9
+randomness = 0.3
+process_material = SubResource("ParticleProcessMaterial_coin")

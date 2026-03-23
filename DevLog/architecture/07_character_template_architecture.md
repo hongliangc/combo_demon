@@ -1,27 +1,26 @@
 # 角色模板系统架构
 
 > **文档类型**: 核心架构 - 角色模板系统
-> **创建日期**: 2026-02-25
-> **更新日期**: 2026-02-26
-> **Godot版本**: 4.6
+> **更新日期**: 2026-03-15
+> **Godot版本**: 4.x
 > **架构模式**: 继承 + 组件化 + 信号驱动 + 数据驱动
 > **模板数量**: 3 个（EnemyBase, PlayerBase, BossBase）
 
 ---
 
-## 📋 目录
+## 目录
 
 1. [设计背景与目标](#1-设计背景与目标)
 2. [架构总览](#2-架构总览)
 3. [三层继承体系](#3-三层继承体系)
 4. [模板场景设计](#4-模板场景设计)
-5. [AnimationTree 混合树架构](#5-animationtree-混合树架构)
-6. [状态机集成](#6-状态机集成)
-7. [组件系统](#7-组件系统)
-8. [场景继承与覆盖模式](#8-场景继承与覆盖模式)
-9. [使用示例](#9-使用示例)
-10. [遇到的问题与解决方案](#10-遇到的问题与解决方案)
-11. [最佳实践](#11-最佳实践)
+5. [组件系统详解](#5-组件系统详解)
+6. [Resource 数据系统](#6-resource-数据系统)
+7. [信号链路与通信流](#7-信号链路与通信流)
+8. [具体角色实现](#8-具体角色实现)
+9. [创建新角色指南](#9-创建新角色指南)
+10. [架构优缺点分析](#10-架构优缺点分析)
+11. [待提升项与改进建议](#11-待提升项与改进建议)
 
 ---
 
@@ -29,25 +28,21 @@
 
 ### 1.1 痛点
 
-项目初期每个敌人独立实现，导致：
-- **大量重复代码** — HitBox/HurtBox/HealthComponent/状态机在每个敌人场景中重复搭建
-- **维护困难** — 修改一个通用行为（如受击逻辑）需要逐个修改所有敌人
-- **不一致性** — 不同敌人的碰撞层、信号连接方式不统一
-- **新敌人创建成本高** — 创建一个新敌人需要从零搭建完整的节点树
+项目初期每个角色独立实现，导致：
+- **大量重复代码** — HitBox/HurtBox/HealthComponent/状态机在每个角色场景中重复搭建
+- **维护困难** — 修改一个通用行为需要逐个修改所有角色
+- **不一致性** — 碰撞层、信号连接方式不统一
+- **新角色创建成本高** — 从零搭建完整节点树
 
 ### 1.2 设计目标
 
 | 目标 | 说明 |
 |------|------|
-| **可复用** | 通用功能在模板中实现一次，所有敌人继承 |
+| **可复用** | 通用功能在模板中实现一次，所有角色继承 |
 | **可继承** | Godot Inherited Scene 实现场景级继承 |
 | **可配置** | 通过 Inspector 导出属性即可定制差异化行为 |
-| **可组合** | 非通用功能（RayCast、AnimatedSprite2D）按需添加 |
-| **零代码创建** | 简单敌人无需编写任何 GDScript，纯配置即可 |
-
-### 1.3 设计灵感
-
-参考 `DevLog/planning/charactor_template.md` 中的工业级 Enemy 模板设计方案，结合项目实际需求，采用了 **模板继承 + 组件化** 的混合架构。
+| **可组合** | 非通用功能按需添加（RayCast、特殊攻击等） |
+| **零代码创建** | 简单角色无需编写 GDScript，纯配置即可 |
 
 ---
 
@@ -55,83 +50,30 @@
 
 ### 2.1 系统全景图
 
-```mermaid
-graph TB
-    subgraph "脚本继承链"
-        BC[BaseCharacter.gd<br/>CharacterBody2D]
-        EB[EnemyBase.gd]
-        PB[PlayerBase.gd]
-        BB[BossBase.gd]
-        FB[ForestBee.gd]
-        FBo[ForestBoar.gd]
-        FS[ForestSnail.gd]
-        Dino[Dinosaur.gd]
-        HS[Hahashin.gd]
-        Boss[Boss.gd]
-        BC --> EB
-        BC --> PB
-        BC --> BB
-        EB --> FB
-        EB --> FBo
-        EB --> FS
-        EB --> Dino
-        PB --> HS
-        BB --> Boss
-    end
+```
+                    ┌─────────────────────────┐
+                    │    BaseCharacter.gd      │
+                    │   (CharacterBody2D)      │
+                    │  生命系统、信号路由、死亡判定  │
+                    └─────────┬───────────────┘
+                              │ extends
+              ┌───────────────┼───────────────┐
+              │               │               │
+     ┌────────┴──────┐ ┌─────┴──────┐ ┌──────┴──────┐
+     │ EnemyBase.gd  │ │PlayerBase.gd│ │ BossBase.gd │
+     │ AI参数/精灵管理│ │组件引用/委托│ │阶段系统/巡逻│
+     │ 动画树/重力/死亡│ │死亡UI处理   │ │攻击冷却/击退│
+     └───────┬───────┘ └─────┬──────┘ └──────┬──────┘
+             │               │               │
+    ┌────────┼────────┐      │               │
+    │        │        │      │               │
+ ForestBee  Boar   Snail  Hahashin        Boss
+ (零代码)  (RayCast) (简单)  (最小覆盖)    (8方位+纹理)
 
-    subgraph "场景继承链"
-        EBT["EnemyBase.tscn<br/>(敌人模板)"]
-        PBT["PlayerBase.tscn<br/>(玩家模板)"]
-        BBT["BossBase.tscn<br/>(Boss模板)"]
-        BeeS[ForestBee.tscn]
-        BoarS[ForestBoar.tscn]
-        SnailS[ForestSnail.tscn]
-        SkullS[Skull.tscn]
-        HashS[Hahashin.tscn]
-        BossS[Boss.tscn]
-        EBT --> BeeS
-        EBT --> BoarS
-        EBT --> SnailS
-        EBT --> SkullS
-        PBT --> HashS
-        BBT --> BossS
-    end
-
-    subgraph "组件层"
-        HC[HealthComponent]
-        HurtB[HurtBoxComponent]
-        HitB[HitBoxComponent]
-        SM[StateMachine]
-        AT[AnimationTree]
-        MC[MovementComponent]
-        CC[CombatComponent]
-        AM[BossAttackManager]
-    end
-
-    EBT --- HC
-    EBT --- HurtB
-    EBT --- HitB
-    EBT --- SM
-    EBT --- AT
-    PBT --- MC
-    PBT --- CC
-    BBT --- AM
-
-    style BC fill:#e1f5fe
-    style EB fill:#b3e5fc
-    style PB fill:#ffe0b2
-    style BB fill:#f8bbd0
-    style EBT fill:#ffecb3
-    style PBT fill:#fff9c4
-    style BBT fill:#ffcdd2
-    style HC fill:#c8e6c9
-    style HurtB fill:#c8e6c9
-    style HitB fill:#c8e6c9
-    style SM fill:#c8e6c9
-    style AT fill:#c8e6c9
-    style MC fill:#b2ebf2
-    style CC fill:#b2ebf2
-    style AM fill:#d1c4e9
+场景继承:
+  EnemyBase.tscn → ForestBee.tscn, ForestBoar.tscn, ForestSnail.tscn
+  PlayerBase.tscn → Hahashin.tscn
+  BossBase.tscn → Boss.tscn
 ```
 
 ### 2.2 核心设计决策
@@ -140,214 +82,137 @@ graph TB
 |------|------|------|
 | 脚本继承 vs 组件 | **混合** | 脚本继承处理核心生命周期，组件处理可插拔功能 |
 | 场景继承 vs 实例化 | **Inherited Scene** | Godot 原生支持，Inspector 直接覆盖属性 |
-| 动画方案 | **AnimationTree BlendTree** | 统一管理移动/攻击/受击动画混合 |
-| 状态机位置 | **模板内置** | 所有敌人共享相同的 7 个基础状态结构 |
-| 通用 vs 组合 | **通用放模板，差异化组合** | 状态机/HitBox/HurtBox 通用；RayCast/AnimatedSprite2D 组合 |
+| 动画方案 | **AnimationTree BlendTree** (主) / **AnimatedSprite2D** (简) | 复杂角色用 BlendTree，简单角色用帧动画 |
+| 状态机位置 | **模板内置** | 所有角色共享相同的基础状态结构 |
+| Boss 继承 | **独立 BossBase** (非 EnemyBase) | Boss 差异过大，强行复用会导致混乱 |
 
 ---
 
 ## 3. 三层继承体系
 
-### 3.1 类图
-
-```mermaid
-classDiagram
-    class BaseCharacter {
-        <<CharacterBody2D>>
-        +max_health: int
-        +health: int
-        +alive: bool
-        #health_component: HealthComponent
-        #damage_numbers_anchor: Node2D
-        +_setup_health_signals()
-        +_on_health_component_damaged()
-        +_on_died()
-        #_on_character_ready()*
-        #_handle_death()*
-    }
-
-    class EnemyBase {
-        <<extends BaseCharacter>>
-        +enemy_data: EnemyData
-        +wander_speed: float
-        +chase_speed: int
-        +detection_radius: float
-        +chase_radius: float
-        +has_gravity: bool
-        +use_animation_tree: bool
-        #sprite: Node2D
-        #anim_player: AnimationPlayer
-        #anim_tree: AnimationTree
-        +_find_sprite()
-        +_update_sprite_facing()
-        +_apply_enemy_data()
-        #_on_enemy_ready()*
-    }
-
-    class PlayerBase {
-        <<extends BaseCharacter>>
-        #movement_component: MovementComponent
-        #combat_component: CombatComponent
-        #animation_component: AnimationComponent
-        #skill_manager: SkillManager
-        +_connect_player_signals()
-        +switch_to_physical()
-        +switch_to_knockup()
-        +perform_special_attack()
-        #_on_player_ready()*
-    }
-
-    class BossBase {
-        <<extends BaseCharacter>>
-        +signal phase_changed
-        +signal boss_defeated
-        +enum Phase
-        +current_phase: Phase
-        +detection_radius: float
-        +attack_range: float
-        +attack_cooldown: float
-        +patrol_points: Array
-        +check_phase_transition()
-        +change_phase()
-        +activate_phase_transition_effect()
-        +knockback_nearby_units()
-        #_on_boss_ready()*
-        #_update_facing()*
-    }
-
-    class ForestBee {
-        <<extends EnemyBase>>
-        -- 零自定义代码 --
-    }
-
-    class Dinosaur {
-        <<extends EnemyBase>>
-        +textures: Array~Texture2D~
-        +_on_enemy_ready()
-    }
-
-    class Hahashin {
-        <<extends PlayerBase>>
-        +debug_print()
-        -- 角色特定逻辑 --
-    }
-
-    class Boss {
-        <<extends BossBase>>
-        +textures: Array~Texture2D~
-        +base_move_speed: float
-        +move_speed: float
-        +DIRECTIONS_8: Array
-        +setup_patrol_points()
-        +_update_facing()
-    }
-
-    BaseCharacter <|-- EnemyBase
-    BaseCharacter <|-- PlayerBase
-    BaseCharacter <|-- BossBase
-    EnemyBase <|-- ForestBee
-    EnemyBase <|-- ForestBoar
-    EnemyBase <|-- ForestSnail
-    EnemyBase <|-- Dinosaur
-    PlayerBase <|-- Hahashin
-    BossBase <|-- Boss
-```
-
-### 3.2 各层职责
-
-#### 第一层：BaseCharacter（所有角色的根基）
+### 3.1 第一层：BaseCharacter（所有角色的根基）
 
 **文件**: `Core/Characters/BaseCharacter.gd`
+
+**职责**: 健康信号链路、死亡判定、子类钩子
 
 ```gdscript
 extends CharacterBody2D
 
-## 所有角色的基类 - 提供统一的生命值系统集成和信号路由
+signal damaged(damage: Damage, attacker_position: Vector2)
 
 @export var max_health: int = 100
 @export var health: int = 100
 var alive: bool = true
 
 func _ready() -> void:
-    _setup_health_signals()
-    _on_character_ready()  # 子类钩子
+    _setup_health_signals()   # 自动连接 HurtBox → Health → 状态机
+    _on_character_ready()     # 子类钩子
 
-func _setup_health_signals() -> void:
-    # HurtBox.damaged → HealthComponent.take_damage → state machine
-    var hurtbox = get_node_or_null("HurtBoxComponent")
-    if hurtbox:
-        hurtbox.damaged.connect(health_component.take_damage)
-    health_component.died.connect(_on_died)
+func _setup_health_signals():
+    # HurtBox.damaged → HealthComponent.take_damage
+    # HealthComponent.died → _on_died()
+    # HealthComponent.health_changed → HealthBar
+
+func _on_died():
+    alive = false
+    velocity = Vector2.ZERO
+    _handle_death()           # 子类实现
+
+# 子类钩子
+func _on_character_ready(): pass
+func _handle_death(): pass
 ```
 
-**职责**: 健康信号链路、死亡判定、子类钩子
-
-#### 第二层：EnemyBase（敌人通用逻辑）
+### 3.2 第二层A：EnemyBase（敌人通用逻辑）
 
 **文件**: `Core/Characters/EnemyBase.gd`
+
+**职责**: AI 参数导出、精灵管理、AnimationTree 激活、重力、死亡动画
 
 ```gdscript
 extends BaseCharacter
 
-## 敌人通用逻辑：AI参数、精灵管理、AnimationTree、重力、死亡动画
-
 @export_group("Wander")
-@export var wander_speed: float = 30.0
+@export var min_wander_time: float = 2.5
+@export var max_wander_time: float = 10.0
+@export var wander_speed: float = 50.0
+
+@export_group("Chase")
 @export var detection_radius: float = 100.0
+@export var chase_radius: float = 200.0
+@export var follow_radius: float = 25.0
+@export var chase_speed: int = 75
+
+@export_group("Physics")
+@export var has_gravity: bool = false
+@export var gravity: float = 800.0
 
 @export_group("Animation")
-@export var use_animation_tree: bool = false
+@export var use_animation_tree: bool = true
 
-func _on_character_ready() -> void:
-    _find_sprite()                    # 自动发现 Sprite2D 或 AnimatedSprite2D
+var stunned: bool = false
+var can_move: bool = true
+var sprite: Node2D  # 自动检测 Sprite2D 或 AnimatedSprite2D
+
+func _on_character_ready():
+    _find_sprite()
     if use_animation_tree:
-        anim_tree.active = true       # 启用 AnimationTree
-    _on_enemy_ready()                 # 子类钩子
+        anim_tree.active = true
+    _on_enemy_ready()  # 子类钩子
 
-func _handle_death() -> void:
-    # 禁用状态机，播放 death 动画
-    if anim_tree and anim_tree.active:
-        anim_tree.set("parameters/control_blend/blend_amount", 1.0)
+func _handle_death():
+    # 1. 停止状态机
+    # 2. 播放 death 动画 (AnimationTree) 或白闪渐隐效果
+    # 3. queue_free()
 ```
 
-**职责**: AI 参数导出、精灵自动发现、AnimationTree 激活、重力处理、死亡动画流程
-
-#### 第二层B：PlayerBase（玩家通用逻辑）
+### 3.2B 第二层B：PlayerBase（玩家通用逻辑）
 
 **文件**: `Core/Characters/PlayerBase.gd`
+
+**职责**: 组件引用、委托 API、死亡 UI
 
 ```gdscript
 extends BaseCharacter
 class_name PlayerBase
 
-## 玩家通用逻辑：组件引用、委托API、死亡处理
+@export var has_gravity: bool = true
+@export var gravity: float = 980.0
 
-@onready var movement_component: MovementComponent = $MovementComponent
-@onready var combat_component: CombatComponent = $CombatComponent
-@onready var animation_component: AnimationComponent = $AnimationComponent
-@onready var skill_manager: SkillManager = $SkillManager
+@onready var movement_component: MovementComponent
+@onready var combat_component: CombatComponent
+@onready var skill_manager: SkillManager
 
-func _on_character_ready() -> void:
-    _connect_player_signals()         # 连接玩家特有信号
-    _on_player_ready()                # 子类钩子
+var pending_combat_skill: String = ""  # 状态间技能传递
 
-func _handle_death() -> void:
-    hide()                            # 隐藏角色
-    set_collision_mask_value(1, false)
-    get_tree().call_group("ui", "show_game_over")
+func _physics_process(delta):
+    if has_gravity:
+        if not is_on_floor():
+            velocity.y += gravity * delta
+        elif velocity.y > 0:
+            velocity.y = 0
+
+# 委托方法（Animation Method Track 调用）
+func switch_to_physical():       combat_component.switch_to_damage_type(0)
+func switch_to_knockup():        combat_component.switch_to_damage_type(1)
+func switch_to_special_attack(): combat_component.switch_to_damage_type(2)
+
+func _handle_death():
+    visible = false
+    # 显示 GameOver UI
+    _show_game_over()
 ```
 
-**职责**: 组件引用管理、委托 API（切换伤害类型、特殊攻击）、玩家死亡 UI 处理
-
-#### 第二层C：BossBase（Boss 通用逻辑）
+### 3.2C 第二层C：BossBase（Boss 通用逻辑）
 
 **文件**: `Core/Characters/BossBase.gd`
+
+**职责**: 阶段系统、阶段转换特效、巡逻点、攻击冷却
 
 ```gdscript
 extends BaseCharacter
 class_name BossBase
-
-## Boss 通用逻辑：阶段系统、巡逻点、攻击冷却、死亡处理
 
 signal phase_changed(new_phase: int)
 signal boss_defeated()
@@ -356,93 +221,112 @@ enum Phase { PHASE_1, PHASE_2, PHASE_3 }
 
 @export var detection_radius := 800.0
 @export var attack_range := 300.0
+@export var min_distance := 150.0
 @export var phase_2_health_percent := 0.66
 @export var phase_3_health_percent := 0.33
 
 var current_phase: Phase = Phase.PHASE_1
-var attack_cooldown := 0.0
+var attack_cooldown: float = 0.0
+var special_attack_cooldown: float = 0.0
+var patrol_points: Array[Vector2] = []
 
-func check_phase_transition() -> void:
-    var health_percent = float(health) / float(max_health)
-    if health_percent <= phase_3_health_percent:
+func check_phase_transition():
+    var hp_pct = float(health) / float(max_health)
+    if hp_pct <= phase_3_health_percent and current_phase != Phase.PHASE_3:
         change_phase(Phase.PHASE_3)
-    elif health_percent <= phase_2_health_percent:
+    elif hp_pct <= phase_2_health_percent and current_phase == Phase.PHASE_1:
         change_phase(Phase.PHASE_2)
+
+func change_phase(new_phase: Phase):
+    current_phase = new_phase
+    activate_phase_transition_effect()  # 1秒无敌 + 击退附近单位
+    phase_changed.emit(new_phase)
+
+# 子类钩子
+func _on_boss_ready(): pass
+func _on_phase_transition(): pass
+func _update_facing(): pass
 ```
 
-**职责**: 阶段系统（3 阶段切换）、阶段转换特效（无敌+击退）、巡逻点管理、攻击冷却
-
-#### 第三层：具体角色（按需覆盖）
+### 3.3 第三层：具体角色
 
 ```gdscript
-# ForestBee.gd - 最简实现：零自定义代码
+# ForestBee.gd — 零自定义代码
 extends EnemyBase
 
-# Dinosaur.gd - 带自定义功能
-extends EnemyBase
+# Hahashin.gd — 最小化
+extends PlayerBase
+class_name Hahashin
+func _on_player_ready(): pass
 
+# Boss.gd — 特化逻辑
+extends BossBase
+class_name Boss
 @export var textures: Array[Texture2D] = []
+@export var base_move_speed := 150.0
+const DIRECTIONS_8 = [...]  # 8方位
 
-func _on_enemy_ready() -> void:
-    if not textures.is_empty() and sprite is Sprite2D:
-        (sprite as Sprite2D).texture = textures.pick_random()
+var move_speed: float:
+    get:
+        match current_phase:
+            Phase.PHASE_1: return base_move_speed * 1.0
+            Phase.PHASE_2: return base_move_speed * 1.3
+            Phase.PHASE_3: return base_move_speed * 1.5
 ```
-
-**职责**: 仅实现该敌人特有的逻辑，其他全部继承
 
 ---
 
 ## 4. 模板场景设计
 
-### 4.1 EnemyBase.tscn 节点树
+### 4.1 EnemyBase.tscn
 
 **文件**: `Scenes/Characters/Templates/EnemyBase.tscn`
 
 ```
 EnemyBase (CharacterBody2D) [EnemyBase.gd]
-│   collision_layer = 8, collision_mask = 128
+│   collision_layer=8, collision_mask=128
 │
 ├── Sprite2D                          ← 空，子场景填充纹理
-├── AnimationPlayer                   ← 仅含 RESET 动画，子场景覆盖
-├── AnimationTree                     ← 完整 BlendTree（所有敌人共享结构）
+├── AnimationPlayer                   ← 仅含 RESET，子场景覆盖
+├── AnimationTree                     ← 完整 BlendTree（共享结构）
 │
-├── HurtBoxComponent (Area2D)         ← 受击检测 [HurtBoxComponent.gd]
+├── HurtBoxComponent (Area2D)         ← 受击检测
 │   └── CollisionShape2D (CircleShape2D r=12)
 │
 ├── FloorCollision (CollisionShape2D) ← 物理碰撞 (CapsuleShape2D)
-├── HealthComponent (Node)            ← 生命值管理 [HealthComponent.gd]
+├── HealthComponent (Node)
 │
-├── EnemyStateMachine (Node)          ← 状态机 [EnemyStateMachine.gd]
-│   ├── Idle      [IdleState.gd]      ← 7 个通用状态
-│   ├── Wander    [WanderState.gd]       预置在模板中
+├── EnemyStateMachine (Node)          ← 7 个通用状态
+│   ├── Idle      [IdleState.gd]
+│   ├── Wander    [WanderState.gd]
 │   ├── Chase     [ChaseState.gd]
 │   ├── Attack    [AttackState.gd]
 │   ├── Hit       [HitState.gd]
 │   ├── Stun      [StunState.gd]
 │   └── Knockback [KnockbackState.gd]
 │
-├── HitBoxComponent (Area2D)          ← 攻击判定 [HitBoxComponent.gd]
+├── HitBoxComponent (Area2D)          ← 攻击判定
 │   └── CollisionShape2D (CircleShape2D r=12)
 │
-├── HealthBar (ProgressBar)           ← 血条UI（内嵌脚本）
-├── DamageNumbersAnchor (Node2D)      ← 伤害数字锚点
-└── AttackAnchor (Node2D)             ← 攻击生成点
+├── HealthBar (ProgressBar)
+├── DamageNumbersAnchor (Node2D)
+└── AttackAnchor (Node2D)
 ```
 
-### 4.2 PlayerBase.tscn 节点树
+### 4.2 PlayerBase.tscn
 
 **文件**: `Scenes/Characters/Templates/PlayerBase.tscn`
 
 ```
 PlayerBase (CharacterBody2D) [PlayerBase.gd]
-│   collision_layer = 2, collision_mask = 128, groups=["player"]
+│   collision_layer=2, collision_mask=128, groups=["player"]
 │
-├── FloorCollision (CollisionShape2D)     ← CircleShape2D r=15
-├── AnimatedSprite2D                      ← 空，子场景填充 SpriteFrames
-├── AnimationPlayer                       ← 仅含 RESET 动画
-├── AnimationTree                         ← 设置 anim_player 路径
+├── FloorCollision (CollisionShape2D)  ← CircleShape2D r=15
+├── AnimatedSprite2D                   ← 空，子场景填充 SpriteFrames
+├── AnimationPlayer                    ← 仅含 RESET
+├── AnimationTree                      ← 设置 anim_player 路径
 │
-├── HurtBoxComponent (Area2D)             ← collision_layer=2, mask=0
+├── HurtBoxComponent (Area2D)          ← collision_layer=2, mask=0
 │   └── CollisionShape2D (CircleShape2D r=15)
 │
 ├── DamageNumbersAnchor (Node2D)
@@ -450,38 +334,44 @@ PlayerBase (CharacterBody2D) [PlayerBase.gd]
 │   └── CollisionShape2D (RectangleShape2D, disabled)
 │
 ├── HealthComponent (Node)
-├── HealthBar (ProgressBar)               ← 玩家血条（绿色）
+├── HealthBar (ProgressBar)            ← 玩家血条（绿色）
 │
-├── MovementComponent (Node)              ← 玩家移动逻辑
-├── AnimationComponent (Node)             ← 动画状态管理
-├── CombatComponent (Node)                ← 战斗系统
-├── SkillManager (Node)                   ← 技能管理
-├── CameraManager (Node)                  ← 相机跟随
-└── AudioStreamPlayer                     ← 音效播放
+├── MovementComponent (Node)           ← 移动逻辑
+├── CombatComponent (Node)             ← 战斗/伤害类型
+├── SkillManager (Node)                ← V-技能管理
+├── AudioStreamPlayer
+│
+└── PlayerStateMachine (Node)          ← 5+1 个状态
+    ├── Ground (PlayerGroundState)     ← BEHAVIOR, interruptible
+    ├── Air (PlayerAirState)           ← BEHAVIOR, interruptible
+    ├── Combat (PlayerCombatState)     ← REACTION, not interruptible
+    ├── Roll (PlayerRollState)         ← REACTION, not interruptible
+    ├── Hit (PlayerHitState)           ← CONTROL, not interruptible
+    └── SpecialAttack (PlayerSpecialAttackState) ← REACTION, not interruptible
 ```
 
-### 4.3 BossBase.tscn 节点树
+### 4.3 BossBase.tscn
 
 **文件**: `Scenes/Characters/Templates/BossBase.tscn`
 
 ```
 BossBase (CharacterBody2D) [BossBase.gd]
-│   collision_layer = 8, collision_mask = 128, groups=["enemy"]
+│   collision_layer=8, collision_mask=128, groups=["enemy"]
 │
-├── Sprite2D                              ← 空，子场景填充纹理
-├── CollisionShape2D                      ← RectangleShape2D 40x60
-├── DamageNumbersAnchor (Node2D)          ← position(0, -40)
+├── Sprite2D                           ← 空，子场景填充纹理
+├── CollisionShape2D                   ← RectangleShape2D 40x60
+├── DamageNumbersAnchor (Node2D)       ← position(0, -40)
 ├── AnimationPlayer
 │
-├── HurtBoxComponent (Area2D)             ← collision_layer=8, mask=0
+├── HurtBoxComponent (Area2D)          ← collision_layer=8, mask=0
 │   └── CollisionShape2D (RectangleShape2D 40x56)
 │
 ├── HealthComponent (Node)
-├── HealthBar (ProgressBar)               ← Boss 血条（红色）
+├── HealthBar (ProgressBar)            ← Boss 血条（红色，较大）
 │
-├── BossAttackManager (Node)              ← 攻击技能管理器
+├── BossAttackManager (Node)           ← 攻击技能管理器
 │
-└── StateMachine (BossStateMachine)       ← 9 个 Boss 状态
+└── StateMachine (BossStateMachine)    ← 9 个 Boss 状态
     ├── Idle          [BossIdle.gd]
     ├── Patrol        [BossPatrol.gd]
     ├── Chase         [BossChase.gd]
@@ -493,703 +383,728 @@ BossBase (CharacterBody2D) [BossBase.gd]
     └── SpecialAttack [BossSpecialAttack.gd]
 ```
 
-### 4.4 模板 vs 组合 决策表
+### 4.4 三种模板对比
+
+| 特性 | EnemyBase | PlayerBase | BossBase |
+|------|-----------|-----------|----------|
+| **状态数量** | 7 (Idle ~ Knockback) | 5+1 (Ground ~ SpecialAttack) | 9 (多 Patrol/Circle/Retreat/Enrage) |
+| **专用组件** | AttackAnchor | MovementComponent, CombatComponent, SkillManager | BossAttackManager |
+| **动画方案** | AnimationTree 或 AnimatedSprite2D | AnimatedSprite2D + AnimationTree | AnimationPlayer |
+| **朝向逻辑** | flip_h（简单翻转） | MovementComponent 处理 | 8 方位旋转 |
+| **特殊系统** | AI参数、重力 | 技能系统、跳跃 | 阶段系统、巡逻点 |
+| **碰撞层** | Layer 8 | Layer 2 | Layer 8 |
+
+### 4.5 模板 vs 组合 决策表
 
 | 节点 | 归属 | 理由 |
 |------|------|------|
-| **Enemy 通用** | | |
-| 7 个状态节点 | **模板** | 所有敌人共享相同的状态结构 |
-| HitBoxComponent | **模板** | 所有敌人都有，形状/damage 可在子场景覆盖 |
-| HurtBoxComponent | **模板** | 所有敌人都有，形状可覆盖 |
-| HealthComponent | **模板** | 所有敌人都有 |
-| AnimationTree | **模板** | BlendTree 结构统一，子场景只需提供动画数据 |
-| RayGround / RayWall | **组合** | 仅地面敌人需要（Boar/Snail），飞行敌人不需要 |
-| AnimatedSprite2D | **组合** | Forest 敌人使用帧动画，与 Sprite2D + AnimationPlayer 方案互斥 |
-| **Player 通用** | | |
-| MovementComponent | **模板** | 所有玩家都有移动逻辑 |
-| CombatComponent | **模板** | 所有玩家都有战斗系统 |
-| AnimationComponent | **模板** | 所有玩家都有动画管理 |
-| SkillManager | **模板** | 所有玩家都有技能系统 |
-| CameraManager | **模板** | 所有玩家都有相机跟随 |
-| HealthBar | **模板** | 玩家血条（绿色） |
-| **Boss 通用** | | |
-| 9 个 Boss 状态 | **模板** | 所有 Boss 共享状态结构（比敌人多 2 个） |
-| BossAttackManager | **模板** | 所有 Boss 都有攻击管理器 |
-| HealthBar | **模板** | Boss 血条（红色，较大） |
-| BossStateMachine | **模板** | Boss 状态机（支持阶段切换） |
+| 状态机 + 所有状态 | **模板** | 所有同类角色共享相同状态结构 |
+| HitBox / HurtBox | **模板** | 所有角色都有，形状/damage 可覆盖 |
+| HealthComponent + HealthBar | **模板** | 所有角色都有 |
+| AnimationTree | **模板** | BlendTree 结构统一，子场景只提供动画数据 |
+| RayGround / RayWall | **组合** | 仅地面敌人需要，飞行敌人不需要 |
+| AnimatedSprite2D | **组合** | Forest 敌人用帧动画，与 Sprite2D 方案互斥 |
 
 ---
 
-## 5. AnimationTree 混合树架构
+## 5. 组件系统详解
 
-### 5.1 BlendTree 结构图
+### 5.1 HealthComponent
 
-```mermaid
-graph LR
-    subgraph BlendTree
-        LOCO[locomotion<br/>BlendSpace2D] --> LTS[loco_timescale<br/>TimeScale]
-        CTRL[control_sm<br/>StateMachine] --> CTS[ctrl_timescale<br/>TimeScale]
-        LTS --> CB[control_blend<br/>Blend2]
-        CTS --> CB
-        CB --> AO[attack_oneshot<br/>OneShot]
-        AO --> OUT[output]
-    end
+**文件**: `Core/Components/HealthComponent.gd`
 
-    style LOCO fill:#c8e6c9
-    style CTRL fill:#ffcdd2
-    style AO fill:#fff9c4
-```
-
-### 5.2 locomotion BlendSpace2D
-
-5 个混合点，由 `velocity.x` 和 `speed_ratio` 驱动：
+**职责**: 生命值管理、伤害处理、效果应用、死亡判定
 
 ```
-          speed_ratio (y)
-              1.0
-              │
-   left_run ──┼── right_run
-    (-1,1)    │    (1,1)
-              │
-              0.5
-              │
-  left_walk ──┼── right_walk
-   (-1,0.5)  │   (1,0.5)
-              │
-     idle ────┤ (0,0)
-              └──────── direction (x)
-            -1    0    1
+信号流:
+  take_damage(damage, attacker_pos)
+    ├→ 检查无敌
+    ├→ 扣血
+    ├→ 显示伤害数字
+    ├→ 应用攻击效果 (KnockBack/KnockUp/Stun/Gather)  ← 先应用效果
+    ├→ emit health_changed → HealthBar 更新
+    ├→ emit damaged → 状态机响应                       ← 后发信号
+    └→ if health <= 0 → emit died
 ```
 
-### 5.3 control StateMachine
-
-处理受击/眩晕/死亡等不可打断动画：
-
-```mermaid
-stateDiagram-v2
-    [*] --> hit
-    hit --> stunned: hit_to_stunned
-    hit --> death: hit_to_death
-    stunned --> death: stunned_to_death
+**无敌系统**:
+```gdscript
+func set_invincible(enabled: bool, duration: float = 0.0):
+    is_invincible = enabled
+    if enabled and duration > 0:
+        # 定时取消无敌
 ```
 
-### 5.4 动画切换机制
+### 5.2 HurtBoxComponent + HitBoxComponent
+
+**文件**: `Core/Components/HurtBoxComponent.gd`, `Core/Components/HitBoxComponent.gd`
 
 ```
-control_blend.blend_amount:
-  0.0 → 播放 locomotion（移动/待机）
-  1.0 → 播放 control_sm（受击/眩晕/死亡）
-
-attack_oneshot:
-  OneShot 触发 → 临时覆盖为攻击动画
-  结束后自动恢复 locomotion/control
+HitBoxComponent (攻击方)              HurtBoxComponent (受击方)
+│                                    │
+│ area_entered(area)                 │
+├────────────────────────────────────→│
+│ update_attack() → randomize        │
+│ take_damage(damage, pos)           │
+│                                    │ damaged.emit(damage, pos)
+│                                    │    │
+│                                    │    ▼
+│                                    │ HealthComponent.take_damage()
 ```
 
-### 5.5 两种动画方案
+**HitBoxComponent 特性**:
+- `destroy_owner_on_hit`: 弹幕/冲撞型敌人命中后自毁
+- `ignore_collision_groups`: 忽略特定组的碰撞
+- **PlayerHitbox.gd**: 玩家专用覆盖，读取 CombatComponent 的 current_damage
 
-| 方案 | 适用对象 | 配置 |
-|------|----------|------|
-| **Sprite2D + AnimationPlayer + AnimationTree** | Dinosaur, Skull | `use_animation_tree = true` |
-| **AnimatedSprite2D** (直接帧动画) | ForestBee, ForestBoar, ForestSnail | `use_animation_tree = false` |
+### 5.3 MovementComponent
 
-AnimationTree 需要的 10 个动画：
+**文件**: `Core/Components/MovementComponent.gd` (263行)
 
-| 动画名 | 用途 | 循环 |
-|--------|------|------|
-| RESET | 重置所有属性 | - |
-| idle | 待机 | loop |
-| left_walk | 左移走路 | loop |
-| right_walk | 右移走路 | loop |
-| left_run | 左移奔跑 | loop |
-| right_run | 右移奔跑 | loop |
-| attack | 攻击 | - |
-| hit | 受击 | - |
-| stunned | 眩晕 | loop |
-| death | 死亡（含消亡特效） | - |
+**职责**: 输入处理、移动物理、跳跃检测、精灵翻转
 
----
-
-## 6. 状态机集成
-
-### 6.1 EnemyStateMachine 架构
-
-**文件**: `Core/StateMachine/EnemyStateMachine.gd`
-
-```mermaid
-classDiagram
-    class BaseStateMachine {
-        +init_state: BaseState
-        +current_state: BaseState
-        +states: Dictionary
-        +_setup_states()
-        +_on_state_transition()
-        +force_transition()
-    }
-
-    class EnemyStateMachine {
-        +preset: Preset
-        +auto_create_states: bool
-        +force_stun()
-        +force_hit()
-        +force_knockback()
-        +is_controlled()
-        +can_act()
-    }
-
-    BaseStateMachine <|-- EnemyStateMachine
+**信号**:
+```gdscript
+signal direction_changed(new_direction: Vector2)
+signal movement_ability_changed(can_move: bool)
+signal velocity_changed(velocity: Vector2)
+signal sprite_flipped(flip_h: bool)
+signal jump_started()
+signal jump_apex_reached()
+signal landed()
 ```
 
-### 6.2 状态优先级系统
-
+**核心逻辑**:
+```gdscript
+func process_movement(delta):
+    handle_jump_input()
+    # 加速度模型
+    var target_vx = input_direction.x * max_speed if can_move else 0.0
+    var accel = (1.0 / acceleration_time) * max_speed * delta
+    owner_body.velocity.x = move_toward(velocity.x, target_vx, accel)
+    update_sprite_flip()    # 自动翻转精灵 + HitBox
+    owner_body.move_and_slide()
 ```
-CONTROL (2)  ── stun, frozen           ← 最高优先级，打断一切
-REACTION (1) ── hit, knockback, launch ← 中优先级，打断行为
-BEHAVIOR (0) ── idle, wander, chase    ← 最低优先级，日常行为
+
+**跳跃检测**:
+```
+起跳 → is_jumping=true → 到达顶点(velocity.y>0) → jump_apex_reached
+                                                    → is_falling=true
+下落 → 着地(on_floor) → landed → is_jumping=false, is_falling=false
 ```
 
-**转换规则**:
-- 高优先级 **总是** 可以打断低优先级
-- 同优先级检查 `can_be_interrupted` 标志
-- 当前状态可以主动转换到任何低优先级状态
+### 5.4 CombatComponent
 
-### 6.3 模板内置 vs 自动创建
+**文件**: `Core/Components/CombatComponent.gd`
+
+**职责**: 管理多种伤害类型，Animation Method Track 调用切换
 
 ```gdscript
-# EnemyStateMachine 配置
-init_state = NodePath("Idle")     # 初始状态指向 Idle 节点
-auto_create_states = false         # 子节点已在模板中存在，跳过自动创建
+@export var damage_types: Array[Damage] = []
+var current_damage: Damage = null
+
+# 伤害类型索引:
+# 0 = Physical (普通斩击)
+# 1 = KnockUp (击飞)
+# 2 = SpecialAttack (V技能)
+
+func switch_to_damage_type(index: int):
+    current_damage = damage_types[index]
+    damage_type_changed.emit(current_damage)
 ```
 
-**关键**: `auto_create_states` 在模板中设为 `false`，因为 7 个状态节点已经作为子节点存在。如果设为 `true`，状态机会尝试根据 `preset` 动态创建节点，导致重复。
+**调用链**:
+```
+Animation Method Track → PlayerBase.switch_to_physical()
+                       → CombatComponent.switch_to_damage_type(0)
+                       → current_damage 更新
+                       → HitBoxComponent 读取 current_damage
+```
 
-### 6.4 状态覆盖模式
+### 5.5 SkillManager
 
-子场景可以覆盖单个状态的脚本：
+**文件**: `Core/Components/SkillManager.gd` (458行)
+
+**职责**: V-技能特殊攻击的完整生命周期管理
+
+**6 阶段流程**:
+```
+Phase 1: create_effects()     → 残影扩散 + 心跳 + 漩涡
+Phase 2: detect_enemies()     → 锥形检测 (radius=300, angle=45)
+Phase 3: gather_enemies()     → 相机移动 + 子弹时间 + 眩晕
+Phase 4: dash_to_target()     → 残影冲刺
+Phase 5: play_attack_sound()  → 音效
+Phase 6: cleanup()            → 解除眩晕、隐藏特效
+```
+
+**关键配置**:
+```gdscript
+@export var detection_radius: float = 300.0
+@export var detection_angle: float = 45.0
+@export var gather_distance: float = 200.0
+@export var move_duration: float = 0.2
+@export var enable_camera_effects: bool = true
+@export var enable_bullet_time: bool = true
+@export var enable_after_image: bool = true
+```
+
+### 5.6 FollowCamera
+
+**文件**: `Core/Components/FollowCamera.gd`
+
+**职责**: 相机跟随、震动效果、焦点切换
 
 ```
-# ForestBee.tscn 中仅覆盖需要自定义的状态
-[node name="Idle" parent="EnemyStateMachine"]
-script = ExtResource("6_idle")     ← BeeIdle.gd 替换默认 IdleState.gd
+模式:
+  Follow Mode → 跟随 "player" 组的目标，lerp 平滑
+  Focus Mode  → Tween 到指定目标，可选 zoom
+  Shake Mode  → 随机偏移 + 衰减
 
-[node name="Chase" parent="EnemyStateMachine"]
-script = ExtResource("8_chase")    ← BeeChase.gd 替换默认 ChaseState.gd
+信号:
+  camera_focus_started(target)
+  camera_focus_finished()
+  camera_shake_started()
+  camera_shake_finished()
+```
 
-# Hit / Knockback 不覆盖 → 使用模板中的 CommonStates 默认实现
+### 5.7 AttackComponent
+
+**文件**: `Core/Components/AttackComponent.gd` (45行)
+
+**职责**: 攻击实体生成
+
+```gdscript
+func perform_attack(attack_name, facing_direction, anchor):
+    # 根据 attack_name 加载攻击场景
+    # 设置旋转/偏移
+    # 实例化到场景树
 ```
 
 ---
 
-## 7. 组件系统
+## 6. Resource 数据系统
 
-### 7.1 伤害信号链路
+### 6.1 Damage
 
-```
-攻击碰撞流程:
+**文件**: `Core/Resources/Damage.gd`
 
-HitBoxComponent          HurtBoxComponent          HealthComponent
-    │                        │                        │
-    │  area_entered(area)    │                        │
-    ├───────────────────────►│                        │
-    │  update_attack()       │                        │
-    │  take_damage(dmg, pos) │                        │
-    │                        │  damaged.emit()        │
-    │                        ├───────────────────────►│
-    │                        │                        │ take_damage()
-    │                        │                        │ 1. 检查无敌
-    │                        │                        │ 2. 扣血
-    │                        │                        │ 3. 显示伤害数字
-    │                        │                        │ 4. 应用攻击效果*
-    │                        │                        │ 5. emit health_changed
-    │                        │                        │ 6. emit damaged
-    │                        │                        │ 7. 检查死亡
-    │                        │                        │
-    │                        │              ┌─────────┤
-    │                        │              │         │
-    │                        │              ▼         ▼
-    │                        │         HealthBar   StateMachine
-    │                        │         (UI更新)    on_damaged()
-    │                        │                     ├─ StunEffect → Stun
-    │                        │                     ├─ KnockEffect → Knockback
-    │                        │                     └─ else → Hit
+```gdscript
+@export var max_amount: float = 50.0
+@export var min_amount: float = 1.0
+@export var amount: float = 10.0
+@export var effects: Array[AttackEffect] = []
+
+func randomize_damage():
+    amount = rng.randf_range(min_amount, max_amount)
+
+func apply_effects(enemy, damage_source_position):
+    for effect in effects:
+        effect.apply_effect(enemy, damage_source_position)
 ```
 
-> **关键设计**: 攻击效果（如击退速度）在 `emit damaged` **之前** 应用。这确保状态机收到信号时，角色速度已被正确设置，避免速度覆盖问题。
+### 6.2 AttackEffect 体系
+
+**基类**: `Core/Resources/AttackEffect.gd`
+
+```
+AttackEffect (基类)
+├── KnockBackEffect     → 击退 (velocity = direction * force)
+├── KnockUpEffect       → 击飞 (Tween: 上升 → 下落)
+├── StunEffect          → 眩晕 (force_transition("stun"))
+├── GatherEffect        → 聚拢 (Tween 到目标点)
+└── ForceStunEffect     → 强制眩晕 (停止移动 + 强制状态切换)
+```
+
+**效果应用链**:
+```
+Damage.apply_effects(enemy, pos)
+  ├→ KnockBackEffect: enemy.velocity = dir * 200
+  ├→ KnockUpEffect: Tween 弧形飞行
+  ├→ StunEffect: state_machine.force_transition("stun")
+  └→ GatherEffect: Tween 到聚拢点
+```
+
+### 6.3 CharacterData
+
+**文件**: `Core/Resources/CharacterData.gd`
+
+```gdscript
+@export var id: String
+@export var display_name: String
+@export var description: String
+@export var portrait: Texture2D
+@export_file("*.tscn") var scene_path: String
+
+@export_group("Base Stats")
+@export var base_health: float = 100.0
+@export var base_speed: float = 100.0
+@export var base_damage: float = 10.0
+
+func instantiate_character() -> Node:
+    return load(scene_path).instantiate()
+```
+
+---
+
+## 7. 信号链路与通信流
+
+### 7.1 完整伤害链路
+
+```
+Player HitBoxComponent 碰撞 Enemy HurtBoxComponent
+    │ (area_entered)
+    ▼
+HitBoxComponent._on_hitbox_area_entered(area)
+    ├→ update_attack()  [随机化伤害]
+    └→ area.take_damage(damage, attacker_position)
+        │
+        ▼
+Enemy HurtBoxComponent.damaged.emit(damage, attacker_pos)
+    │ (BaseCharacter._setup_health_signals 连接)
+    ▼
+Enemy HealthComponent.take_damage(damage, attacker_pos)
+    ├→ health -= damage.amount
+    ├→ display_damage_number()
+    ├→ damage.apply_effects(enemy, pos)        ← 先应用效果
+    │   ├→ KnockBackEffect → velocity 设置
+    │   ├→ StunEffect → force_transition("stun")
+    │   └→ ...
+    │
+    ├→ health_changed.emit(health, max_health)  ← 后发信号
+    │   └→ HealthBar 更新
+    │
+    ├→ damaged.emit(damage, pos)
+    │   └→ BaseCharacter.damaged.emit()
+    │       └→ 状态机 on_damaged()
+    │           └→ force_transition("hit")
+    │
+    └→ if health <= 0:
+        └→ died.emit()
+            └→ BaseCharacter._on_died()
+                └→ EnemyBase._handle_death()
+                    ├→ 停止状态机
+                    ├→ 播放死亡动画
+                    └→ queue_free()
+```
+
+**关键设计**: 攻击效果在 `emit damaged` **之前**应用，确保状态机收到信号时速度已正确设置。
 
 ### 7.2 碰撞层配置
 
 | Layer | 用途 | 数值 |
 |-------|------|------|
-| Layer 1 | 地形/墙壁 | 1 |
-| Layer 2 | 玩家攻击 | 2 |
-| Layer 3 | 玩家受击 | 4 |
+| Layer 2 | 玩家 | 2 |
+| Layer 3 | 玩家攻击 | 4 |
 | Layer 4 | 敌人 | 8 |
 | Layer 8 | 地形碰撞 | 128 |
 
 | 组件 | collision_layer | collision_mask | 含义 |
 |------|----------------|----------------|------|
-| Enemy Body | 8 | 129 (128+1) | 敌人实体，与地形碰撞 |
-| HurtBoxComponent | 8 | 4 | 敌人受击区，接收玩家攻击 |
-| HitBoxComponent | 8 | 2 | 敌人攻击区，命中玩家受击区 |
+| Player Body | 2 | 128 | 玩家，与地形碰撞 |
+| Player HitBox | 4 | 8 | 玩家攻击，命中敌人 |
+| Player HurtBox | 2 | 0 | 玩家受击区 |
+| Enemy Body | 8 | 128 | 敌人，与地形碰撞 |
+| Enemy HitBox | 8 | 2 | 敌人攻击，命中玩家 |
+| Enemy HurtBox | 8 | 4 | 敌人受击区，接收玩家攻击 |
 
 ---
 
-## 8. 场景继承与覆盖模式
+## 8. 具体角色实现
 
-### 8.1 Godot Inherited Scene 语法
-
-模板定义（完整节点）：
-```
-[node name="Sprite2D" type="Sprite2D" parent="."]
-```
-
-子场景覆盖（仅覆盖属性，无 `type`）：
-```
-[node name="Sprite2D" parent="." index="0"]
-texture = ExtResource("2_texture")
-hframes = 4
-vframes = 4
-```
-
-### 8.2 覆盖层级
+### 8.1 ForestBee — 零代码飞行敌人
 
 ```
-EnemyBase.tscn (模板)
-    │
-    ├── ForestBee.tscn (继承)
-    │   ├── 覆盖: 根节点参数 (health, speed, detection)
-    │   ├── 覆盖: 5个状态脚本 (BeeIdle, BeeWander, BeeChase, BeeAttack, BeeStun)
-    │   ├── 新增: AnimatedSprite2D (帧动画，组合方式)
-    │   └── 继承: HitBoxComponent (默认 CircleShape2D r=12，无需覆盖)
-    │
-    ├── ForestBoar.tscn (继承)
-    │   ├── 覆盖: 根节点参数
-    │   ├── 覆盖: 5个状态脚本
-    │   ├── 覆盖: HitBoxComponent (RectangleShape2D + Damage资源 + destroy_owner_on_hit)
-    │   ├── 新增: AnimatedSprite2D + RayGround + RayWall (组合)
-    │   └── 覆盖: FloorCollision/HurtBox 碰撞形状
-    │
-    └── Skull.tscn (继承)
-        ├── 覆盖: 根节点参数 + use_animation_tree=true
-        ├── 覆盖: Sprite2D (纹理 + hframes/vframes)
-        ├── 覆盖: AnimationPlayer (完整10个动画的AnimationLibrary)
-        ├── 覆盖: 碰撞形状 (CircleShape2D r=8，较小)
-        └── 继承: 7个状态 + AnimationTree + HitBoxComponent (全部使用模板默认)
+继承: EnemyBase.tscn
+脚本: extends EnemyBase (空)
+配置覆盖:
+  max_health = 30
+  wander_speed = 40
+  detection_radius = 150
+  chase_speed = 80
+  use_animation_tree = false
+  has_gravity = false (飞行)
+新增节点:
+  AnimatedSprite2D (帧动画: fly, idle)
+状态覆盖:
+  5 个状态替换为 Bee 专用 (BeeIdle, BeeWander, BeeChase, BeeAttack, BeeStun)
+```
+
+### 8.2 ForestBoar — 带 RayCast 地面敌人
+
+```
+继承: EnemyBase.tscn
+脚本: extends EnemyBase
+配置覆盖:
+  max_health = 50
+  wander_speed = 40
+  chase_speed = 100
+  has_gravity = true (地面)
+新增节点:
+  AnimatedSprite2D (idle, run, walk, hit, stunned, death)
+  RayGround: position(20,0), target(0,20)  ← 边缘检测
+  RayWall: target(25,0)                     ← 墙壁检测
+覆盖节点:
+  HitBoxComponent: damage + destroy_owner_on_hit=true (冲撞自毁)
+  CollisionShape2D: 调整碰撞形状
+状态覆盖:
+  5 个状态替换为 Boar/Forest 专用
+```
+
+### 8.3 Hahashin — 玩家角色
+
+```
+继承: PlayerBase.tscn
+脚本: extends PlayerBase (最小)
+配置覆盖:
+  max_health = 10000
+  MovementComponent.max_speed = 200
+  CombatComponent.damage_types = [Physical, KnockUp, SpecialAttack]
+覆盖节点:
+  AnimatedSprite2D: Hahashin 精灵 (idle, run, atk_1/2/3, atk_air, atk_sp, roll, j_up, j_down, take_hit)
+  AnimationPlayer: 完整动画库 (包括 HitBox 启用/禁用动画)
+  AnimationTree: 完整 BlendTree (locomotion SM + control SM)
+  CollisionShape2D: 调整碰撞形状
+
+HitBox 动画驱动 (AnimationPlayer Method Track):
+  atk_1: Frame 1-3 启用 HitBox, 位置 (20.5, -9.5), 尺寸 (42, 19)
+  atk_2: 无 HitBox (远程型)
+  atk_3: Frame 0-2, 7-11, 15-20 分段启用 (连击)
+  atk_air: Frame 1-6 启用, 向上移动
+```
+
+### 8.4 Boss (DemonCyclop) — 阶段战斗
+
+```
+继承: BossBase.tscn
+脚本: extends BossBase (8方位 + 纹理 + 速度倍率)
+配置覆盖:
+  max_health = 1001
+  BossAttackManager: 配置 projectile/laser/aoe 场景和 damage 资源
+覆盖节点:
+  Sprite2D: DemonCyclop 纹理 (48x64)
+
+特化逻辑:
+  move_speed: Phase1 x1.0 → Phase2 x1.3 → Phase3 x1.5
+  8方位旋转: DIRECTIONS_8 数组 + 平滑旋转
+  巡逻点: setup_patrol_points() 初始化
 ```
 
 ---
 
-## 9. 使用示例
+## 9. 创建新角色指南
 
-### 9.1 最简敌人：ForestBee（飞行型，零自定义代码）
-
-**ForestBee.gd** — 完全空的脚本：
-```gdscript
-extends EnemyBase
-# 所有行为继承自 EnemyBase，无自定义逻辑
-```
-
-**ForestBee.tscn** — 关键配置：
-```
-[node name="ForestBee" instance=ExtResource("1_base")]
-collision_mask = 129
-max_health = 30
-health = 30
-wander_speed = 40.0
-detection_radius = 150.0
-chase_speed = 80
-use_animation_tree = false          ← 使用 AnimatedSprite2D
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-sprite_frames = SubResource("SpriteFrames_bee")
-autoplay = "fly"                     ← 组合方式添加
-```
-
-### 9.2 地面敌人：ForestBoar（带 RayCast + 自定义 HitBox）
-
-**ForestBoar.tscn** — 覆盖 HitBoxComponent：
-```
-[node name="HitBoxComponent" parent="."]
-damage = SubResource("Resource_damage")     ← 自定义伤害值
-destroy_owner_on_hit = true                 ← 冲撞后自毁
-
-[node name="CollisionShape2D" parent="HitBoxComponent"]
-shape = SubResource("RectangleShape2D_hitbox")   ← 覆盖为矩形
-
-[node name="RayGround" type="RayCast2D" parent="."]   ← 组合：地面检测
-[node name="RayWall" type="RayCast2D" parent="."]     ← 组合：墙壁检测
-```
-
-### 9.3 AnimationTree 敌人：Skull（4方向精灵表）
-
-**Skull.tscn** — 覆盖 AnimationPlayer 提供 10 个动画：
-```
-[node name="Sprite2D" parent="." index="0"]
-texture = ExtResource("2_texture")
-hframes = 4                          ← 4列方向：下/上/左/右
-vframes = 4                          ← 4行帧：行走周期
-
-[node name="AnimationPlayer" parent="."]
-libraries/ = SubResource("AnimationLibrary_skull")  ← 覆盖默认库
-```
-
-精灵帧映射（4x4 方向精灵表）：
-
-```
-        Col0(下)  Col1(上)  Col2(左)  Col3(右)
-Row0      0        1        2        3
-Row1      4        5        6        7
-Row2      8        9       10       11
-Row3     12       13       14       15
-
-idle:       [0, 4, 8, 4]       ← 下方向（正面）
-left_walk:  [2, 6, 10, 14]     ← 左方向列
-right_walk: [3, 7, 11, 15]     ← 右方向列
-left_run:   [2, 6, 10, 14]     ← 同帧，更快速度
-right_run:  [3, 7, 11, 15]     ← 同帧，更快速度
-attack:     [0, 4, 8, 12]      ← 正面方向
-hit:        [0, 4, 0]          ← 快速闪烁
-stunned:    [0, 4, 8, 4, 0]    ← 摇晃循环
-death:      [0, 4, 8, 12]      ← + 旋转/淡出/上浮特效
-```
-
-### 9.4 带自定义功能：Dinosaur（随机纹理）
-
-**Dinosaur.gd** — 仅覆盖 `_on_enemy_ready()` 钩子：
-```gdscript
-extends EnemyBase
-
-@export var textures: Array[Texture2D] = []
-
-func _on_enemy_ready() -> void:
-    if not textures.is_empty() and sprite is Sprite2D:
-        (sprite as Sprite2D).texture = textures.pick_random()
-```
-
-### 9.5 玩家角色：Hahashin（组件化架构）
-
-**Hahashin.gd** — 最小化代码：
-```gdscript
-extends PlayerBase
-class_name Hahashin
-
-func _on_player_ready() -> void:
-    pass  # Hahashin 特定初始化
-```
-
-**Hahashin.tscn** — 继承 PlayerBase.tscn：
-```
-[node name="Hahashin" instance=ExtResource("1_base")]
-script = ExtResource("1_hahashin")
-max_health = 10000
-health = 10000
-
-[node name="AnimatedSprite2D" parent="." index="1"]
-sprite_frames = SubResource("SpriteFrames_hahashin")
-animation = &"idle"
-
-[node name="AnimationPlayer" parent="." index="2"]
-libraries/ = SubResource("AnimationLibrary_hahashin")  ← 攻击动画
-
-[node name="AnimationTree" parent="." index="3"]
-tree_root = SubResource("AnimationNodeBlendTree_hahashin")  ← 完整状态机
-
-[node name="MovementComponent" parent="." index="9"]
-max_speed = 200.0
-
-[node name="CombatComponent" parent="." index="11"]
-damage_types = [Physical, KnockUp, SpecialAttack]  ← 3种伤害类型
-```
-
-**职责分离**:
-- **PlayerBase.tscn**: 提供所有组件节点
-- **Hahashin.tscn**: 仅覆盖动画、速度、伤害配置
-
-### 9.6 Boss 角色：Boss (DemonCyclop)（阶段战斗）
-
-**Boss.gd** — extends BossBase，实现 8 方位和纹理选择：
-```gdscript
-extends BossBase
-class_name Boss
-
-@export var textures: Array[Texture2D] = []
-@export var base_move_speed := 150.0
-@export var rotation_speed := 5.0
-
-const DIRECTIONS_8 = [Vector2(1,0), Vector2(0.7,-0.7), ...]  # 8方位
-
-var move_speed: float:
-    get:
-        match current_phase:
-            Phase.PHASE_1: return base_move_speed * 1.0
-            Phase.PHASE_2: return base_move_speed * 1.3
-            Phase.PHASE_3: return base_move_speed * 1.5
-
-func _on_boss_ready() -> void:
-    if not textures.is_empty():
-        sprite.texture = textures.pick_random()
-    setup_patrol_points()
-
-func _update_facing() -> void:
-    # 平滑旋转到 8 方位方向
-    var direction_index = int(round(velocity.angle() / (PI / 4))) % 8
-    sprite.rotation = lerp_angle(sprite.rotation,
-                                   DIRECTIONS_8[direction_index].angle(),
-                                   rotation_speed * delta)
-```
-
-**Boss.tscn** — 继承 BossBase.tscn：
-```
-[node name="Boss" instance=ExtResource("1_base")]
-script = ExtResource("1_boss")
-max_health = 1001
-health = 1001
-
-[node name="Sprite2D" parent="." index="0"]
-texture = ExtResource("2_demon_cyclop")
-
-[node name="BossAttackManager" parent="." index="8"]
-projectile_scene = ExtResource("5_projectile")
-laser_scene = ExtResource("6_laser")
-aoe_scene = ExtResource("7_aoe")
-projectile_damage = ExtResource("8_proj_damage")
-laser_damage = ExtResource("9_laser_damage")
-aoe_damage = ExtResource("10_aoe_damage")
-```
-
-**职责分离**:
-- **BossBase.gd**: 阶段系统、无敌特效、击退、巡逻点
-- **Boss.gd**: 8 方位移动、纹理选择、速度倍率
-
-### 9.7 创建新角色的步骤
-
-#### 创建新敌人
+### 9.1 创建新敌人
 
 1. **Godot 编辑器** → 右键 `EnemyBase.tscn` → **New Inherited Scene**
-2. **设置参数** → Inspector 中配置 health、speed、detection 等
-3. **添加动画** → 根据动画方案选择：
-   - **方案 A**: 设置 `use_animation_tree = true`，覆盖 Sprite2D 纹理和 AnimationPlayer 库
-   - **方案 B**: 设置 `use_animation_tree = false`，添加 AnimatedSprite2D 子节点
-4. **（可选）自定义状态** → 覆盖需要的状态节点脚本
-5. **（可选）调整碰撞** → 覆盖 FloorCollision/HurtBox/HitBox 的 CollisionShape2D
+2. **设置参数** → Inspector 配置 health, speed, detection 等
+3. **添加动画**:
+   - **方案 A** (AnimationTree): `use_animation_tree = true` + 覆盖 Sprite2D 纹理 + AnimationPlayer 库
+   - **方案 B** (AnimatedSprite2D): `use_animation_tree = false` + 新增 AnimatedSprite2D 节点
+4. **(可选) 自定义状态** → 覆盖需要的状态节点脚本
+5. **(可选) 调整碰撞** → 覆盖 CollisionShape2D
 
-#### 创建新玩家
+### 9.2 创建新玩家
 
 1. **Godot 编辑器** → 右键 `PlayerBase.tscn` → **New Inherited Scene**
-2. **设置参数** → Inspector 中配置 max_health
-3. **添加动画** → 覆盖 AnimatedSprite2D 的 SpriteFrames（idle, run, atk_1/2/3, sp_atk）
-4. **配置组件** → 覆盖 MovementComponent.max_speed, CombatComponent.damage_types
-5. **（可选）自定义脚本** → 覆盖 `_on_player_ready()` 钩子
+2. **覆盖动画** → AnimatedSprite2D + AnimationPlayer + AnimationTree
+3. **配置组件** → MovementComponent.max_speed + CombatComponent.damage_types
+4. **(可选) 自定义脚本** → 覆盖 `_on_player_ready()` 钩子
 
-#### 创建新 Boss
+### 9.3 创建新 Boss
 
 1. **Godot 编辑器** → 右键 `BossBase.tscn` → **New Inherited Scene**
-2. **设置参数** → Inspector 中配置 max_health, detection_radius, phase 阈值
-3. **配置攻击** → 覆盖 BossAttackManager 的 projectile/laser/aoe 场景和 damage 资源
-4. **添加纹理** → 覆盖 Sprite2D.texture
-5. **（可选）自定义逻辑** → 在子类脚本中覆盖 `_on_boss_ready()`, `_update_facing()` 钩子
-
-### 9.8 创建新敌人的步骤（向后兼容）
-
-1. **Godot 编辑器** → 右键 `EnemyBase.tscn` → **New Inherited Scene**
-2. **设置参数** → Inspector 中配置 health、speed、detection 等
-3. **添加动画** → 根据动画方案选择：
-   - **方案 A**: 设置 `use_animation_tree = true`，覆盖 Sprite2D 纹理和 AnimationPlayer 库
-   - **方案 B**: 设置 `use_animation_tree = false`，添加 AnimatedSprite2D 子节点
-4. **（可选）自定义状态** → 覆盖需要的状态节点脚本
-5. **（可选）调整碰撞** → 覆盖 FloorCollision/HurtBox/HitBox 的 CollisionShape2D
+2. **设置参数** → max_health, detection_radius, phase 阈值
+3. **配置攻击** → BossAttackManager 的攻击场景和 damage 资源
+4. **添加纹理** → 覆盖 Sprite2D
+5. **(可选) 自定义逻辑** → `_on_boss_ready()`, `_update_facing()` 钩子
 
 ---
 
-## 10. 遇到的问题与解决方案
+## 10. 架构优缺点分析
 
-### 10.1 空壳状态机脚本问题
+### 10.1 优点
 
-**问题**: Forest 敌人最初各自有自己的 StateMachine 脚本（BeeStateMachine.gd 等），但它们仅 `extends BaseStateMachine`，没有任何自定义逻辑。更严重的是，它们继承了 `BaseStateMachine` 而非 `EnemyStateMachine`，丢失了 `force_stun()`/`force_hit()` 等便捷方法。
+**场景继承降低创建成本**
+- ForestBee 仅需一个空 GDScript + Inspector 配置即可创建
+- Hahashin 仅需覆盖动画和参数，状态机完全继承
+- 新建敌人从"数小时"降低到"数分钟"
 
-**解决方案**: 删除所有空壳脚本，统一使用模板中的 `EnemyStateMachine.gd`。子场景不再覆盖 EnemyStateMachine 的脚本，只覆盖个别状态子节点的脚本。
+**三层继承职责清晰**
+- BaseCharacter: 生命系统（不变）
+- 二层基类: 角色类型逻辑（偶尔修改）
+- 三层具体: 个体差异化（频繁修改）
+- 修改二层基类自动惠及所有同类角色
 
-### 10.2 auto_create_states 冲突
+**钩子方法避免 _ready() 重写**
+- `_on_character_ready()` → `_on_enemy_ready()` → 子类自定义
+- 避免忘记调用 `super._ready()` 导致信号断裂
+- 清晰的初始化顺序保证
 
-**问题**: `EnemyStateMachine` 有 `auto_create_states` 功能，如果模板中已经手动放置了 7 个状态子节点，同时 `auto_create_states = true`，会导致状态重复创建。
+**组件化可插拔**
+- MovementComponent, CombatComponent 等独立运作
+- 通过信号通信，无直接耦合
+- 可以在子场景中按需添加/移除组件
 
-**解决方案**: 模板中设置 `auto_create_states = false`。状态机的 `_ready()` 会检查 `get_child_count() == 0`，但显式设为 false 更安全。
+**信号驱动松耦合**
+- HurtBox → HealthComponent → StateMachine 全部通过信号连接
+- 替换某个组件不影响其他组件
+- 外部系统（如 AttackEffect）通过信号/方法调用与状态机交互
 
-```gdscript
-# EnemyStateMachine._ready()
-func _ready() -> void:
-    if auto_create_states and get_child_count() == 0:
-        _create_preset_states()  # 仅在没有子节点时才自动创建
-    super._ready()
-```
+**Resource 数据驱动**
+- Damage 资源包含效果列表，Inspector 可视化配置
+- AttackEffect 子类支持多种效果组合
+- 新增攻击效果只需创建新的 AttackEffect 子类
 
-### 10.3 AnimationTree 动画查找时机
+### 10.2 缺点
 
-**问题**: EnemyBase.tscn 的 AnimationTree 引用了 "idle"、"hit" 等动画名，但模板的 AnimationPlayer 只包含 RESET 动画。其他动画由子场景提供。AnimationTree 能否在运行时正确找到这些动画？
+**动画方案不统一**
+- EnemyBase 支持两种方案 (AnimationTree / AnimatedSprite2D)
+- PlayerBase 使用 AnimatedSprite2D + AnimationTree
+- BossBase 仅使用 AnimationPlayer
+- 三种模板使用三种不同的动画控制方式，新开发者容易混淆
+- `use_animation_tree` 标志增加了条件分支
 
-**解决方案**: 可以。Godot 的 AnimationTree 在运行时解析动画名，此时子场景已经覆盖了 AnimationPlayer 的库。加载顺序为：模板 → 子场景覆盖 → `_ready()` → AnimationTree 激活。所以 AnimationTree 激活时，所有动画已就位。
+**BaseCharacter._setup_health_signals() 过于隐式**
+- 信号连接在 `_ready()` 中自动完成
+- 如果节点命名不匹配（如 "HurtBoxComponent" 写错），信号静默失败
+- 依赖硬编码的节点路径（如 `get_node_or_null("HurtBoxComponent")`）
+- 调试困难：信号未连接时没有明确的错误提示
 
-### 10.4 Sprite2D 方向精灵表的帧映射
+**Boss 缺少 AnimationTree**
+- BossBase.tscn 没有 AnimationTree 节点
+- Boss 状态直接操作 AnimationPlayer，绕过了 BaseState 的动画 helper
+- 导致 Boss 状态代码与 Player/Enemy 状态代码风格不一致
+- 无法利用 BlendTree 的混合和过渡功能
 
-**问题**: Skull 的 SpriteSheet 是 4x4 方向精灵表（列=方向，行=帧），帧索引为 `row * hframes + col`。初始实现错误地按行解读（把每行当作一组动画），导致动画完全错误。
+**碰撞层配置分散**
+- 碰撞层在多个 .tscn 文件中各自配置
+- 缺少集中的碰撞层文档/常量定义
+- 容易出现配置不一致（如新角色忘记设置正确的 mask）
 
-**解决方案**: 按列提取同方向帧。例如左方向为 col=2，帧索引为 [2, 6, 10, 14]（跨4行）。run 和 walk 使用相同帧，通过不同的动画速度（walk=0.4s, run=0.25s）区分。
+**EnemyData Resource 未充分利用**
+- `EnemyBase.gd` 有 `enemy_data: EnemyData` 导出属性和 `_apply_enemy_data()` 方法
+- 但大部分敌人直接在 Inspector 中覆盖 `@export` 属性，没有使用 EnemyData
+- 两套配置方式并存（直接导出 vs Resource），增加混淆
 
-### 10.5 攻击效果应用顺序
+**SkillManager 承担过多职责**
+- 458 行代码管理特效、检测、聚拢、冲刺、相机、子弹时间
+- 与 PlayerSpecialAttackState 高度耦合
+- 难以复用到其他技能或其他角色
 
-**问题**: 受击后角色的速度被覆盖。原因是 HealthComponent 先 emit `damaged` 信号（触发状态机转换和速度设置），然后才应用 AttackEffect（覆盖了刚设置的速度）。
-
-**解决方案**: 在 `take_damage()` 中调整顺序 — **先应用效果，后发信号**：
-
-```gdscript
-func take_damage(damage_data, attacker_position) -> void:
-    health -= damage_data.get_amount()
-    display_damage_number(damage_data)
-    apply_attack_effects(damage_data, attacker_position)  # ← 先应用效果
-    health_changed.emit(health, max_health)                # ← 后发信号
-    damaged.emit(damage_data, attacker_position)
-```
-
-### 10.6 PlayerBase 和 BossBase 类型引用更新
-
-**问题**: 在创建 PlayerBase 和 BossBase 模板后，需要更新所有引用 `Hahashin` 或 `Boss` 类型的脚本，改为引用基类 `PlayerBase` 或 `BossBase`，以支持未来的多角色扩展。
-
-**解决方案**: 系统性更新类型引用：
-
-```gdscript
-# PlayerHitbox.gd - 原来
-@onready var player: Hahashin = get_owner()
-
-# PlayerHitbox.gd - 更新后
-@onready var player: PlayerBase = get_owner()  # 支持所有 PlayerBase 子类
-
-# BossAttackManager.gd - 原来
-@onready var boss: Boss = get_owner()
-
-# BossAttackManager.gd - 更新后
-@onready var boss: BossBase = get_owner()  # 支持所有 BossBase 子类
-
-# BossStateMachine.gd - 原来
-if owner_node is Boss and target_node is Hahashin:
-    var boss = owner_node as Boss
-    var player = target_node as Hahashin
-
-# BossStateMachine.gd - 更新后
-if owner_node is BossBase and target_node is PlayerBase:
-    var boss = owner_node as BossBase
-    var player = target_node as PlayerBase
-
-# BossBaseState.gd - 阶段判断
-if boss and boss.current_phase != BossBase.Phase.PHASE_3:
-    transitioned.emit(self, "stun")
-```
-
-**要点**: 使用基类类型引用提高了代码的通用性，新的玩家/Boss 角色无需修改这些脚本即可使用。
-
-### 10.7 Boss 不应继承 EnemyBase
-
-**问题**: 最初考虑让 Boss 继承 EnemyBase，复用敌人的基础功能。但分析后发现 Boss 的架构与普通敌人差异过大：
-- Boss 有 **3 阶段系统**，敌人没有
-- Boss 使用 **8 方位旋转**，敌人使用简单的 flip_h
-- Boss 有 **巡逻点系统**，敌人使用简单的 wander
-- Boss 有 **BossAttackManager** 管理复杂攻击，敌人没有
-- Boss 有 **9 个状态**（多 Enrage/SpecialAttack），敌人只有 7 个
-
-**解决方案**: 创建独立的 `BossBase` 继承链：
-
-```
-BaseCharacter
-  ├── EnemyBase (简单 AI, 7 状态)
-  │     └── 普通敌人
-  └── BossBase (阶段系统, 9 状态)
-        └── Boss 角色
-```
-
-这样避免了强行复用导致的架构混乱。
-
-### 10.8 Godot 版本差异导致 UID 警告
-
-**问题**: 用户使用 Godot 4.6 编辑，MCP 工具使用 Godot 4.4.1 运行验证，导致 `.tscn` 中的 UID 格式不兼容，产生 `invalid UID` 警告。
-
-**解决方案**: 这是已知的版本差异问题，不影响功能。Godot 会自动回退到文本路径加载。在 CI/CD 环境中应统一 Godot 版本。
+**HitBox 启用/禁用依赖动画帧**
+- 攻击动画通过 AnimationPlayer Method Track 启用/禁用 HitBox
+- 时机精确但难以调试（需要在 AnimationPlayer 中逐帧查看）
+- 修改攻击范围需要同时修改动画和碰撞形状
 
 ---
 
-## 11. 最佳实践
+## 11. 待提升项与改进建议
 
-### ✅ 推荐
+### 11.1 短期改进
 
-```gdscript
-# ✅ 使用钩子方法，不要重写 _ready()
-func _on_enemy_ready() -> void:
-    # 敌人特有初始化
-    pass
-
-# ✅ 通过 Inspector 配置参数，不要硬编码
-@export var chase_speed: int = 80
-```
-
-```
-# ✅ 子场景仅覆盖需要变化的节点
-[node name="Idle" parent="EnemyStateMachine"]
-script = ExtResource("6_custom_idle")
-
-# ✅ 非通用功能用组合方式添加
-[node name="RayGround" type="RayCast2D" parent="."]
-```
-
-### ❌ 避免
+#### A. 碰撞层常量化
 
 ```gdscript
-# ❌ 不要在子类重写 _ready()，会破坏信号链路
-func _ready() -> void:
-    super._ready()  # 容易忘记调用 super
+# Core/Constants/CollisionLayers.gd
+class_name CollisionLayers
 
-# ❌ 不要创建空壳继承脚本
-extends BaseStateMachine  # 丢失 EnemyStateMachine 功能
+const PLAYER_BODY = 2          # Layer 2
+const PLAYER_ATTACK = 4        # Layer 3
+const ENEMY = 8                # Layer 4
+const TERRAIN = 128            # Layer 8
+
+const PLAYER_HURTBOX_MASK = 0
+const PLAYER_HITBOX_MASK = ENEMY
+const ENEMY_HURTBOX_MASK = PLAYER_ATTACK
+const ENEMY_HITBOX_MASK = PLAYER_BODY
 ```
 
+**收益**: 集中管理，减少配置错误
+
+#### B. 信号连接验证
+
+```gdscript
+# BaseCharacter._setup_health_signals() 增加验证
+func _setup_health_signals():
+    var hurtbox = get_node_or_null("HurtBoxComponent")
+    if not hurtbox:
+        push_warning("%s: HurtBoxComponent not found" % name)
+        return
+
+    if not health_component:
+        push_warning("%s: HealthComponent not found" % name)
+        return
+
+    hurtbox.damaged.connect(health_component.take_damage)
+    # ...
 ```
-# ❌ 不要在子场景重新定义模板已有的节点
-[node name="Hit" type="Node" parent="EnemyStateMachine"]
-script = ExtResource("hit_state")  # type="Node" 会创建新节点而非覆盖
 
-# ❌ 不要把所有功能都放模板（RayCast 不是每个敌人都需要）
+**收益**: 开发阶段快速发现配置错误
+
+#### C. 统一 EnemyData 使用
+
+```
+当前: 直接导出属性 + EnemyData Resource 并存
+建议: 选择一种方案:
+  方案 A: 全部使用 EnemyData Resource（数据驱动）
+  方案 B: 移除 EnemyData，全部使用直接导出（简单直接）
+推荐: 方案 B（当前项目规模不需要额外的 Resource 抽象层）
 ```
 
-### 设计原则总结
+### 11.2 中期改进
 
-| 原则 | 说明 |
-|------|------|
-| **通用放模板** | 所有角色共有的功能放在对应模板（EnemyBase/PlayerBase/BossBase） |
-| **差异化组合** | 非通用功能（RayCast、特殊攻击）按需在子场景添加 |
-| **覆盖而非重建** | 子场景覆盖属性/脚本，不重新定义整个节点 |
-| **钩子优于重写** | 使用钩子方法（`_on_enemy_ready()`, `_on_player_ready()`, `_on_boss_ready()`） |
-| **配置优于代码** | 尽量通过 Inspector 导出属性配置，减少脚本代码 |
-| **效果先于信号** | 攻击效果在信号 emit 之前应用，避免速度覆盖 |
-| **基类类型引用** | 脚本中使用 `PlayerBase`/`BossBase` 而非具体子类，提高通用性 |
-| **职责清晰分离** | 基类处理通用逻辑，子类处理特定行为（8方位、纹理选择） |
+#### D. BossBase 添加 AnimationTree
 
-### 三种模板对比
+```
+当前: Boss 直接使用 AnimationPlayer
+建议: BossBase.tscn 添加 AnimationTree，使用与 EnemyBase 相同的 BlendTree 结构
 
-| 特性 | EnemyBase | PlayerBase | BossBase |
-|------|-----------|-----------|----------|
-| **状态数量** | 7 个（Idle ~ Knockback） | 无（组件化） | 9 个（多 Enrage/SpecialAttack） |
-| **组件系统** | 无 | 5 个组件 | BossAttackManager |
-| **动画方案** | AnimationTree 或 AnimatedSprite2D | AnimatedSprite2D + AnimationTree | AnimationPlayer |
-| **朝向逻辑** | flip_h（简单翻转） | 组件处理 | 8 方位旋转 |
-| **特殊系统** | 重力、地面检测 | 技能系统、相机跟随 | 阶段系统、巡逻点 |
-| **目标用户** | 简单敌人 | 可操作角色 | 强大 Boss |
+步骤:
+1. BossBase.tscn 添加 AnimationTree 节点
+2. 配置 BlendTree (locomotion + control_sm)
+3. BossBaseState 改用 enter_control_state() 等 helper
+4. 更新现有 Boss 状态脚本
+
+收益:
+- 统一的动画控制接口
+- Boss 动画混合更平滑
+- 代码风格一致
+```
+
+#### E. SkillManager 拆分
+
+```
+当前: SkillManager (458行) 管理所有技能阶段
+建议: 拆分为 SkillManager (协调) + 独立的 Phase 类
+
+# SkillManager — 协调器
+func execute_skill(skill_data: SkillData):
+    for phase in skill_data.phases:
+        await phase.execute(self)
+
+# SkillPhase — 独立阶段
+class DetectPhase extends SkillPhase:
+    func execute(context):
+        context.detect_enemies_in_cone(...)
+
+class GatherPhase extends SkillPhase:
+    func execute(context):
+        context.gather_enemies()
+```
+
+**收益**: 技能阶段可组合、可复用、可独立测试
+
+#### F. 动画方案统一策略
+
+```
+方案 1: 全部统一到 AnimationTree
+  - 为 AnimatedSprite2D 类型创建简化的 BlendTree 适配
+  - ForestEnemy 也使用 AnimationTree 控制
+
+方案 2: 在 BaseState 中增加 AnimatedSprite2D 支持
+  - 新增 play_sprite_animation(name) helper
+  - ForestEnemyState 不再需要独立的动画控制代码
+
+方案 3: 接受双系统（推荐）
+  - AnimationTree 用于复杂角色（方向+速度混合）
+  - AnimatedSprite2D 用于简单角色（仅帧动画）
+  - 但在 BaseState 中统一暴露接口
+```
+
+### 11.3 长期改进
+
+#### G. 模板场景版本管理
+
+```
+问题: 修改模板会影响所有继承场景
+建议: 制定模板修改流程
+  1. 修改前列出所有继承场景
+  2. 验证修改不会破坏现有行为
+  3. 必要时创建新版本模板 (V2) 而非修改原模板
+```
+
+#### H. 组件自动发现
+
+```
+当前: BaseCharacter 硬编码节点路径
+建议: 组件通过 class_name 自动发现
+
+func _find_component(type) -> Node:
+    for child in get_children():
+        if child is type:
+            return child
+    return null
+
+# 用法:
+health_component = _find_component(HealthComponent)
+```
+
+**收益**: 组件可以在子场景中重命名或重新排列而不破坏功能
+
+### 11.4 改进优先级
+
+| 优先级 | 改进项 | 原因 |
+|--------|--------|------|
+| P0 | B. 信号连接验证 | 开发体验提升，改动极小 |
+| P0 | A. 碰撞层常量化 | 减少配置错误，改动小 |
+| P1 | C. 统一 EnemyData 策略 | 减少混淆，改动小 |
+| P2 | D. Boss AnimationTree | 架构一致性，改动中等 |
+| P2 | E. SkillManager 拆分 | 可维护性提升，改动中等 |
+| P3 | F. 动画方案统一 | 架构一致性，可选 |
+| P3 | H. 组件自动发现 | 灵活性提升，需评估 |
+| P4 | G. 模板版本管理 | 流程优化，非代码改动 |
+
+---
+
+## 文件索引
+
+**模板场景**:
+- `Scenes/Characters/Templates/EnemyBase.tscn`
+- `Scenes/Characters/Templates/PlayerBase.tscn`
+- `Scenes/Characters/Templates/BossBase.tscn`
+
+**基类脚本**:
+- `Core/Characters/BaseCharacter.gd`
+- `Core/Characters/EnemyBase.gd`
+- `Core/Characters/PlayerBase.gd`
+- `Core/Characters/BossBase.gd`
+
+**组件**:
+- `Core/Components/HealthComponent.gd`
+- `Core/Components/HurtBoxComponent.gd`
+- `Core/Components/HitBoxComponent.gd`
+- `Core/Components/MovementComponent.gd`
+- `Core/Components/CombatComponent.gd`
+- `Core/Components/SkillManager.gd`
+- `Core/Components/FollowCamera.gd`
+- `Core/Components/AttackComponent.gd`
+
+**Resource**:
+- `Core/Resources/Damage.gd`
+- `Core/Resources/AttackEffect.gd`
+- `Core/Resources/KnockBackEffect.gd`
+- `Core/Resources/KnockUpEffect.gd`
+- `Core/Resources/StunEffect.gd`
+- `Core/Resources/GatherEffect.gd`
+- `Core/Resources/ForceStunEffect.gd`
+- `Core/Resources/CharacterData.gd`
+
+**具体角色**:
+- `Scenes/Characters/Player/Hahashin/Hahashin.tscn` + `hahashin.gd`
+- `Scenes/Characters/Enemies/ForestBee/ForestBee.tscn`
+- `Scenes/Characters/Enemies/ForestBoar/ForestBoar.tscn`
+- `Scenes/Characters/Enemies/ForestSnail/ForestSnail.tscn`
+- `Scenes/Characters/Enemies/Boss/Boss.tscn` + `Scripts/boss.gd`
 
 ---
 
 > **相关文档**:
-> - [01_state_machine_architecture.md](01_state_machine_architecture.md) — 状态机系统详解
-> - [02_combat_system_architecture.md](02_combat_system_architecture.md) — 战斗系统架构
-> - [03_component_system_architecture.md](03_component_system_architecture.md) — 组件系统架构
-> - [04_signal_driven_architecture.md](04_signal_driven_architecture.md) — 信号驱动架构
+> - [状态机 + AnimationTree 架构](01_state_machine_architecture.md) — 状态机和动画混合详解
+> - [战斗系统架构](02_combat_system_architecture.md) — 战斗系统
+> - [组件系统架构](03_component_system_architecture.md) — 组件系统
+> - [信号驱动架构](04_signal_driven_architecture.md) — 信号通信
 >
 > **更新历史**:
-> - 2026-02-25: 创建文档，记录 EnemyBase 模板系统
-> - 2026-02-26: 新增 PlayerBase 和 BossBase 模板，完善三层模板体系
->
-> **Token消耗**: ~5000 (更新后)
+> - 2026-02-25: 创建文档，EnemyBase 模板系统
+> - 2026-02-26: 新增 PlayerBase 和 BossBase 模板
+> - 2026-03-15: 全面重写，深度分析三种模板的优缺点和改进建议，完善组件/Resource/信号链路文档

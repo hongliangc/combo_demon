@@ -136,12 +136,12 @@ func _update_sprite_facing() -> void:
 	if not sprite or not alive or velocity.x == 0:
 		return
 
-	# 注意：velocity.x > 0 表示向右移动，此时翻转精灵
-	# 这是因为敌人精灵资源默认朝向左边
+	# 注意：velocity.x < 0 表示向左移动，此时翻转精灵
+	# 这是因为敌人精灵资源默认朝向右边
 	if sprite is Sprite2D:
-		(sprite as Sprite2D).flip_h = velocity.x > 0
+		(sprite as Sprite2D).flip_h = velocity.x < 0
 	elif sprite is AnimatedSprite2D:
-		(sprite as AnimatedSprite2D).flip_h = velocity.x > 0
+		(sprite as AnimatedSprite2D).flip_h = velocity.x < 0
 
 # ============ 数据驱动 ============
 ## 从 EnemyData 资源加载配置

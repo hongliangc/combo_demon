@@ -15,6 +15,7 @@ signal player_entered()
 @export var is_exit: bool = true  # true=出口, false=入口
 @export var auto_activate: bool = false  # 是否自动激活
 @export var activation_hint: String = "Complete the objective to unlock!"
+@export var target_scene: String = ""  # 指定目标场景路径（不为空时跳转到该场景而非完成关卡）
 
 var is_active: bool = false
 var player_in_range: bool = false
@@ -98,7 +99,7 @@ func _on_body_exited(body: Node2D) -> void:
 
 
 ## 传送玩家
-func _teleport_player(player: Node2D) -> void:
+func _teleport_player(_player: Node2D) -> void:
 	player_entered.emit()
 
 	# 播放传送特效
@@ -107,8 +108,10 @@ func _teleport_player(player: Node2D) -> void:
 	# 等待特效
 	await get_tree().create_timer(0.5).timeout
 
-	# 完成关卡
-	if is_exit:
+	# 跳转到指定场景或完成关卡
+	if target_scene != "":
+		UIManager.transition_to_scene(target_scene, "fade")
+	elif is_exit:
 		LevelManager.complete_level()
 
 

@@ -24,10 +24,18 @@ func physics_process_state(_delta: float) -> void:
 		transitioned.emit(self, "ground")
 		return
 
+	# 空中跳跃（二段跳）
+	if Input.is_action_just_pressed("jump"):
+		var movement = get_movement()
+		if movement and movement.can_air_jump():
+			movement.perform_jump(true)
+			enter_control_state("j_up")
+			return
+
 	# 攻击输入 → 空中攻击（普通攻击键映射为 atk_air）
 	for action in ["atk_1", "atk_2", "atk_3"]:
 		if Input.is_action_just_pressed(action):
-			owner_node.pending_combat_skill = "atk_air"
+			owner_node.set_pending_skill("atk_air", {"is_air": true})
 			transitioned.emit(self, "combat")
 			return
 

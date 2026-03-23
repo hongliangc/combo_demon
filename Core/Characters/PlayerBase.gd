@@ -16,8 +16,19 @@ class_name PlayerBase
 @onready var skill_manager: SkillManager = $SkillManager
 
 # ============ 状态机通信 ============
-## 待执行的战斗技能名（由 Ground/Air 状态设置，Combat 状态读取）
-var pending_combat_skill: String = ""
+## 待执行的战斗技能（由 Ground/Air 状态设置，Combat 状态消费）
+var pending_combat_skill: Dictionary = {}
+
+## 设置待执行技能
+func set_pending_skill(skill_name: String, metadata: Dictionary = {}) -> void:
+	pending_combat_skill = metadata.duplicate()
+	pending_combat_skill["skill_name"] = skill_name
+
+## 消费待执行技能（读取后清空，避免残留）
+func consume_pending_skill() -> Dictionary:
+	var data = pending_combat_skill.duplicate()
+	pending_combat_skill = {}
+	return data
 
 func _on_character_ready() -> void:
 	# 落地灰尘特效
@@ -29,8 +40,9 @@ func _physics_process(delta: float) -> void:
 	if has_gravity:
 		if not is_on_floor():
 			velocity.y += gravity * delta
-		elif velocity.y > 0:
-			velocity.y = 0
+		else:
+			if velocity.y > 0:
+				velocity.y = 0
 
 # ============ 信号回调 ============
 func _on_landed() -> void:
@@ -48,6 +60,13 @@ func switch_to_knockup() -> void:
 func switch_to_special_attack() -> void:
 	if combat_component:
 		combat_component.switch_to_special_attack()
+
+# ============ 坠落死亡 ============
+## 触发坠落死亡（由 KillZone 调用）
+func trigger_fall_death() -> void:
+	var state_machine = get_node_or_null("PlayerStateMachine") as BaseStateMachine
+	if state_machine:
+		state_machine.force_transition("falldeath")
 
 # ============ 死亡处理 ============
 func _handle_death() -> void:

@@ -1,4 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://dvdtxgsuir5jc"]
+[gd_scene load_steps=2 format=3 uid="uid://dvdtxgsuir5jc"]
+
+[ext_resource type="Script" path="res://Effects/TeleportVfx.gd" id="1_script"]
 
 [sub_resource type="Gradient" id="Gradient_k8mpv"]
 offsets = PackedFloat32Array(0, 0.547009, 1)
@@ -29,6 +31,7 @@ scale_curve = SubResource("CurveTexture_aqk3v")
 color_ramp = SubResource("GradientTexture1D_dmc2j")
 
 [node name="TeleportVfx" type="GPUParticles2D"]
+script = ExtResource("1_script")
 emitting = false
 amount = 150
 one_shot = true

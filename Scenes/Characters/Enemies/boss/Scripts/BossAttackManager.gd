@@ -117,11 +117,16 @@ func spawn_projectile(angle: float) -> void:
 
 # ============ 激光攻击 ============
 
-## 生成激光（朝向目标）
+## 生成激光（朝向目标）- 同时最多 1 个激光
 func fire_laser(target_position: Vector2) -> void:
 	if not laser_scene or not boss:
 		push_warning("激光场景或Boss引用缺失")
 		return
+
+	# 限制同时只能有 1 个激光
+	for child in boss.get_children():
+		if child is BossLaser:
+			return
 
 	var laser = laser_scene.instantiate()
 	# 将激光作为boss的子节点，这样它会跟随boss移动
@@ -217,10 +222,27 @@ func apply_knockback_to_player(player: Node2D) -> void:
 
 	print("玩家被击退！方向: ", knockback_direction)
 
+# ============ 连续弹幕（异步安全） ============
+
+## 发射连续追踪弹（await 安全，状态切走后自动中止）
+func fire_rapid_projectiles(target: Node2D, count: int, interval: float = 0.1) -> void:
+	for i in count:
+		if not is_instance_valid(target) or not is_instance_valid(boss):
+			return
+		fire_single_projectile(target.global_position)
+		if i < count - 1:
+			await get_tree().create_timer(interval).timeout
+
 # ============ 工具方法 ============
 
+var _cached_player: Node2D
+
 func get_player() -> Node2D:
+	if is_instance_valid(_cached_player):
+		return _cached_player
 	var players = get_tree().get_nodes_in_group("player")
 	if players.is_empty():
+		_cached_player = null
 		return null
-	return players[0] as Node2D
+	_cached_player = players[0] as Node2D
+	return _cached_player

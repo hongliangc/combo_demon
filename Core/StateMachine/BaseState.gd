@@ -53,10 +53,13 @@ var target_node: Node
 var state_machine: BaseStateMachine
 
 # ============ 内部状态 ============
-## 当前状态定时器（由 start_timer 创建）
+## 当前状态定时器（懒创建复用）
 var _state_timer: Timer
+## 当前定时器回调（用于断开连接）
+var _timer_callback: Callable
 
 # ============ 生命周期方法（子类重写）============
+
 ## 进入状态时调用
 func enter() -> void:
 	pass
@@ -163,38 +166,51 @@ func on_damaged(damage: Damage, _attacker_position: Vector2) -> void:
 
 
 # ============ Timer 管理方法 ============
-## 创建并启动状态定时器
+
+## 懒创建定时器（首次调用时创建，之后复用）
+func _ensure_timer() -> void:
+	if not _state_timer:
+		_state_timer = Timer.new()
+		_state_timer.one_shot = true
+		add_child(_state_timer)
+
+## 启动状态定时器（懒创建复用 Timer，避免频繁创建/销毁）
 ## @param duration: 定时器持续时间
 ## @param callback: 超时回调函数（可选，默认调用 _on_timer_timeout）
 ## @param one_shot: 是否单次触发（默认 true）
 func start_timer(duration: float, callback: Callable = Callable(), one_shot: bool = true) -> Timer:
-	# 清理旧定时器
-	stop_timer()
+	_ensure_timer()
 
-	# 创建新定时器
-	_state_timer = Timer.new()
+	# 断开旧回调
+	_disconnect_timer_callback()
+
+	# 配置定时器
 	_state_timer.wait_time = duration
 	_state_timer.one_shot = one_shot
-	_state_timer.autostart = true
 
-	# 连接回调
+	# 连接新回调
 	if callback.is_valid():
-		_state_timer.timeout.connect(callback)
+		_timer_callback = callback
 	else:
-		_state_timer.timeout.connect(_on_timer_timeout)
+		_timer_callback = _on_timer_timeout
+	_state_timer.timeout.connect(_timer_callback)
 
-	add_child(_state_timer)
+	_state_timer.start()
 	return _state_timer
 
 
-## 停止并清理状态定时器
+## 停止状态定时器（不销毁，仅停止并断开回调）
 func stop_timer() -> void:
 	if _state_timer:
 		_state_timer.stop()
-		if _state_timer.timeout.is_connected(_on_timer_timeout):
-			_state_timer.timeout.disconnect(_on_timer_timeout)
-		_state_timer.queue_free()
-		_state_timer = null
+		_disconnect_timer_callback()
+
+
+## 断开当前定时器回调
+func _disconnect_timer_callback() -> void:
+	if _state_timer and _timer_callback.is_valid() and _state_timer.timeout.is_connected(_timer_callback):
+		_state_timer.timeout.disconnect(_timer_callback)
+	_timer_callback = Callable()
 
 
 ## 重置定时器（重新开始计时）

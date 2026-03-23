@@ -4,18 +4,19 @@ class_name PlayerCombatState
 ## 战斗状态：播放攻击动画，动画结束后返回 Ground/Air
 ## priority = REACTION(1), can_be_interrupted = false
 
-var current_skill: String = ""
+var current_skill: Dictionary = {}
 
 func _init() -> void:
 	priority = StatePriority.REACTION
 	can_be_interrupted = false
 
 func enter() -> void:
-	current_skill = owner_node.pending_combat_skill if owner_node else ""
+	current_skill = owner_node.consume_pending_skill() if owner_node else {}
 
 	# 进入 control_sm 播放攻击动画
-	if current_skill != "":
-		enter_control_state(current_skill)
+	var skill_name := current_skill.get("skill_name", "") as String
+	if skill_name != "":
+		enter_control_state(skill_name)
 
 	# 加速攻击动画
 	set_control_time_scale(2.0)
@@ -43,5 +44,5 @@ func exit() -> void:
 		tree.animation_finished.disconnect(_on_animation_finished)
 
 func _on_animation_finished(anim_name: StringName) -> void:
-	if anim_name == current_skill:
+	if anim_name == current_skill.get("skill_name", ""):
 		return_to_locomotion()

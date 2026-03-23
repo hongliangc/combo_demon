@@ -39,6 +39,10 @@ func _ready() -> void:
 	if hitbox_area:
 		hitbox_area.area_entered.connect(_on_area_entered)
 
+func _exit_tree() -> void:
+	if collision_shape:
+		collision_shape.shape = null
+
 func _process(delta: float) -> void:
 	match state:
 		"charging":

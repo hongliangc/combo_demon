@@ -55,6 +55,9 @@ func physics_process_state(delta: float) -> void:
 		transition_to(default_state_name)
 		return
 
+	# 攻击时持续面向目标（基于 direction_to_target 而非 velocity）
+	update_sprite_facing(false)
+
 	var effective_range = get_owner_property("follow_radius", default_attack_range)
 	var distance = get_distance_to_target()
 

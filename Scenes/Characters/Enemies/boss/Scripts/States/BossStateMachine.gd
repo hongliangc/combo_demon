@@ -50,9 +50,9 @@ func _on_phase_changed(new_phase: int):
 						if states.has("chase"):
 							force_transition("chase")
 			BossBase.Phase.PHASE_3:
-				# 第三阶段立即进入狂暴状态
-				if states.has("enrage"):
-					force_transition("enrage")
+				# 第三阶段立即进入攻击（Attack 状态自动读取 Phase 决定行为）
+				if states.has("attack"):
+					force_transition("attack")
 
 	# 短暂延迟后清除标志，防止阶段转换瞬间的状态冲突
 	await get_tree().create_timer(0.1).timeout

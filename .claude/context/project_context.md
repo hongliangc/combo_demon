@@ -12,6 +12,19 @@
 
 ## 🆕 最近更新
 
+### 2026-03-20: Boss 状态机全面重构（8项优化） ✅
+**类型**: 状态机架构重构 + 代码精简
+
+**核心成果**:
+- **BossPhaseConfig Resource**: 替代旧三层 Resource 体系，单 Resource 定义攻击池/冷却/行为模式
+- **统一攻击入口**: `evaluate_combat_transition()` 消除 Chase/Retreat/Attack 中重复的距离判断
+- **Callable combo 工厂**: `_resolve_combo_factory()` 替代 match-string 映射，启动时解析为 Callable
+- **_boss 懒缓存**: BossBaseState 内 `_boss` 属性消除所有状态中的重复类型守卫
+- **Player 缓存**: BossAttackManager `_cached_player` + `is_instance_valid` 避免重复查找
+- **`_dispatch_attack()` 提升**: 攻击分发从 BossAttack 提升到 BossBaseState，Chase/Retreat 共用
+- **dead code 清理**: 移除 `special_attack_cooldown`、BossEnrage、BossSpecialAttack
+- **`fire_rapid_projectiles()`**: BossAttackManager 新增连射方法，含逐发有效性检查
+
 ### 2026-02-08: AI 状态机 + AnimationTree 架构优化 ✅
 **类型**: 状态机框架升级 + 动画系统重构
 
@@ -62,8 +75,9 @@ AutoLoad 单例
 │   └── AttackEffect子类     - StunEffect/KnockUp/KnockBack/Gather/ForceStun
 │
 ├── Boss战
-│   ├── Boss基类             - 多阶段（3阶段）、8方位移动
-│   └── 状态机（9状态）      - idle/patrol/chase/circle/attack/retreat/special/enrage/stun
+│   ├── Boss基类             - 多阶段（可扩展）、8方位移动、AnimationTree双层BlendTree
+│   ├── BossPhaseConfig      - 单 Resource 定义：攻击池/追击池/撤退池/冷却/行为模式
+│   └── 状态机（7状态）      - idle/patrol/chase/circle/attack/retreat/stun
 │
 └── Player (自治组件架构)
     ├── HealthComponent      - 生命值、受伤、死亡
@@ -181,7 +195,7 @@ Core/
 │   ├── EnemyStateMachine.gd
 │   ├── CommonStates/    - 7个通用状态
 │   └── ForestEnemyStates/ - 地面敌人状态
-├── Resources/       - Damage, AttackEffect, StunEffect 等
+├── Resources/       - Damage, AttackEffect, StunEffect, BossPhaseConfig
 ├── Components/      - Health, HitBoxComponent, HurtBoxComponent, Combat, Movement, Animation, SkillManager
 ├── Data/SkillBook/  - .tres 资源文件（Physical, KnockUp, SpecialAttack）
 └── Effects/         - 视觉特效（AfterImage, Highlight, Vortex）
@@ -225,6 +239,6 @@ func take_damage() -> void   # snake_case + 类型注解
 
 ---
 
-**最后更新**: 2026-02-08
+**最后更新**: 2026-03-20
 **Token消耗**: ~2800 tokens
 **项目状态**: ✅ 可运行，架构清晰，AI状态机+AnimationTree完善

@@ -1,215 +1,209 @@
 extends BossState
 
-## Boss 攻击状态 - 执行基础攻击
+## Boss 攻击状态 - 按阶段驱动（BossPhaseConfig Resource）
+## 每个 Phase 自包含：技能池、冷却、行为模式、免疫
+## Phase 1-2: timer 行为（站桩开火 → 退出）
+## Phase 3: chase 行为（边追边打，持续循环）
 
-@export var attack_duration := 1.0  # 攻击动作持续时间
+const PhaseConfig = preload("res://Scenes/Characters/Enemies/boss/Scripts/BossPhaseConfig.gd")
 
-var attack_timer := 0.0
-var has_attacked := false
+# ============ 阶段配置（Phase → BossPhaseConfig） ============
+var phase_configs: Dictionary = {}
 
+# ============ 运行时状态 ============
+var _config                          # 当前阶段配置 (BossPhaseConfig)
+var _attack_timer: float = 0.0      # timer 模式倒计时
+var _has_attacked: bool = false     # timer 模式是否已开火
+
+# ============ 初始化 ============
 func _init():
 	priority = StatePriority.BEHAVIOR
-	can_be_interrupted = true  # 可被反应层打断（第三阶段在 on_damaged 中特殊处理）
+	can_be_interrupted = true
 	animation_state = "attack"
 
-func enter():
-	# print("Boss: 进入攻击状态")
-	attack_timer = attack_duration
-	has_attacked = false
 
-	if owner_node is not Boss:
+func _ready():
+	_build_phase_configs()
+	_resolve_callables()
+
+
+## 构建各阶段配置（代码初始化，未来可迁移为 .tres）
+func _build_phase_configs() -> void:
+	# Phase 1
+	var p1 = PhaseConfig.new()
+	p1.attacks = [
+		{ "mode": "fan_spread", "count": 3, "spread": deg_to_rad(30) },
+		{ "mode": "rapid_fire", "count": 3 },
+		{ "mode": "combo", "factory": "create_triple_shot" },
+	]
+	p1.chase_attacks = [
+		{ "mode": "rapid_fire", "count": 1 },
+	]
+	p1.retreat_attacks = [
+		{ "mode": "rapid_fire", "count": 1 },
+	]
+	p1.cooldown = 1.5
+	p1.attack_duration = 1.0
+	p1.behavior = "timer"
+	p1.immune = false
+
+	# Phase 2
+	var p2 := PhaseConfig.new()
+	p2.attacks = [
+		{ "mode": "fan_spread", "count": 5, "spread": deg_to_rad(45) },
+		{ "mode": "spiral", "count": 16 },
+		{ "mode": "laser" },
+		{ "mode": "combo", "factory": "create_fan_spiral" },
+		{ "mode": "combo", "factory": "create_laser_shockwave" },
+	]
+	p2.chase_attacks = [
+		{ "mode": "fan_spread", "count": 3, "spread": PI / 8 },
+	]
+	p2.retreat_attacks = [
+		{ "mode": "fan_spread", "count": 3, "spread": PI / 6 },
+	]
+	p2.cooldown = 1.0
+	p2.attack_duration = 1.0
+	p2.behavior = "timer"
+	p2.immune = false
+
+	# Phase 3
+	var p3 := PhaseConfig.new()
+	p3.attacks = [
+		{ "mode": "fan_spread", "count": 8, "spread": deg_to_rad(60) },
+		{ "mode": "combo", "factory": "create_spiral_aoe" },
+		{ "mode": "combo", "factory": "create_laser_barrage" },
+		{ "mode": "aoe" },
+		{ "mode": "combo", "factory": "create_ultimate_combo" },
+		{ "mode": "combo", "factory": "create_double_spiral" },
+	]
+	p3.chase_attacks = [
+		{ "mode": "fan_spread", "count": 5, "spread": PI / 4 },
+	]
+	p3.retreat_attacks = [
+		{ "mode": "spiral", "count": 8 },
+	]
+	p3.cooldown = 0.5
+	p3.behavior = "chase"
+	p3.speed_multiplier = 1.8
+	p3.immune = true
+
+	phase_configs = {
+		BossBase.Phase.PHASE_1: p1,
+		BossBase.Phase.PHASE_2: p2,
+		BossBase.Phase.PHASE_3: p3,
+	}
+
+
+## 将所有攻击池中的字符串 factory 解析为 Callable
+func _resolve_callables() -> void:
+	for config in phase_configs.values():
+		for pool in [config.attacks, config.chase_attacks, config.retreat_attacks]:
+			for entry in pool:
+				if entry.get("mode") == "combo" and entry.get("factory") is String:
+					var callable := _resolve_combo_factory(entry["factory"])
+					if callable.is_valid():
+						entry["factory"] = callable
+
+# ============ 状态生命周期 ============
+
+func enter():
+	if not _boss:
 		return
 
-	# 停止移动，准备攻击
-	var boss = owner_node as Boss
-	boss.velocity = Vector2.ZERO
+	_config = phase_configs.get(_boss.current_phase, phase_configs[BossBase.Phase.PHASE_1])
+
+	if _config.behavior == "timer":
+		can_be_interrupted = true
+		_attack_timer = _config.attack_duration
+		_has_attacked = false
+		_boss.velocity = Vector2.ZERO
+	else:
+		can_be_interrupted = false
+
+	var owner_name = str(owner_node.name) if owner_node else "?"
+	DebugConfig.debug("[%s] Attack phase=%d behavior=%s" % [owner_name, _boss.current_phase, _config.behavior], "", "state_machine")
+
 
 func process_state(delta: float) -> void:
-	attack_timer -= delta
+	if not _config or _config.behavior != "timer":
+		return
 
-	# 在攻击动作中途执行攻击
-	if not has_attacked and attack_timer <= attack_duration * 0.5:
-		perform_attack()
-		has_attacked = true
+	# Timer 行为：倒计时 → 中点开火 → 结束退出
+	_attack_timer -= delta
 
-	# 攻击结束
-	if attack_timer <= 0:
-		if owner_node is not Boss:
-			return
+	if not _has_attacked and _attack_timer <= _config.attack_duration * 0.5:
+		_fire_attack()
+		play_boss_anim("attack")
+		_has_attacked = true
 
-		# 设置攻击冷却
-		set_attack_cooldown()
+	if _attack_timer <= 0:
+		_finish_timer_attack()
 
-		# 根据距离决定下一个状态
-		if is_target_alive():
-			var boss = owner_node as Boss
-			var distance = get_distance_to_target()
-			if distance < boss.min_distance:
-				transitioned.emit(self, "retreat")
-			elif distance > boss.attack_range:
-				transitioned.emit(self, "chase")
-			else:
-				transitioned.emit(self, "circle")
-		else:
-			transitioned.emit(self, "idle")
 
 func physics_process_state(delta: float) -> void:
-	if owner_node is not Boss:
+	if not _boss or not _config:
 		return
 
-	# 攻击时缓慢减速
-	var boss = owner_node as Boss
-	boss.velocity = boss.velocity.lerp(Vector2.ZERO, 10.0 * delta)
+	if _config.behavior == "chase":
+		# Chase 行为：追击 + 循环开火
+		if not is_target_alive():
+			transitioned.emit(self, "patrol")
+			return
 
-func perform_attack():
-	if owner_node is not Boss:
-		return
+		var distance := get_distance_to_target()
 
-	#print("Boss 执行攻击！")
+		# 距离管理
+		if distance < _boss.min_distance:
+			var away_dir := -get_direction_to_target()
+			_boss.velocity = away_dir * _boss.move_speed
+		elif distance > _boss.attack_range:
+			var direction := get_direction_to_target()
+			_boss.velocity = direction * _boss.move_speed * _config.speed_multiplier
+		else:
+			_boss.velocity = _boss.velocity.lerp(Vector2.ZERO, 5.0 * delta)
 
-	var boss = owner_node as Boss
+		# 普通攻击：cooldown 循环
+		if _boss.attack_cooldown <= 0:
+			_fire_attack()
+			play_boss_anim("attack")
+			_boss.attack_cooldown = _config.cooldown
+	else:
+		# Timer 行为：减速
+		_boss.velocity = _boss.velocity.lerp(Vector2.ZERO, 10.0 * delta)
 
-	# 根据阶段决定攻击模式
-	match boss.current_phase:
-		Boss.Phase.PHASE_1:
-			attack_pattern_phase_1()
-		Boss.Phase.PHASE_2:
-			attack_pattern_phase_2()
-		Boss.Phase.PHASE_3:
-			attack_pattern_phase_3()
-
-	# 播放攻击动画
-	if boss.anim_player and boss.anim_player.has_animation("attack"):
-		boss.anim_player.play("attack")
-
-func attack_pattern_phase_1():
-	# 第一阶段：保守策略 - 随机使用基础攻击或简单连击
-	var attack_manager = get_attack_manager()
-	if not attack_manager:
-		return
-
-	var attack_choice = randi() % 3
-	match attack_choice:
-		0:
-			# Fan Spread - 3发扇形弹幕
-			print("阶段1攻击：扇形弹幕 (3发)")
-			attack_manager.fire_projectiles(3, PI / 6)
-		1:
-			# Rapid Fire - 快速单发射击
-			print("阶段1攻击：快速射击")
-			if target_node:
-				attack_manager.fire_single_projectile((target_node as Node2D).global_position)
-			# 0.1秒后再发射两发
-			await get_tree().create_timer(0.1).timeout
-			if is_instance_valid(attack_manager) and target_node:
-				attack_manager.fire_single_projectile((target_node as Node2D).global_position)
-			await get_tree().create_timer(0.1).timeout
-			if is_instance_valid(attack_manager) and target_node:
-				attack_manager.fire_single_projectile((target_node as Node2D).global_position)
-		2:
-			# Combo - 三连击
-			print("阶段1攻击：三连击")
-			var combo = BossComboAttack.create_triple_shot()
-			attack_manager.execute_combo(combo)
-
-func attack_pattern_phase_2():
-	# 第二阶段：激进策略 - 更强攻击 + 螺旋弹幕 + 连击
-	var attack_manager = get_attack_manager()
-	if not attack_manager:
-		return
-
-	var attack_choice = randi() % 5
-	match attack_choice:
-		0:
-			# Fan Spread - 5发扇形弹幕（更密集）
-			print("阶段2攻击：密集扇形弹幕 (5发)")
-			attack_manager.fire_projectiles(5, PI / 4)
-		1:
-			# Spiral Barrage - 16方向螺旋弹幕
-			print("阶段2攻击：螺旋弹幕 (16发)")
-			attack_manager.fire_spiral_projectiles(16)
-		2:
-			# Laser Sweep - 激光扫射
-			print("阶段2攻击：激光扫射")
-			if attack_manager.laser_scene and target_node:
-				attack_manager.fire_laser_at_player()
-		3:
-			# Combo - 扇形 + 螺旋
-			print("阶段2攻击：扇形螺旋连击")
-			var combo = BossComboAttack.create_fan_spiral()
-			attack_manager.execute_combo(combo)
-		4:
-			# Combo - 激光 + 冲击波
-			print("阶段2攻击：激光冲击波连击")
-			var combo = BossComboAttack.create_laser_shockwave()
-			attack_manager.execute_combo(combo)
-
-func attack_pattern_phase_3():
-	# 第三阶段：狂暴模式 - 多重攻击组合 + 高级连击
-	var attack_manager = get_attack_manager()
-	if not attack_manager:
-		return
-
-	var attack_choice = randi() % 6
-	match attack_choice:
-		0:
-			# Fan Spread - 8发大范围弹幕
-			print("阶段3攻击：超密集弹幕 (8发)")
-			attack_manager.fire_projectiles(8, PI / 3)
-		1:
-			# Spiral Barrage + AOE - 螺旋弹幕 + 冲击波
-			print("阶段3攻击：螺旋弹幕 + 冲击波组合")
-			attack_manager.fire_spiral_projectiles(16)
-			await get_tree().create_timer(0.3).timeout
-			if is_instance_valid(attack_manager) and attack_manager.aoe_scene:
-				attack_manager.fire_aoe()
-		2:
-			# Rapid Laser + Projectiles - 激光 + 弹幕组合
-			print("阶段3攻击：激光弹幕组合")
-			if attack_manager.laser_scene and target_node:
-				attack_manager.fire_laser_at_player()
-			await get_tree().create_timer(0.2).timeout
-			if is_instance_valid(attack_manager):
-				attack_manager.fire_projectiles(6, PI / 4)
-		3:
-			# Shockwave - AOE冲击波
-			print("阶段3攻击：冲击波")
-			if attack_manager.aoe_scene:
-				attack_manager.fire_aoe()
-		4:
-			# Combo - 终极连击（螺旋 + 扇形 + AOE + 激光）
-			print("阶段3攻击：终极连击")
-			var combo = BossComboAttack.create_ultimate_combo()
-			attack_manager.execute_combo(combo)
-		5:
-			# Combo - 双重螺旋
-			print("阶段3攻击：双重螺旋连击")
-			var combo = BossComboAttack.create_double_spiral()
-			attack_manager.execute_combo(combo)
-
-func set_attack_cooldown():
-	if owner_node is not Boss:
-		return
-
-	# 根据阶段设置不同的攻击冷却
-	var boss = owner_node as Boss
-	match boss.current_phase:
-		Boss.Phase.PHASE_1:
-			boss.attack_cooldown = 1.5
-		Boss.Phase.PHASE_2:
-			boss.attack_cooldown = 1.0
-		Boss.Phase.PHASE_3:
-			boss.attack_cooldown = 0.7
 
 func exit():
 	pass
 
-# 攻击状态下仍然可以被打断
+
 func on_damaged(_damage: Damage, _attacker_position: Vector2 = Vector2.ZERO):
-	if owner_node is not Boss:
+	if _config and _config.immune:
+		return
+	transitioned.emit(self, "stun")
+
+# ============ 攻击执行 ============
+
+## 从攻击池随机选一个并执行
+func _fire_attack() -> void:
+	if not _config:
+		return
+	var entry = _config.pick_attack()
+	if entry.is_empty():
+		return
+	var attack_manager := get_attack_manager()
+	if attack_manager:
+		_dispatch_attack(attack_manager, entry)
+
+
+## Timer 模式攻击结束后处理
+func _finish_timer_attack() -> void:
+	if not _boss or not _config:
 		return
 
-	# 只有在非第三阶段才会被打断
-	var boss = owner_node as Boss
-	if boss.current_phase != Boss.Phase.PHASE_3:
-		transitioned.emit(self, "stun")
+	# 设置冷却
+	_boss.attack_cooldown = _config.cooldown
+
+	# 根据距离选择下一个状态
+	var next := evaluate_combat_transition()
+	transitioned.emit(self, next)

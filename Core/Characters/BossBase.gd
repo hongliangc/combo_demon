@@ -38,7 +38,9 @@ var can_move := true  # 用于技能聚集时强制停止移动
 
 # 攻击冷却
 var attack_cooldown := 0.0
-var special_attack_cooldown := 0.0
+
+# 眩晕免疫冷却（防止 stunlock）
+var stun_immunity := 0.0
 
 # 巡逻相关
 var patrol_points: Array[Vector2] = []
@@ -46,8 +48,13 @@ var current_patrol_index := 0
 
 # ============ 节点引用 ============
 @onready var anim_player: AnimationPlayer = $AnimationPlayer if has_node("AnimationPlayer") else null
+@onready var anim_tree: AnimationTree = $AnimationTree if has_node("AnimationTree") else null
 
 func _on_character_ready() -> void:
+	# 激活 AnimationTree
+	if anim_tree:
+		anim_tree.active = true
+
 	# 监听生命值变化以检查阶段转换
 	if health_component:
 		health_component.health_changed.connect(_on_health_changed)
@@ -59,8 +66,8 @@ func _physics_process(delta: float) -> void:
 	# 更新攻击冷却
 	if attack_cooldown > 0:
 		attack_cooldown -= delta
-	if special_attack_cooldown > 0:
-		special_attack_cooldown -= delta
+	if stun_immunity > 0:
+		stun_immunity -= delta
 
 	# 应用移动
 	move_and_slide()
@@ -98,13 +105,6 @@ func change_phase(new_phase: Phase) -> void:
 	activate_phase_transition_effect()
 
 	phase_changed.emit(new_phase)
-
-	match new_phase:
-		Phase.PHASE_2:
-			# 重置特殊攻击冷却，立即使用
-			special_attack_cooldown = 0
-		Phase.PHASE_3:
-			special_attack_cooldown = 0
 
 	# 调用子类钩子
 	_on_phase_transition()
@@ -169,6 +169,17 @@ func knockback_nearby_units() -> void:
 func _handle_death() -> void:
 	boss_defeated.emit()
 
+	# 优先通过 AnimationTree 播放死亡动画（必须确认动画存在）
+	if anim_tree and anim_tree.active and anim_player and anim_player.has_animation("death"):
+		anim_tree.set("parameters/control_blend/blend_amount", 1.0)
+		var playback = anim_tree.get("parameters/control_sm/playback")
+		if playback:
+			playback.start("death", true)
+			await anim_tree.animation_finished
+			queue_free()
+			return
+
+	# 回退到直接 AnimationPlayer
 	if anim_player and anim_player.has_animation("death"):
 		anim_player.play("death")
 		await anim_player.animation_finished

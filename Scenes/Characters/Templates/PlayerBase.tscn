@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://blfkf8nub1o60" path="res://Core/StateMachine/PlayerStates/PlayerRollState.gd" id="14_sm_roll"]
 [ext_resource type="Script" uid="uid://kkmnjkou0eie" path="res://Core/StateMachine/PlayerStates/PlayerHitState.gd" id="15_sm_hit"]
 [ext_resource type="Script" uid="uid://vyfwglbh5x83" path="res://Core/StateMachine/PlayerStates/PlayerSpecialAttackState.gd" id="16_sm_special"]
+[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerFallDeathState.gd" id="17_sm_falldeath"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_floor"]
 
@@ -133,6 +134,11 @@ can_be_interrupted = false
 [node name="SpecialAttack" type="Node" parent="PlayerStateMachine" unique_id=1124944062]
 script = ExtResource("16_sm_special")
 priority = 1
+can_be_interrupted = false
+
+[node name="FallDeath" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("17_sm_falldeath")
+priority = 2
 can_be_interrupted = false
 
 [connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

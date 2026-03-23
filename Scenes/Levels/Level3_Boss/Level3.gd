@@ -28,10 +28,10 @@ func _ready() -> void:
 
 
 func _setup_boss() -> void:
-	if boss and boss.has_signal("died"):
-		boss.died.connect(_on_boss_died)
+	if boss and boss.has_signal("boss_defeated"):
+		boss.boss_defeated.connect(_on_boss_defeated)
 
 
-func _on_boss_died() -> void:
+func _on_boss_defeated() -> void:
 	print("Level3: Boss defeated!")
 	LevelManager.on_boss_defeated()

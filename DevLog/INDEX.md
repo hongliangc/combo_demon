@@ -53,15 +53,15 @@
 | # | 模块 | 文档 | Token |
 |---|------|------|-------|
 | 0 | **总览** | [架构总览](architecture/00_architecture_overview.md) | ~600 |
-| 1 | **状态机** | [状态机系统](architecture/01_state_machine_architecture.md) | ~1000 |
+| 1 | **状态机+动画** | [状态机与AnimationTree架构](architecture/01_state_machine_architecture.md) | ~5000 |
 | 2 | **战斗系统** | [战斗系统](architecture/02_combat_system_architecture.md) | ~1500 |
 | 3 | **组件系统** | [组件系统](architecture/03_component_system_architecture.md) | ~1000 |
 | 4 | **信号驱动** | [信号驱动](architecture/04_signal_driven_architecture.md) | ~900 |
 | 5 | **Autoload** | [Autoload系统](architecture/05_autoload_system_architecture.md) | ~800 |
 | 6 | **技能系统** | [技能系统](architecture/06_skill_system_architecture.md) | ~1000 |
-| 7 | **角色模板** | [角色模板系统](architecture/07_character_template_architecture.md) | ~5000 |
-| 8 | **Player状态机** | [Player状态机与AnimationTree](architecture/08_player_statemachine_architecture.md) | ~3500 |
-| 9 | **完整架构** | [项目完整架构总览](architecture/09_project_architecture_overview_2026-03.md) ⭐ | ~3500 |
+| 7 | **角色模板** | [角色模板系统](architecture/07_character_template_architecture.md) | ~6000 |
+| 9 | **完整架构** | [项目完整架构总览](architecture/09_project_architecture_overview_2026-03.md) | ~3500 |
+| 10 | **Boss数据驱动攻击** | [Boss数据驱动攻击系统](architecture/10_boss_data_driven_attack.md) | ~3000 |
 
 #### 原有架构文档
 
@@ -82,6 +82,17 @@
 | 2026-03-07 | [项目开发路线图](planning/project_roadmap_2026-03.md) ⭐⭐⭐ | 完整产品规划与开发计划 | ~6000 |
 | 2026-01-18 | [优化工作计划](planning/optimization_work_plan.md) | 11项任务追踪 | ~1000 |
 | 2026-01-19 | [会话总结](sessions/session_summary_2026-01-19.md) | 本次会话记录 | ~400 |
+
+---
+
+### 💡 开发 Tips
+
+| 日期 | 标题 | 要点 | Token |
+|------|------|------|-------|
+| 2026-03-15 | [PathFollow2D progress_ratio 顺序](tips/pathfollow2d_progress_ratio_order.md) | progress_ratio 必须在 add_child 之后设置 | ~200 |
+| 2026-03-13 | [下坡弹跳修复](tips/slope_downhill_bounce_fix.md) | floor_snap_length + floor_constant_speed | ~200 |
+| - | [AnimationTree 继承场景编辑](tips/animation_tree_inherited_scene_editable.md) | 继承场景中 AnimationTree 的编辑方式 | ~200 |
+| - | [批量缩放动画帧间隔](tips/batch_scale_animation_frame_interval.md) | 批量修改动画帧间隔的方法 | ~200 |
 
 ---
 
@@ -114,12 +125,23 @@
   - 💡 技术亮点和创新设计
   - 📚 完整技术文档索引
 
+### 2026-03-15
+- 📐 [Boss数据驱动攻击系统](architecture/10_boss_data_driven_attack.md) - Resource 数据驱动 Boss 攻击配置
+  - BossAttackEntry / BossPhasePattern / BossAttackData 三层 Resource 体系
+  - 编辑器 + .tres 文件双路径配置教程
+  - 加权随机选择、阶段索引自动映射
+  - 扩展指南：添加更多阶段 / 添加新攻击模式
+- 📐 [状态机与AnimationTree架构](architecture/01_state_machine_architecture.md) - 全面重写，整合 Player/Enemy/Boss/ForestEnemy 四套状态机
+  - 深度分析双层 BlendTree 结构（locomotion + control）
+  - 覆盖四种角色类型的状态机实现差异
+  - 优缺点分析 + 10 项改进建议（含优先级排序）
+- 📐 [角色模板系统架构](architecture/07_character_template_architecture.md) - 全面重写三种模板体系
+  - 完善组件系统、Resource 体系、信号链路文档
+  - 深度分析优缺点 + 8 项改进建议
+  - 合并原 08_player_statemachine_architecture.md 内容至 01
+
 ### 2026-02-27
-- 📐 [Player状态机与AnimationTree架构](architecture/08_player_statemachine_architecture.md) - Player 状态机重构为 BaseState 统一框架
-  - ✅ 重构 AnimationTree 为 BlendTree 模式（locomotion SM + control_sm + control_blend）
-  - ✅ 5 个状态脚本使用 BaseState 内置 helper（set_locomotion_state, enter_control_state 等）
-  - ✅ PlayerStateMachine 移入 PlayerBase.tscn 模板场景
-  - ✅ 三层优先级系统: Hit(CONTROL=2) > Combat/Roll(REACTION=1) > Ground/Air(BEHAVIOR=0)
+- 📐 Player状态机与AnimationTree架构（已合并至 01_state_machine_architecture.md）
 
 ### 2026-02-26
 - 📐 [角色模板系统架构](architecture/07_character_template_architecture.md) - 新增 PlayerBase 和 BossBase 模板
@@ -168,9 +190,13 @@
 | **特殊攻击** | [V技能完整文档](features/special_attack_v_skill.md), [Bug修复](bug-fixes/player_autonomous_components_implementation_2026-01-19.md#问题发现), [流程图](architecture/architecture_uml_diagrams.md#2-特殊攻击流程时序图) |
 | **信号通信** | [架构设计](refactoring/autonomous_component_architecture_2026-01-18.md#信号通信), [UML图](architecture/architecture_uml_diagrams.md#3-信号通信架构图) |
 | **await问题** | [V技能-call_deferred](features/special_attack_v_skill.md#问题7-按v时没有残影效果), [内存泄漏](bug-fixes/await_memory_leak_fix_2026-01-18.md), [特殊攻击Bug](bug-fixes/player_autonomous_components_implementation_2026-01-19.md#技术细节) |
-| **状态机** | [架构评审](architecture/architecture_review_2026-01-18.md#状态机系统), [优化计划](planning/optimization_work_plan.md#5-重构stunstate---职责分离), [Player状态机架构](architecture/08_player_statemachine_architecture.md) |
-| **Player状态机** | [Player状态机与AnimationTree](architecture/08_player_statemachine_architecture.md), [角色模板](architecture/07_character_template_architecture.md) |
-| **BlendTree** | [Player状态机架构](architecture/08_player_statemachine_architecture.md#3-animationtree-blendtree-架构), [Enemy BlendTree](architecture/07_character_template_architecture.md#5-animationtree-混合树架构) |
+| **状态机** | [状态机与AnimationTree架构](architecture/01_state_machine_architecture.md), [架构评审](architecture/architecture_review_2026-01-18.md#状态机系统) |
+| **数据驱动攻击** | [Boss数据驱动攻击系统](architecture/10_boss_data_driven_attack.md) |
+| **BossAttackData** | [Boss数据驱动攻击系统](architecture/10_boss_data_driven_attack.md#2-resource-层级结构) |
+| **多阶段攻击** | [Boss数据驱动攻击系统](architecture/10_boss_data_driven_attack.md#7-扩展指南添加更多阶段) |
+| **攻击模式枚举** | [Boss数据驱动攻击系统](architecture/10_boss_data_driven_attack.md#3-攻击模式枚举) |
+| **Player状态机** | [状态机架构-Player章节](architecture/01_state_machine_architecture.md#4-player-状态机), [角色模板](architecture/07_character_template_architecture.md) |
+| **BlendTree** | [状态机架构-BlendTree章节](architecture/01_state_machine_architecture.md#3-animationtree-blendtree-架构), [模板-动画方案](architecture/07_character_template_architecture.md) |
 | **角色模板** | [模板系统架构](architecture/07_character_template_architecture.md), [模板规划](planning/charactor_template.md) |
 | **EnemyBase** | [模板系统架构](architecture/07_character_template_architecture.md#4-模板场景设计), [EnemyBase.tscn 节点树](architecture/07_character_template_architecture.md#41-enemybasetscn-节点树) |
 | **AnimationTree** | [BlendTree架构](architecture/07_character_template_architecture.md#5-animationtree-混合树架构), [两种动画方案](architecture/07_character_template_architecture.md#55-两种动画方案), [Player AnimationTree](architecture/08_player_statemachine_architecture.md#3-animationtree-blendtree-架构) |
@@ -244,6 +270,10 @@
 
 | 日期 | 变更 |
 |------|------|
+| 2026-03-15 | 📐 新增 Boss 数据驱动攻击系统文档（Resource 三层体系、配置教程、扩展指南） |
+| 2026-03-15 | 📐 全面重写状态机+AnimationTree架构文档（整合4套状态机，深度分析优缺点和改进建议） |
+| 2026-03-15 | 📐 全面重写角色模板系统文档（完善组件/Resource/信号链路，深度分析优缺点） |
+| 2026-03-15 | 🗑️ 合并 08_player_statemachine_architecture.md 至 01_state_machine_architecture.md |
 | 2026-03-13 | 🐛 修复 ForestBoar 接触玩家自毁问题（destroy_owner_on_hit 误用） |
 | 2026-03-07 | ⭐ 新增项目开发路线图（3阶段完整规划、任务清单、工时估算、资源评估） |
 | 2026-03-07 | ⭐ 新增项目完整架构总览（代码统计、9大系统详解、技术亮点、SWOT分析） |
@@ -260,6 +290,6 @@
 
 ---
 
-**最后更新**: 2026-03-13
+**最后更新**: 2026-03-15
 **维护者**: Claude + 用户
-**版本**: v1.4
+**版本**: v1.5

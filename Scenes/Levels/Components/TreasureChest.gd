@@ -108,7 +108,7 @@ func open_chest() -> void:
 	LevelManager.collect_item("treasure")
 
 	# 生成奖励特效
-	await _spawn_reward_effect()
+	_spawn_reward_effect()
 
 	# 开箱后完全移除宝箱
 	await get_tree().create_timer(0.5).timeout
@@ -131,23 +131,17 @@ func _play_open_animation() -> void:
 
 
 func _spawn_reward_effect() -> void:
-	# 简单的粒子效果（如果有的话）
-	var particles = GPUParticles2D.new()
-	particles.emitting = true
-	particles.one_shot = true
-	particles.amount = 8
-	particles.lifetime = 0.5
-	particles.global_position = global_position
-	get_tree().current_scene.add_child(particles)
+	# 生成金币爆散特效（复用 CoinBurst 场景）
+	var coin_burst_scene := preload("res://Effects/CoinBurst.tscn")
+	var coin_burst := coin_burst_scene.instantiate()
+	coin_burst.coin_amount = clampi(int(reward_gold / 2.0), 4, 12)
+	coin_burst.global_position = global_position + Vector2(0, -8)
+	get_tree().current_scene.add_child(coin_burst)
 
 	# 生成金币奖励
 	if reward_gold > 0:
-		LevelManager.collected_coins += reward_gold
+		LevelManager.collect_item("coin", reward_gold)
 		UIManager.show_toast("+%d Gold" % reward_gold, 1.5, "success")
-
-	# 自动清理
-	await get_tree().create_timer(1.0).timeout
-	particles.queue_free()
 
 
 ## 检查解锁条件

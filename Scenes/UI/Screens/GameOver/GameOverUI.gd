@@ -9,6 +9,12 @@ class_name GameOverUI
 ## UIManager.open_panel(game_over, UIManager.UILayer.POPUP)
 ## ```
 
+# 复活回调（设置后 restart 调用此回调而非重载场景）
+var on_restart_callback: Callable
+
+# 待设置的标题（在 _ready 前调用 set_title 时暂存）
+var _pending_title: String = ""
+
 # 节点引用
 @onready var background: ColorRect = $Background
 @onready var panel: VBoxContainer = $VBoxContainer
@@ -22,6 +28,9 @@ func _ready() -> void:
 	# 设置标题字体大小
 	if title:
 		title.add_theme_font_size_override("font_size", 48)
+		# 应用待设置的标题
+		if _pending_title != "":
+			title.text = _pending_title
 
 	# 初始状态：透明
 	background.modulate.a = 0.0
@@ -38,12 +47,23 @@ func _on_restart_button_pressed() -> void:
 func _on_quit_button_pressed() -> void:
 	quit_game()
 
+## 设置标题文字（可在 add_child 前调用）
+func set_title(text: String) -> void:
+	if title:
+		title.text = text
+	else:
+		_pending_title = text
+
 ## 重新开始游戏
 func restart_game() -> void:
-	# 先移除UI
-	queue_free()
-	# 然后重新加载场景
-	get_tree().reload_current_scene()
+	if on_restart_callback.is_valid():
+		# 复活模式：调用回调，移除UI
+		on_restart_callback.call()
+		queue_free()
+	else:
+		# 默认模式：重载场景
+		queue_free()
+		get_tree().reload_current_scene()
 
 ## 退出游戏
 func quit_game() -> void:

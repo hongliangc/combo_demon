@@ -1357,6 +1357,7 @@ offset_bottom = -23.0
 
 [node name="MovementComponent" parent="." index="9" unique_id=1866148992]
 max_speed = 200.0
+max_jump_count = 2
 
 [node name="CombatComponent" parent="." index="10" unique_id=1903333573]
 damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr"), ExtResource("4_special")])

@@ -31,6 +31,10 @@ signal landed()
 @export var jump_force: float = -400.0
 ## 是否启用跳跃功能
 @export var enable_jump: bool = true
+## 最大跳跃次数（1=单跳, 2=二段跳）
+@export var max_jump_count: int = 1
+## 空中跳跃力度（二段跳力度，可比地面弱）
+@export var air_jump_force: float = -350.0
 
 @export_group("Input")
 ## 输入映射名称
@@ -66,6 +70,8 @@ var last_face_direction: Vector2 = Vector2.RIGHT
 var is_jumping: bool = false
 var is_falling: bool = false
 var was_on_floor: bool = false
+## 当前已跳跃次数（落地时重置）
+var current_jump_count: int = 0
 
 # ============ 节点引用（由组件自动获取）============
 var owner_body: CharacterBody2D = null
@@ -117,22 +123,33 @@ func handle_jump_input() -> void:
 	if not enable_jump or not owner_body or not can_move:
 		return
 
-	# 只有在地面上才能跳跃
 	if Input.is_action_just_pressed(input_jump):
 		if owner_body.is_on_floor():
 			perform_jump()
+		elif can_air_jump():
+			perform_jump(true)
 
-## 执行跳跃
-func perform_jump() -> void:
+## 是否可以空中跳跃
+func can_air_jump() -> bool:
+	return enable_jump and current_jump_count > 0 and current_jump_count < max_jump_count
+
+## 执行跳跃（is_air_jump=true 时为空中跳跃）
+func perform_jump(is_air_jump: bool = false) -> void:
 	if not owner_body:
 		return
 
-	owner_body.velocity.y = jump_force
+	if is_air_jump:
+		owner_body.velocity.y = air_jump_force
+		current_jump_count += 1
+	else:
+		owner_body.velocity.y = jump_force
+		current_jump_count = 1
+
 	is_jumping = true
 	is_falling = false
 	jump_started.emit()
 
-	DebugConfig.debug("跳跃开始", "", "movement")
+	DebugConfig.debug("跳跃 (%d/%d)" % [current_jump_count, max_jump_count], "", "movement")
 
 ## 更新跳跃状态（检测顶点和落地）
 func update_jump_state() -> void:
@@ -152,6 +169,7 @@ func update_jump_state() -> void:
 	if not was_on_floor and on_floor:
 		is_jumping = false
 		is_falling = false
+		current_jump_count = 0
 		landed.emit()
 		DebugConfig.debug("落地", "", "movement")
 

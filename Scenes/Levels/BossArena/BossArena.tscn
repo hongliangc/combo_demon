@@ -1,0 +1,164 @@
+[gd_scene load_steps=13 format=4]
+
+[ext_resource type="Script" path="res://Scenes/Levels/BossArena/BossArena.gd" id="1_level"]
+[ext_resource type="Texture2D" uid="uid://crjfjiyaqtnk2" path="res://Assets/Art/HighForest/Background/Background.png" id="2_bg"]
+[ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="3_spawn"]
+[ext_resource type="PackedScene" uid="uid://bw51dsuf1pism" path="res://Scenes/Levels/Components/LevelHUD.tscn" id="4_hud"]
+[ext_resource type="PackedScene" uid="uid://cqu5qcubrlemt" path="res://Scenes/Characters/Enemies/Boss/Boss.tscn" id="5_boss"]
+[ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="6_camera"]
+[ext_resource type="PackedScene" uid="uid://ckill0one001" path="res://Scenes/Levels/Components/KillZone.tscn" id="7_killzone"]
+[ext_resource type="PackedScene" uid="uid://dh5collect001" path="res://Scenes/Levels/Components/Collectible.tscn" id="8_collectible"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(640, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(16, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform_wide"]
+size = Vector2(96, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform_narrow"]
+size = Vector2(80, 16)
+
+[node name="BossArena" type="Node2D" groups=["level"]]
+script = ExtResource("1_level")
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.2, 0.2)
+
+[node name="Background" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
+modulate = Color(0.4, 0.2, 0.2, 1)
+position = Vector2(320, 200)
+scale = Vector2(3, 3)
+texture = ExtResource("2_bg")
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(320, 448)
+collision_layer = 128
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="GroundVisual" type="ColorRect" parent="Ground"]
+offset_left = -320.0
+offset_top = -16.0
+offset_right = 320.0
+offset_bottom = 200.0
+color = Color(0.15, 0.1, 0.07, 1)
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="LeftPlatform" type="StaticBody2D" parent="Platforms"]
+position = Vector2(150, 384)
+collision_layer = 128
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/LeftPlatform"]
+shape = SubResource("RectangleShape2D_platform_wide")
+
+[node name="Visual" type="ColorRect" parent="Platforms/LeftPlatform"]
+offset_left = -48.0
+offset_top = -8.0
+offset_right = 48.0
+offset_bottom = 8.0
+color = Color(0.25, 0.18, 0.12, 1)
+
+[node name="CenterPlatform" type="StaticBody2D" parent="Platforms"]
+position = Vector2(320, 360)
+collision_layer = 128
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/CenterPlatform"]
+shape = SubResource("RectangleShape2D_platform_narrow")
+
+[node name="Visual" type="ColorRect" parent="Platforms/CenterPlatform"]
+offset_left = -40.0
+offset_top = -8.0
+offset_right = 40.0
+offset_bottom = 8.0
+color = Color(0.25, 0.18, 0.12, 1)
+
+[node name="RightPlatform" type="StaticBody2D" parent="Platforms"]
+position = Vector2(500, 384)
+collision_layer = 128
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/RightPlatform"]
+shape = SubResource("RectangleShape2D_platform_wide")
+
+[node name="Visual" type="ColorRect" parent="Platforms/RightPlatform"]
+offset_left = -48.0
+offset_top = -8.0
+offset_right = 48.0
+offset_bottom = 8.0
+color = Color(0.25, 0.18, 0.12, 1)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(320, 300)
+zoom = Vector2(2, 2)
+limit_left = 0
+limit_right = 640
+limit_bottom = 480
+script = ExtResource("6_camera")
+
+[node name="PlayerSpawn" type="Node2D" parent="." groups=["player_spawn"]]
+position = Vector2(80, 420)
+script = ExtResource("3_spawn")
+
+[node name="Boss" parent="." instance=ExtResource("5_boss")]
+position = Vector2(520, 420)
+
+[node name="PatrolPoints" type="Node2D" parent="."]
+
+[node name="Point1" type="Marker2D" parent="PatrolPoints" groups=["boss_patrol_points"]]
+position = Vector2(120, 420)
+
+[node name="Point2" type="Marker2D" parent="PatrolPoints" groups=["boss_patrol_points"]]
+position = Vector2(320, 420)
+
+[node name="Point3" type="Marker2D" parent="PatrolPoints" groups=["boss_patrol_points"]]
+position = Vector2(520, 420)
+
+[node name="Point4" type="Marker2D" parent="PatrolPoints" groups=["boss_patrol_points"]]
+position = Vector2(200, 420)
+
+[node name="HealthPickups" type="Node2D" parent="."]
+
+[node name="HeartLeft" parent="HealthPickups" instance=ExtResource("8_collectible")]
+position = Vector2(150, 368)
+item_type = "heart"
+
+[node name="HeartCenter" parent="HealthPickups" instance=ExtResource("8_collectible")]
+position = Vector2(320, 344)
+item_type = "heart"
+
+[node name="HeartRight" parent="HealthPickups" instance=ExtResource("8_collectible")]
+position = Vector2(580, 420)
+item_type = "heart"
+
+[node name="LevelHUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="ArenaWalls" type="Node2D" parent="."]
+
+[node name="LeftWall" type="StaticBody2D" parent="ArenaWalls"]
+position = Vector2(-8, 200)
+collision_layer = 128
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ArenaWalls/LeftWall"]
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="RightWall" type="StaticBody2D" parent="ArenaWalls"]
+position = Vector2(648, 200)
+collision_layer = 128
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ArenaWalls/RightWall"]
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="KillZone" parent="." instance=ExtResource("7_killzone")]
+position = Vector2(0, 600)
