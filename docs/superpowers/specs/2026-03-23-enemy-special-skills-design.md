@@ -23,10 +23,12 @@ var _recheck_remaining := 0.0
 ```
 
 **Key methods**:
-- `can_trigger(distance: float) -> bool` — cooldown + probability + subclass condition check
-- `execute_skill() -> void` — abstract, subclass implements
-- `finish_skill()` — reset cooldown, transition back to chase/attack
-- `roll_probability() -> bool` — `randf() < skill_probability`, fail sets `_recheck_remaining = recheck_delay`
+- `process_state(delta)` — decrements `_cooldown_remaining` and `_recheck_remaining` each frame
+- `can_trigger(distance: float) -> bool` — cooldown + recheck + probability + subclass `_check_condition()`
+- `_check_condition(distance: float) -> bool` — virtual, subclass overrides
+- `execute_skill() -> void` — virtual, subclass implements; must guard after each `await`
+- `finish_skill()` — reset `_cooldown_remaining = skill_cooldown`, transition back to "chase"
+- `roll_probability() -> bool` — `randf() < skill_probability`; fail → `_recheck_remaining = recheck_delay`
 
 **Trigger integration**: Chase/Attack states call `SpecialSkillState.can_trigger()` in `physics_process_state()`. SpecialSkillState exposes a static-like check via the state machine's states dict.
 
@@ -51,11 +53,36 @@ SpecialSkillState.can_trigger(distance):
 
 ### Enemy Registration
 
-Each enemy with a special skill state: set `EnemyStateMachine.auto_create_states = false` in .tscn, manually add states as child nodes (or extend `_create_basic_states()` + append special_skill state).
+`EnemyStateMachine._ready()` checks `get_child_count() == 0` before auto-creating states. Adding **any** child node to the state machine skips auto-creation entirely — including Idle, Wander, Chase, Hit, etc.
 
-Simpler approach: keep `auto_create_states = true`, add special skill state as a scene child node. `BaseStateMachine._ready()` picks up all BaseState children.
+**Rule**: Any enemy with custom states must set `auto_create_states = false` and explicitly list ALL state nodes as children in the .tscn:
 
-For attack-enhanced enemies (A type): override the auto-created Attack state by adding a custom AttackState child with matching name "Attack" — `EnemyStateMachine` skips auto-creation when children already exist (`get_child_count() == 0` check).
+```
+EnemyStateMachine (auto_create_states = false)
+  ├── Idle (IdleState.gd)
+  ├── Wander (WanderState.gd)
+  ├── Chase (ChaseState.gd)         ← modified to check for special_skill
+  ├── Attack (BearAttackState.gd)   ← custom for Group A, AttackState.gd for Group B
+  ├── SpecialSkill (XxxState.gd)    ← Group B only
+  ├── Hit (HitState.gd)
+  ├── Knockback (KnockbackState.gd)
+  └── Stun (StunState.gd)
+```
+
+Group A enemies only need the custom Attack node (no SpecialSkill node).
+Group B enemies need both the standard Attack node and the SpecialSkill node.
+
+### Safety: Dead Node During Async Skill
+
+All Group B `execute_skill()` implementations that use `await` must guard after each await:
+
+```gdscript
+await tween.finished
+if not is_instance_valid(self) or not is_instance_valid(owner_node):
+    return
+```
+
+Alternatively, connect `owner_node.tree_exiting` to `tween.kill` at the start of execute_skill.
 
 ---
 
@@ -158,16 +185,21 @@ For attack-enhanced enemies (A type): override the auto-created Attack state by 
 ### 9. Slime — 分裂 (Split)
 
 **File**: `Scenes/Characters/Enemies/Slime/SlimeSplitState.gd`
+**File**: `Scenes/Characters/Enemies/Slime/Slime.gd` (new enemy script)
 
 - `skill_cooldown = INF` (one-time), `skill_probability = 1.0`
-- **Condition**: HP drops below 50% (checked via `on_damaged` override, not from Chase/Attack)
+- **Condition**: HP first drops below 50%
+- **Trigger mechanism** (different from other Group B — not from Chase/Attack per-frame check):
+  - `Slime.gd` extends `EnemyBase`, adds `@export var can_split := true`
+  - Connects `health_component.health_changed` signal in `_on_enemy_ready()`
+  - On signal: if `can_split` and `health <= max_health * 0.5` → `can_split = false` → `state_machine.force_transition("special_skill")`
+  - Mini-Slimes spawned with `can_split = false` to prevent recursion
 - **Execute**:
   1. Brief pause (0.3s), scale tween wobble
-  2. Spawn 2 mini-Slime instances at offset positions (±30px)
-  3. Mini-Slime: same scene, scale 0.6x, HP = parent.max_health * 0.3, speed *= 1.3, `_can_split = false` (prevent recursive split)
-  4. Original Slime `queue_free()`
-- **Triggered from**: `on_damaged()` in SlimeSplitState or via Slime.gd script checking HP threshold
-- **Special**: needs custom `_on_enemy_ready()` to set `_can_split` flag, and override `on_damaged` to check threshold
+  2. Spawn 2 mini-Slime instances (same Slime.tscn) at offset ±30px
+  3. Set each mini: `scale *= 0.6`, `max_health = parent.max_health * 0.3`, `chase_speed *= 1.3`, `can_split = false`
+  4. `owner_node.queue_free()`
+- **Triggered from**: `health_component.health_changed` signal (not Chase/Attack)
 
 ### 10. SkullBlue — 冰冻光环 (Frost Aura)
 
