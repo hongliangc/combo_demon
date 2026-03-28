@@ -13,6 +13,7 @@ var state := "charging"  # charging, firing, done
 var timer := 0.0
 
 @onready var laser_line: Line2D = $LaserLine
+@onready var laser_core: Line2D = $LaserCore
 @onready var hitbox_area: Area2D = $HitboxArea
 @onready var collision_shape: CollisionShape2D = $HitboxArea/CollisionShape2D
 
@@ -27,6 +28,11 @@ func _ready() -> void:
 		laser_line.clear_points()
 		laser_line.add_point(Vector2.ZERO)
 		laser_line.add_point(Vector2.RIGHT * laser_length)
+	if laser_core:
+		laser_core.clear_points()
+		laser_core.add_point(Vector2.ZERO)
+		laser_core.add_point(Vector2.RIGHT * laser_length)
+		laser_core.visible = false  # 蓄力阶段隐藏
 
 	# 初始化碰撞形状（矩形）
 	if collision_shape:
@@ -65,9 +71,11 @@ func _process_charging(delta: float) -> void:
 		timer = 0.0
 		damaged_targets.clear()
 
-		# 发射阶段：激光变为实体
+		# 发射阶段：激光变为实体，显示白色核心
 		if laser_line:
 			laser_line.default_color = Color(1, 0, 0, 0.8)
+		if laser_core:
+			laser_core.visible = true
 
 func _process_firing(delta: float) -> void:
 	timer += delta
@@ -78,6 +86,8 @@ func _process_firing(delta: float) -> void:
 	# 更新激光线
 	if laser_line:
 		laser_line.set_point_position(1, Vector2.RIGHT * laser_length)
+	if laser_core:
+		laser_core.set_point_position(1, Vector2.RIGHT * laser_length)
 
 	if timer >= fire_duration:
 		state = "done"

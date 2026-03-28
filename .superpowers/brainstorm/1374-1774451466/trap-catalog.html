@@ -1,0 +1,156 @@
+<h2>12 种机关设计目录</h2>
+<p class="subtitle">按难度递进排列 — 点击查看详情，可多选你喜欢的</p>
+
+<div class="options" data-multiselect>
+
+  <div class="option" data-choice="1" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>🗡️ 地刺陷阱 SpikeTrap</h3>
+      <p><strong>难度：★☆☆</strong> | 效果：伤害 + 击退<br>
+      周期性从地面伸出的尖刺。有节奏的安全窗口，玩家需要观察timing通过。<br>
+      <em>运动：垂直伸缩，可配置伸出/缩回时间和停留时间</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="2" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>🔥 火焰喷射 FlameJet</h3>
+      <p><strong>难度：★☆☆</strong> | 效果：持续伤害 + 击退<br>
+      墙壁/地面喷出火焰柱，周期性开关。火焰有预警粒子效果。<br>
+      <em>运动：无位移，纯区域开关。可配置喷射方向（上/下/左/右）</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="3" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>⬆️ 浮动平台 FloatingPlatform</h3>
+      <p><strong>难度：★☆☆</strong> | 效果：无伤害，纯移动挑战<br>
+      上下或左右循环移动的平台。玩家需要跳上去并随之移动。<br>
+      <em>运动：Tween 驱动，可配置路径点、速度、停留时间</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="4" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>🌀 旋转刀刃 SpinBlade</h3>
+      <p><strong>难度：★★☆</strong> | 效果：伤害 + 击飞（KnockUp）<br>
+      围绕中心点旋转的带刺转盘。玩家需要计算旋转间隙通过。<br>
+      <em>运动：绕轴匀速旋转，可配置半径、速度、刀刃数量</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="5" onclick="toggleSelect(this)">
+    <div class="letter">5</div>
+    <div class="content">
+      <h3>🪨 落石陷阱 FallingRock</h3>
+      <p><strong>难度：★★☆</strong> | 效果：伤害 + 眩晕（Stun）<br>
+      玩家经过时从天花板掉落的石头。有短暂阴影预警。砸中后眩晕。<br>
+      <em>运动：触发式垂直下落，落地后消失并重置</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="6" onclick="toggleSelect(this)">
+    <div class="letter">6</div>
+    <div class="content">
+      <h3>🏹 箭矢陷阱 DartTrap</h3>
+      <p><strong>难度：★★☆</strong> | 效果：伤害 + 击退（KnockBack）<br>
+      墙壁中周期性射出飞行物。可复用 BossProjectile 的飞行逻辑。<br>
+      <em>运动：直线飞行，可配置射速、间隔、方向</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="7" onclick="toggleSelect(this)">
+    <div class="letter">7</div>
+    <div class="content">
+      <h3>🌊 传送带 ConveyorBelt</h3>
+      <p><strong>难度：★★☆</strong> | 效果：强制位移（ForceStun 变体）<br>
+      站上去会被推向一个方向的地面。玩家需要逆向移动或快速跳过。<br>
+      <em>运动：无视觉位移，对玩家施加持续力。可配置方向和强度</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="8" onclick="toggleSelect(this)">
+    <div class="letter">8</div>
+    <div class="content">
+      <h3>💀 消失平台 CrumblingPlatform</h3>
+      <p><strong>难度：★★★</strong> | 效果：无伤害，坠落危险<br>
+      踩上去后开始抖动，短暂延迟后碎裂消失。一段时间后重生。<br>
+      <em>运动：静态 → 抖动（Tween shake）→ 消失 → 重生循环</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="9" onclick="toggleSelect(this)">
+    <div class="letter">9</div>
+    <div class="content">
+      <h3>⚡ 激光栅栏 LaserFence</h3>
+      <p><strong>难度：★★★</strong> | 效果：高伤害 + 眩晕<br>
+      两点之间的能量光束，周期性开关。可以水平或垂直放置。<br>
+      <em>运动：无位移，RayCast2D 检测 + Line2D 视觉。开关有闪烁预警</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="10" onclick="toggleSelect(this)">
+    <div class="letter">10</div>
+    <div class="content">
+      <h3>🔨 锤摆 SwingHammer</h3>
+      <p><strong>难度：★★★</strong> | 效果：高伤害 + 击飞（KnockUp）<br>
+      从天花板悬挂的大锤，来回摆动。被击中时大力击飞。<br>
+      <em>运动：钟摆式旋转（sin函数），可配置摆幅和周期</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="11" onclick="toggleSelect(this)">
+    <div class="letter">11</div>
+    <div class="content">
+      <h3>🌪️ 弹射器 LaunchPad</h3>
+      <p><strong>难度：★★☆</strong> | 效果：强制击飞（KnockUp 高力度）<br>
+      踩上去将玩家弹射到高处的跳板。既是机关也是通路——用来到达隐藏区域。<br>
+      <em>运动：静态触发，对玩家施加向上力。可配置弹射高度和方向</em></p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="12" onclick="toggleSelect(this)">
+    <div class="letter">12</div>
+    <div class="content">
+      <h3>☠️ 锯齿轨道 SawRail</h3>
+      <p><strong>难度：★★★</strong> | 效果：高伤害 + 击退<br>
+      沿预设轨道（Path2D）移动的锯齿。轨道可以是直线、曲线或环形。<br>
+      <em>运动：PathFollow2D 驱动，可配置路径形状、速度、是否往返</em></p>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+  <h3>效果分配总览</h3>
+  <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+      <th style="text-align:left; padding: 0.5rem;">AttackEffect</th>
+      <th style="text-align:left; padding: 0.5rem;">使用的机关</th>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+      <td style="padding: 0.5rem;">KnockBackEffect</td>
+      <td style="padding: 0.5rem;">地刺、火焰、箭矢、锯齿轨道</td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+      <td style="padding: 0.5rem;">KnockUpEffect</td>
+      <td style="padding: 0.5rem;">旋转刀刃、锤摆、弹射器</td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+      <td style="padding: 0.5rem;">StunEffect</td>
+      <td style="padding: 0.5rem;">落石、激光栅栏</td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+      <td style="padding: 0.5rem;">ForceStunEffect（变体）</td>
+      <td style="padding: 0.5rem;">传送带</td>
+    </tr>
+    <tr>
+      <td style="padding: 0.5rem;">无效果（纯移动）</td>
+      <td style="padding: 0.5rem;">浮动平台、消失平台</td>
+    </tr>
+  </table>
+</div>

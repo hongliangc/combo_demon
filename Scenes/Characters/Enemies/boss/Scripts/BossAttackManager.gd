@@ -30,6 +30,10 @@ func execute_combo(combo: BossComboAttack) -> void:
 		if step.delay > 0:
 			await get_tree().create_timer(step.delay).timeout
 
+		# await 恢复后检查 boss 是否仍然有效（可能已被眩晕/死亡）
+		if not is_instance_valid(boss) or boss.stunned:
+			return
+
 		# 执行攻击步骤
 		_execute_combo_step(step)
 
@@ -194,12 +198,13 @@ func fire_knockback_wave() -> void:
 
 	# 2. 在Boss位置生成AOE（用于实际击退伤害）
 	await get_tree().create_timer(0.1).timeout
-	if is_instance_valid(boss):
-		fire_aoe()
+	if not is_instance_valid(boss):
+		return
+	fire_aoe()
 
 	# 3. 对玩家施加击退力（如果玩家在范围内）
 	var player = get_player()
-	if player and boss.global_position.distance_to(player.global_position) < 200:
+	if is_instance_valid(player) and boss.global_position.distance_to(player.global_position) < 200:
 		apply_knockback_to_player(player)
 
 ## 对玩家施加击退力

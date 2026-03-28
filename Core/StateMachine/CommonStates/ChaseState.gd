@@ -54,6 +54,12 @@ func physics_process_state(_delta: float) -> void:
 		transition_to(give_up_state_name)
 		return
 
+	# 检查特殊技能（冷却完成 + 概率）
+	var ss := state_machine.states.get("specialskill") as SpecialSkillState
+	if ss and ss.can_trigger(distance):
+		transition_to("specialskill")
+		return
+
 	# 进入攻击范围
 	if distance <= attack_range:
 		transition_to(attack_state_name)

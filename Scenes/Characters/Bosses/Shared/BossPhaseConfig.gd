@@ -33,24 +33,40 @@ extends Resource
 ## 是否免疫伤害反应（受击不切换状态）
 @export var immune: bool = false
 
-# ============ 攻击池选择 ============
+# ============ 攻击池选择（支持加权） ============
+
+## 从攻击池加权随机选取（兼容无 weight 的旧格式）
+func _pick_from_pool(pool: Array) -> Dictionary:
+	if pool.is_empty():
+		return {}
+	# 检查是否有 weight 字段
+	if pool[0].has("weight"):
+		return _weighted_pick(pool)
+	return pool.pick_random()
+
+## 加权随机选取
+func _weighted_pick(pool: Array) -> Dictionary:
+	var total_weight := 0
+	for entry in pool:
+		total_weight += entry.get("weight", 1)
+	var roll := randi() % total_weight
+	var cumulative := 0
+	for entry in pool:
+		cumulative += entry.get("weight", 1)
+		if roll < cumulative:
+			return entry
+	return pool.back()
 
 ## 从主攻击池随机选取一个攻击条目
 func pick_attack() -> Dictionary:
-	if attacks.is_empty():
-		return {}
-	return attacks.pick_random()
+	return _pick_from_pool(attacks)
 
 ## 从追击攻击池随机选取（空则回退到主攻击池）
 func pick_chase_attack() -> Dictionary:
 	var pool := chase_attacks if not chase_attacks.is_empty() else attacks
-	if pool.is_empty():
-		return {}
-	return pool.pick_random()
+	return _pick_from_pool(pool)
 
 ## 从撤退攻击池随机选取（空则回退到主攻击池）
 func pick_retreat_attack() -> Dictionary:
 	var pool := retreat_attacks if not retreat_attacks.is_empty() else attacks
-	if pool.is_empty():
-		return {}
-	return pool.pick_random()
+	return _pick_from_pool(pool)

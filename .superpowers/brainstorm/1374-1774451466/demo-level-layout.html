@@ -1,0 +1,112 @@
+<h2>演示关卡布局设计</h2>
+<p class="subtitle">从左到右难度递进，分为 4 个区域</p>
+
+<div class="mockup" style="margin-bottom: 2rem;">
+  <div class="mockup-header">TrapDemoLevel 俯瞰图（横向卷轴）</div>
+  <div class="mockup-body" style="overflow-x: auto; padding: 1.5rem;">
+    <div style="display: flex; gap: 0; min-width: 1100px; position: relative;">
+
+      <!-- Zone 1 -->
+      <div style="flex: 1; border: 2px solid #4ade80; border-radius: 8px; padding: 1rem; background: rgba(74,222,128,0.08); position: relative;">
+        <div style="position: absolute; top: -12px; left: 12px; background: #1a1a2e; padding: 0 8px; color: #4ade80; font-weight: bold; font-size: 0.85rem;">区域 1：入门</div>
+        <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 0.8rem;">★☆☆ 安全学习区</div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.78rem;">
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #4ade80;">
+            🗡️ <strong>地刺 ×3</strong><br>慢节奏，间距大<br>学会观察timing
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #4ade80;">
+            ⬆️ <strong>浮动平台 ×2</strong><br>上下移动，速度慢<br>学会跟随平台跳跃
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #4ade80;">
+            🔥 <strong>火焰喷射 ×1</strong><br>长间隔，预警明显<br>学会等待安全窗口
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display: flex; align-items: center; padding: 0 0.3rem; font-size: 1.5rem; color: #666;">→</div>
+
+      <!-- Zone 2 -->
+      <div style="flex: 1; border: 2px solid #facc15; border-radius: 8px; padding: 1rem; background: rgba(250,204,21,0.08); position: relative;">
+        <div style="position: absolute; top: -12px; left: 12px; background: #1a1a2e; padding: 0 8px; color: #facc15; font-weight: bold; font-size: 0.85rem;">区域 2：进阶</div>
+        <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 0.8rem;">★★☆ 组合挑战</div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.78rem;">
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #facc15;">
+            🌀 <strong>旋转刀刃 ×2</strong><br>不同转速和半径<br>穿越旋转间隙
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #facc15;">
+            🏹 <strong>箭矢 + 浮动平台</strong><br>在移动平台上躲箭<br>第一次机关组合
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #facc15;">
+            🌊 <strong>传送带 + 地刺</strong><br>被推向地刺方向<br>逆行 + 躲避双重挑战
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display: flex; align-items: center; padding: 0 0.3rem; font-size: 1.5rem; color: #666;">→</div>
+
+      <!-- Zone 3 -->
+      <div style="flex: 1; border: 2px solid #f97316; border-radius: 8px; padding: 1rem; background: rgba(249,115,22,0.08); position: relative;">
+        <div style="position: absolute; top: -12px; left: 12px; background: #1a1a2e; padding: 0 8px; color: #f97316; font-weight: bold; font-size: 0.85rem;">区域 3：高阶</div>
+        <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 0.8rem;">★★★ 精准操作</div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.78rem;">
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #f97316;">
+            💀 <strong>消失平台连跳</strong><br>5个消失平台串联<br>必须快速连续跳跃
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #f97316;">
+            🪨 <strong>落石 + 激光栅栏</strong><br>躲落石同时穿激光间隙<br>上下双重威胁
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #f97316;">
+            🔨 <strong>锤摆走廊</strong><br>3个锤摆不同相位<br>需要精准站位等待
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div style="display: flex; align-items: center; padding: 0 0.3rem; font-size: 1.5rem; color: #666;">→</div>
+
+      <!-- Zone 4 -->
+      <div style="flex: 1; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem; background: rgba(239,68,68,0.08); position: relative;">
+        <div style="position: absolute; top: -12px; left: 12px; background: #1a1a2e; padding: 0 8px; color: #ef4444; font-weight: bold; font-size: 0.85rem;">区域 4：终极</div>
+        <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 0.8rem;">★★★ 综合挑战</div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.78rem;">
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #ef4444;">
+            ☠️ <strong>锯齿轨道迷宫</strong><br>多条交叉轨道<br>观察路线找安全路径
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #ef4444;">
+            🌪️ <strong>弹射器 + 旋转刀刃</strong><br>弹射穿过刀刃间隙<br>timing + 空中路线判断
+          </div>
+          <div style="background: rgba(255,255,255,0.06); padding: 0.5rem; border-radius: 4px; border-left: 3px solid #ef4444;">
+            🏆 <strong>终点：全机关混合</strong><br>所有类型随机组合<br>到达终点 = 通关
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<h3>关卡参数</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
+  <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px;">
+    <div class="label">场景尺寸</div>
+    <p>横向约 <strong>4000×600 px</strong>（4屏宽度），适合横向卷轴闯关</p>
+  </div>
+  <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px;">
+    <div class="label">玩家生成</div>
+    <p>左端起点 + 每个区域入口设 <strong>KillZone 重生点</strong>（死后不用从头来）</p>
+  </div>
+  <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px;">
+    <div class="label">地形</div>
+    <p>复用现有 TileMapLayer，简单平台地形即可，重点在机关而非地图美术</p>
+  </div>
+  <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px;">
+    <div class="label">相机</div>
+    <p>复用 <strong>FollowCamera</strong>，水平跟随玩家，限制垂直范围</p>
+  </div>
+</div>

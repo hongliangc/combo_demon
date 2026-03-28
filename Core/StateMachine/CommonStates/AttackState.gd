@@ -1,4 +1,5 @@
 extends BaseState
+class_name AttackState
 
 ## 通用 Attack（攻击）状态
 ## 适用于所有使用 AttackComponent 的实体
@@ -77,6 +78,11 @@ func physics_process_state(delta: float) -> void:
 	attack_timer -= delta
 	if attack_timer <= 0:
 		attack_timer = attack_interval
+		# 检查特殊技能（Group B 独立状态，在攻击间隔时触发）
+		var ss := state_machine.states.get("specialskill") as SpecialSkillState
+		if ss and ss.can_trigger(distance):
+			transition_to("specialskill")
+			return
 		perform_attack()
 
 

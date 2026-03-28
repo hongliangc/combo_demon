@@ -10,6 +10,9 @@ class_name BossProjectile
 var direction := Vector2.RIGHT
 var velocity := Vector2.ZERO
 
+@export var frame_speed := 10.0  # 动画帧率 (fps)
+var _frame_timer := 0.0
+
 @onready var hitbox: HitBoxComponent = $HitBoxComponent
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -25,6 +28,12 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	velocity = direction * speed
 	position += velocity * delta
+
+	# 循环播放火球动画帧
+	_frame_timer += delta
+	if _frame_timer >= 1.0 / frame_speed:
+		_frame_timer = 0.0
+		sprite.frame = (sprite.frame + 1) % sprite.hframes
 
 ## 设置弹幕方向
 func set_direction(dir: Vector2) -> void:

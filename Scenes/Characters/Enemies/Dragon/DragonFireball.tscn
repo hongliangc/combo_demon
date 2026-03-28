@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/Dragon/DragonFireball.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://fi46kb5a1eiu" path="res://Assets/Art/FX/Projectile/Fireball.png" id="2_fireball"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6.0
+
+[node name="DragonFireball" type="Area2D"]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_fireball")
+hframes = 4
+vframes = 1
+scale = Vector2(0.8, 0.8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")

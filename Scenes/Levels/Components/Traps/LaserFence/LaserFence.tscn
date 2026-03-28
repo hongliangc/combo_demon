@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scenes/Levels/Components/Traps/LaserFence/LaserFence.gd" id="1_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(80, 6)
+
+[node name="LaserFence" type="Node2D"]
+script = ExtResource("1_script")
+damage_amount = 20.0
+damage_cooldown = 1.0
+
+[node name="EmitterA" type="ColorRect" parent="."]
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+color = Color(0.2, 0.3, 0.7, 1)
+
+[node name="EmitterB" type="ColorRect" parent="."]
+offset_left = -4.0
+offset_top = -84.0
+offset_right = 4.0
+offset_bottom = -76.0
+color = Color(0.2, 0.3, 0.7, 1)
+
+[node name="LaserLine" type="Line2D" parent="."]
+width = 3.0
+default_color = Color(0.3, 0.5, 1, 1)
+
+[node name="DamageZone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DamageZone"]
+shape = SubResource("RectangleShape2D_1")

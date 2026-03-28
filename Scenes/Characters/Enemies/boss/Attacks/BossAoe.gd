@@ -21,9 +21,15 @@ func _ready() -> void:
 	shape.radius = 0
 	collision_shape.shape = shape
 
-	# 初始化视觉（如果有）
+	# 初始化视觉（如果有）— 生成32点圆形多边形替换粗糙六边形
 	if visual_circle:
-		visual_circle.modulate = Color(1, 0, 0, 0.3)
+		var points: PackedVector2Array = []
+		var segments := 32
+		for i in range(segments):
+			var angle := i * TAU / segments
+			points.append(Vector2(cos(angle), sin(angle)) * 50.0)
+		visual_circle.polygon = points
+		visual_circle.color = Color(1, 0.2, 0.1, 0.35)
 		visual_circle.scale = Vector2.ZERO
 
 	# 连接信号

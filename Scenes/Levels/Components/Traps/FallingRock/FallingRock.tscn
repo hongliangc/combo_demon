@@ -1,0 +1,45 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scenes/Levels/Components/Traps/FallingRock/FallingRock.gd" id="1_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
+size = Vector2(48, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rock"]
+size = Vector2(20, 20)
+
+[node name="FallingRock" type="Node2D"]
+script = ExtResource("1_script")
+damage_amount = 15.0
+damage_cooldown = 1.0
+
+[node name="TriggerZone" type="Area2D" parent="."]
+position = Vector2(0, 128)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerZone"]
+shape = SubResource("RectangleShape2D_trigger")
+
+[node name="Shadow" type="ColorRect" parent="."]
+offset_left = -12.0
+offset_top = 118.0
+offset_right = 12.0
+offset_bottom = 128.0
+color = Color(0.1, 0.1, 0.1, 0.6)
+
+[node name="Rock" type="Node2D" parent="."]
+
+[node name="Visual" type="ColorRect" parent="Rock"]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+color = Color(0.5, 0.45, 0.4, 1)
+
+[node name="DamageZone" type="Area2D" parent="Rock"]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rock/DamageZone"]
+shape = SubResource("RectangleShape2D_rock")
