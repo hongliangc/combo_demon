@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bqw7xc3ykn8r1"]
 
-[ext_resource type="Script" uid="uid://c33n6sern67" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossProjectile.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://c33n6sern67" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossProjectile.gd" id="1_script"]
 [ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="2_hitbox"]
 [ext_resource type="Texture2D" path="res://Assets/Art/FX/Projectile/Fireball.png" id="3_fireball"]
 

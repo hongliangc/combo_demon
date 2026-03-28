@@ -57,7 +57,8 @@ func physics_process_state(delta: float) -> void:
 	# 远离玩家
 	if target_node:
 		var direction := (_boss.global_position - (target_node as Node2D).global_position).normalized()
-		_boss.velocity = direction * _boss.move_speed * retreat_speed_multiplier
+		var cyclops := _boss as Cyclops
+		_boss.velocity = direction * (cyclops.move_speed if cyclops else 150.0) * retreat_speed_multiplier
 
 	# 撤退时发动攻击（边退边打）
 	if retreat_attack_timer <= 0:
@@ -73,11 +74,11 @@ func handle_cornered_situation() -> void:
 
 	# 根据阶段选择不同的脱困策略
 	match _boss.current_phase:
-		Boss.Phase.PHASE_1:
+		BossBase.Phase.PHASE_1:
 			# 第一阶段：使用击退技能
 			_use_knockback_skill()
 			transitioned.emit(self, "circle")
-		Boss.Phase.PHASE_2, Boss.Phase.PHASE_3:
+		BossBase.Phase.PHASE_2, BossBase.Phase.PHASE_3:
 			# 第二、三阶段：使用闪现技能
 			_use_teleport_skill()
 			transitioned.emit(self, "attack")

@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://crjfjiyaqtnk2" path="res://Assets/Art/HighForest/Background/Background.png" id="3_bg"]
 [ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="4_spawn"]
 [ext_resource type="PackedScene" uid="uid://bw51dsuf1pism" path="res://Scenes/Levels/Components/LevelHUD.tscn" id="5_hud"]
-[ext_resource type="PackedScene" uid="uid://dg8ot3heoutwi" path="res://Scenes/Characters/Enemies/Boss/Boss.tscn" id="6_boss"]
+[ext_resource type="PackedScene" uid="uid://dg8ot3heoutwi" path="res://Scenes/Characters/Bosses/Cyclops/Cyclops.tscn" id="6_boss"]
 [ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="7_camera"]
 [ext_resource type="PackedScene" uid="uid://ckill0one001" path="res://Scenes/Levels/Components/KillZone.tscn" id="8_killzone"]
 [ext_resource type="PackedScene" uid="uid://dh5collect001" path="res://Scenes/Levels/Components/Collectible.tscn" id="9_collectible"]

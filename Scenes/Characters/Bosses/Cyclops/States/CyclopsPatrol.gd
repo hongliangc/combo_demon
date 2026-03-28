@@ -26,7 +26,8 @@ func physics_process_state(_delta: float) -> void:
 
 	# 移动到巡逻点
 	var direction := (target_patrol_point - _boss.global_position).normalized()
-	_boss.velocity = direction * _boss.move_speed * patrol_speed_multiplier
+	var cyclops := _boss as Cyclops
+	_boss.velocity = direction * (cyclops.move_speed if cyclops else 150.0) * patrol_speed_multiplier
 
 	# 到达巡逻点
 	if _boss.is_at_position(target_patrol_point):

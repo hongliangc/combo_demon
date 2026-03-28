@@ -1,19 +1,19 @@
 [gd_scene format=3 uid="uid://dg8ot3heoutwi"]
 
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/BossBase.tscn" id="1_base"]
-[ext_resource type="Script" uid="uid://c4vwkhayrop5f" path="res://Scenes/Characters/Enemies/Boss/Scripts/boss.gd" id="1_boss"]
+[ext_resource type="Script" uid="uid://c4vwkhayrop5f" path="res://Scenes/Characters/Bosses/Cyclops/Cyclops.gd" id="1_boss"]
 [ext_resource type="Texture2D" uid="uid://d2mr0oginn5kf" path="res://Assets/Art/Ninja_Adventure/Actor/Boss/DemonCyclop/Sprite.png" id="2_sprite"]
-[ext_resource type="PackedScene" uid="uid://bqw7xc3ykn8r1" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossProjectile.tscn" id="5_projectile"]
-[ext_resource type="PackedScene" uid="uid://cvx8p4n2mh1ld" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossLaser.tscn" id="6_laser"]
-[ext_resource type="PackedScene" uid="uid://d0ow3j5sx53nq" path="res://Scenes/Characters/Enemies/Boss/Attacks/BossAoe.tscn" id="7_aoe"]
-[ext_resource type="Resource" uid="uid://blfx5oww3g2r4" path="res://Scenes/Characters/Enemies/Boss/Resources/BossProjectileDamage.tres" id="8_proj_dmg"]
-[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Boss/Resources/BossLaserDamage.tres" id="9_laser_dmg"]
-[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Boss/Resources/BossAoeDamage.tres" id="10_aoe_dmg"]
+[ext_resource type="PackedScene" uid="uid://bqw7xc3ykn8r1" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossProjectile.tscn" id="5_projectile"]
+[ext_resource type="PackedScene" uid="uid://cvx8p4n2mh1ld" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossLaser.tscn" id="6_laser"]
+[ext_resource type="PackedScene" uid="uid://d0ow3j5sx53nq" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossAoe.tscn" id="7_aoe"]
+[ext_resource type="Resource" uid="uid://blfx5oww3g2r4" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossProjectileDamage.tres" id="8_proj_dmg"]
+[ext_resource type="Resource" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossLaserDamage.tres" id="9_laser_dmg"]
+[ext_resource type="Resource" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossAoeDamage.tres" id="10_aoe_dmg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_collision"]
 size = Vector2(48, 64)
 
-[node name="Boss" instance=ExtResource("1_base")]
+[node name="Cyclops" instance=ExtResource("1_base")]
 script = ExtResource("1_boss")
 max_health = 1001
 health = 1001

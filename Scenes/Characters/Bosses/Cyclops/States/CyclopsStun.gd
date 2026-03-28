@@ -16,11 +16,11 @@ func exit() -> void:
 func decide_next_state() -> void:
 	# BossStun 继承 StunState（非 BossState），需要手动查找 BossAttack 来访问决策逻辑
 	# 但我们可以直接内联简化版决策，因为 StunState 不继承 BossState
-	if owner_node is not Boss:
+	if owner_node is not BossBase:
 		super.decide_next_state()
 		return
 
-	var boss := owner_node as Boss
+	var boss := owner_node as BossBase
 
 	if not is_target_alive():
 		transition_to("patrol")

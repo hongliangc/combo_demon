@@ -1,14 +1,14 @@
 extends BossBase
-class_name Boss
+class_name Cyclops
 
-## Boss 具体实现 - 继承 BossBase
+## Cyclops Boss — 继承 BossBase
 ## 实现8方位移动、纹理选择、巡逻点设置、旋转逻辑
 ##
 ## 架构:
-##   BaseCharacter → BossBase → Boss
+##   BaseCharacter → BossBase → Cyclops
 ##   - BaseCharacter: 生命系统、伤害信号
 ##   - BossBase: 阶段系统、检测参数、冷却管理、死亡逻辑
-##   - Boss: 8方位移动、巡逻路径、纹理选择、旋转逻辑
+##   - Cyclops: 8方位移动、巡逻路径、纹理选择、旋转逻辑
 
 # ============ 配置参数 ============
 @export_group("Textures")

@@ -5,7 +5,9 @@ extends BossState
 ## Phase 1-2: timer 行为（站桩开火 → 退出）
 ## Phase 3: chase 行为（边追边打，持续循环）
 
-const PhaseConfig = preload("res://Scenes/Characters/Enemies/boss/Scripts/BossPhaseConfig.gd")
+const PhaseConfig = preload("res://Scenes/Characters/Bosses/Shared/BossPhaseConfig.gd")
+const CHASE_DECELERATION := 5.0
+const TIMER_DECELERATION := 10.0
 
 # ============ 阶段配置（Phase → BossPhaseConfig） ============
 var phase_configs: Dictionary = {}
@@ -153,15 +155,18 @@ func physics_process_state(delta: float) -> void:
 
 		var distance := get_distance_to_target()
 
+		var cyclops := _boss as Cyclops
+		var spd := cyclops.move_speed if cyclops else 150.0
+
 		# 距离管理
 		if distance < _boss.min_distance:
 			var away_dir := -get_direction_to_target()
-			_boss.velocity = away_dir * _boss.move_speed
+			_boss.velocity = away_dir * spd
 		elif distance > _boss.attack_range:
 			var direction := get_direction_to_target()
-			_boss.velocity = direction * _boss.move_speed * _config.speed_multiplier
+			_boss.velocity = direction * spd * _config.speed_multiplier
 		else:
-			_boss.velocity = _boss.velocity.lerp(Vector2.ZERO, 5.0 * delta)
+			_boss.velocity = _boss.velocity.lerp(Vector2.ZERO, CHASE_DECELERATION * delta)
 
 		# 普通攻击：cooldown 循环
 		if _boss.attack_cooldown <= 0:
@@ -170,7 +175,7 @@ func physics_process_state(delta: float) -> void:
 			_boss.attack_cooldown = _config.cooldown
 	else:
 		# Timer 行为：减速
-		_boss.velocity = _boss.velocity.lerp(Vector2.ZERO, 10.0 * delta)
+		_boss.velocity = _boss.velocity.lerp(Vector2.ZERO, TIMER_DECELERATION * delta)
 
 
 func exit():

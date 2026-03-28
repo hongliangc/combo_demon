@@ -9,6 +9,10 @@ class_name BossLaser
 @export var laser_length := 500.0    # 激光长度
 @export var damage_config: Damage    # 伤害配置
 
+const FLICKER_SPEED := 10.0
+const FLICKER_MIN_ALPHA := 0.3
+const FLICKER_AMPLITUDE := 0.5
+
 var state := "charging"  # charging, firing, done
 var timer := 0.0
 
@@ -63,7 +67,7 @@ func _process_charging(delta: float) -> void:
 
 	# 蓄力阶段：激光闪烁
 	if laser_line:
-		var alpha = abs(sin(timer * 10.0)) * 0.5 + 0.3
+		var alpha = abs(sin(timer * FLICKER_SPEED)) * FLICKER_AMPLITUDE + FLICKER_MIN_ALPHA
 		laser_line.default_color = Color(1, 0, 0, alpha)
 
 	if timer >= charge_time:

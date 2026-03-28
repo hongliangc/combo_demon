@@ -33,7 +33,8 @@ func physics_process_state(delta: float) -> void:
 	var random_offset := Vector2(randf_range(-0.2, 0.2), randf_range(-0.2, 0.2))
 	direction = (direction + random_offset).normalized()
 
-	_boss.velocity = direction * _boss.move_speed
+	var cyclops := _boss as Cyclops
+	_boss.velocity = direction * (cyclops.move_speed if cyclops else 150.0)
 
 	# 追击时发动攻击（边追边打）
 	if chase_attack_timer <= 0:

@@ -8,6 +8,8 @@ class_name BossAOE
 @export var max_radius := 200.0       # 最大半径
 @export var damage_config: Damage     # 伤害配置
 
+const SPRITE_BASE_SIZE := 50.0
+
 var current_radius := 0.0
 var damaged_targets: Array = []
 
@@ -27,7 +29,7 @@ func _ready() -> void:
 		var segments := 32
 		for i in range(segments):
 			var angle := i * TAU / segments
-			points.append(Vector2(cos(angle), sin(angle)) * 50.0)
+			points.append(Vector2(cos(angle), sin(angle)) * SPRITE_BASE_SIZE)
 		visual_circle.polygon = points
 		visual_circle.color = Color(1, 0.2, 0.1, 0.35)
 		visual_circle.scale = Vector2.ZERO
@@ -48,7 +50,7 @@ func start_expansion() -> void:
 
 	# 视觉扩散（如果有）
 	if visual_circle:
-		var target_scale = Vector2.ONE * (max_radius / 50.0)  # 假设原始大小为100x100
+		var target_scale = Vector2.ONE * (max_radius / SPRITE_BASE_SIZE)
 		tween.tween_property(visual_circle, "scale", target_scale, expand_time)
 		tween.tween_property(visual_circle, "modulate:a", 0.6, expand_time)
 
