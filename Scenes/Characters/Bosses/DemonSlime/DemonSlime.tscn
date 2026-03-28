@@ -1,0 +1,151 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/BossBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/DemonSlime/DemonSlime.gd" id="2_ds"]
+[ext_resource type="Texture2D" path="res://Assets/Art/BOSS_SLIME/spritesheets/demon_slime_FREE_v1.0_288x160_spritesheet.png" id="3_sprite"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/DemonSlime/DSAttackManager.gd" id="4_atkmgr"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/DemonSlime/DSStateMachine.gd" id="5_sm"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSIdle.gd" id="6_idle"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSChase.gd" id="7_chase"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSCleave.gd" id="8_cleave"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSSlam.gd" id="9_slam"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSStun.gd" id="10_stun"]
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Bosses/DemonSlime/Attacks/DSShockwave.tscn" id="11_shockwave"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ds_collision"]
+size = Vector2(48, 64)
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_control"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cleave"]
+animation = &"cleave"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hit"]
+animation = &"take_hit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_stun"]
+animation = &"take_hit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_death"]
+animation = &"death"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_cleave_to_hit"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_hit_to_stun"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_stun_to_death"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_hit_to_death"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_cleave_to_death"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_control"]
+states/cleave/node = SubResource("AnimationNodeAnimation_cleave")
+states/cleave/position = Vector2(346, -50)
+states/hit/node = SubResource("AnimationNodeAnimation_hit")
+states/hit/position = Vector2(346, 100)
+states/stun/node = SubResource("AnimationNodeAnimation_stun")
+states/stun/position = Vector2(504, 304)
+states/death/node = SubResource("AnimationNodeAnimation_death")
+states/death/position = Vector2(658, 100)
+transitions = ["cleave", "hit", SubResource("Transition_cleave_to_hit"), "hit", "stun", SubResource("Transition_hit_to_stun"), "stun", "death", SubResource("Transition_stun_to_death"), "hit", "death", SubResource("Transition_hit_to_death"), "cleave", "death", SubResource("Transition_cleave_to_death")]
+graph_offset = Vector2(-96, 0)
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_ctrl"]
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_loco"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_idle"]
+animation = &"idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_walk"]
+animation = &"walk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_idle_to_walk"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="Transition_walk_to_idle"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_locomotion"]
+states/idle/node = SubResource("AnimationNodeAnimation_idle")
+states/idle/position = Vector2(240, 100)
+states/walk/node = SubResource("AnimationNodeAnimation_walk")
+states/walk/position = Vector2(440, 100)
+transitions = ["idle", "walk", SubResource("Transition_idle_to_walk"), "walk", "idle", SubResource("Transition_walk_to_idle")]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_root"]
+graph_offset = Vector2(-292, 133)
+nodes/output/position = Vector2(680, 400)
+nodes/control_blend/node = SubResource("AnimationNodeBlend2_control")
+nodes/control_blend/position = Vector2(460, 340)
+nodes/control_sm/node = SubResource("AnimationNodeStateMachine_control")
+nodes/control_sm/position = Vector2(20, 560)
+nodes/ctrl_timescale/node = SubResource("AnimationNodeTimeScale_ctrl")
+nodes/ctrl_timescale/position = Vector2(260, 560)
+nodes/loco_timescale/node = SubResource("AnimationNodeTimeScale_loco")
+nodes/loco_timescale/position = Vector2(260, 260)
+nodes/locomotion/node = SubResource("AnimationNodeStateMachine_locomotion")
+nodes/locomotion/position = Vector2(-60, 260)
+node_connections = [&"output", 0, &"control_blend", &"control_blend", 0, &"loco_timescale", &"control_blend", 1, &"ctrl_timescale", &"ctrl_timescale", 0, &"control_sm", &"loco_timescale", 0, &"locomotion"]
+
+[node name="DemonSlime" instance=ExtResource("1_base")]
+script = ExtResource("2_ds")
+max_health = 1200
+health = 1200
+
+[node name="Sprite2D" parent="." index="0"]
+texture = ExtResource("3_sprite")
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource("RectangleShape2D_ds_collision")
+
+[node name="AnimationTree" parent="." index="5"]
+tree_root = SubResource("AnimationNodeBlendTree_root")
+anim_player = NodePath("../AnimationPlayer")
+parameters/control_blend/blend_amount = 0.0
+parameters/ctrl_timescale/scale = 1.0
+parameters/loco_timescale/scale = 1.0
+
+[node name="HealthComponent" parent="." index="6"]
+max_health = 1200.0
+health = 1200.0
+
+[node name="BossAttackManager" parent="." index="8"]
+script = ExtResource("4_atkmgr")
+shockwave_scene = ExtResource("11_shockwave")
+
+[node name="StateMachine" parent="." index="9"]
+script = ExtResource("5_sm")
+
+[node name="Idle" parent="StateMachine" index="0"]
+script = ExtResource("6_idle")
+
+[node name="Patrol" parent="StateMachine" index="1"]
+script = ExtResource("6_idle")
+
+[node name="Chase" parent="StateMachine" index="2"]
+script = ExtResource("7_chase")
+
+[node name="Circle" parent="StateMachine" index="3"]
+script = ExtResource("7_chase")
+
+[node name="Attack" parent="StateMachine" index="4"]
+script = ExtResource("8_cleave")
+
+[node name="Retreat" parent="StateMachine" index="5"]
+script = ExtResource("7_chase")
+
+[node name="Stun" parent="StateMachine" index="6"]
+script = ExtResource("10_stun")
+
+[node name="Cleave" type="Node" parent="StateMachine"]
+script = ExtResource("8_cleave")
+
+[node name="Slam" type="Node" parent="StateMachine"]
+script = ExtResource("9_slam")
