@@ -26,13 +26,13 @@ func _init():
 
 # ============ 缓存的 Boss 引用 ============
 
-var _boss_cache: Boss
+var _boss_cache: BossBase
 
 ## 缓存的 Boss 类型引用（lazy 初始化，避免重复类型守卫）
-var _boss: Boss:
+var _boss: BossBase:
 	get:
-		if not _boss_cache and owner_node is Boss:
-			_boss_cache = owner_node as Boss
+		if not is_instance_valid(_boss_cache) and owner_node is BossBase:
+			_boss_cache = owner_node as BossBase
 		return _boss_cache
 
 # ============ 攻击管理器访问 ============
@@ -98,40 +98,11 @@ func evaluate_combat_transition(include_attack: bool = true) -> String:
 
 # ============ 统一攻击分派 ============
 
-## 根据攻击条目字典分派具体攻击（供所有 Boss 状态共用）
+## 根据攻击条目字典分派具体攻击（委托给 AttackManager）
 func _dispatch_attack(attack_manager: BossAttackManager, entry: Dictionary) -> void:
-	var attack_mode: String = entry.get("mode", "")
-	DebugConfig.debug("[BossState] 执行: %s | %s" % [attack_mode, entry], "", "combat")
-	match attack_mode:
-		"fan_spread":
-			attack_manager.fire_projectiles(entry.get("count", 3), entry.get("spread", PI / 6))
-		"spiral":
-			attack_manager.fire_spiral_projectiles(entry.get("count", 12))
-		"laser":
-			if target_node:
-				attack_manager.fire_laser_at_player()
-		"aoe":
-			if attack_manager.aoe_scene:
-				attack_manager.fire_aoe()
-		"rapid_fire":
-			if target_node:
-				attack_manager.fire_rapid_projectiles(
-					target_node as Node2D,
-					entry.get("count", 3)
-				)
-		"combo":
-			var factory = entry.get("factory")
-			var callable: Callable
-			if factory is Callable:
-				callable = factory
-			elif factory is String:
-				callable = _resolve_combo_factory(factory)
-			if callable.is_valid():
-				var combo: BossComboAttack = callable.call()
-				if combo:
-					attack_manager.execute_combo(combo)
-			else:
-				push_warning("[BossState] Invalid combo factory: %s" % str(factory))
+	var target_pos := target_node.global_position if target_node else Vector2.ZERO
+	DebugConfig.debug("[BossState] 执行: %s | %s" % [entry.get("mode", ""), entry], "", "combat")
+	attack_manager.execute_attack(entry, target_pos)
 
 # ============ 动画控制 ============
 
