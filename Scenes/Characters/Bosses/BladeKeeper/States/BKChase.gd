@@ -30,12 +30,11 @@ func physics_process_state(_delta: float) -> void:
 	var direction := (target_node.global_position - boss.global_position).normalized()
 	boss.velocity = direction * bk.move_speed
 
-	# 更新 locomotion BlendSpace2D
-	var speed_ratio := 1.0
-	set_locomotion(Vector2(direction.x, speed_ratio))
+	# 更新 locomotion 动画（使用 StateMachine locomotion）
+	set_locomotion_state("walk")
 
 func exit() -> void:
 	var boss := get_boss()
 	if boss:
 		boss.velocity = Vector2.ZERO
-	set_locomotion(Vector2.ZERO)
+	set_locomotion_state("idle")

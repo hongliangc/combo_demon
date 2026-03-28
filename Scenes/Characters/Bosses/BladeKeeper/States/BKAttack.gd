@@ -67,6 +67,7 @@ func _finish_attack() -> void:
 	transitioned.emit(self, next)
 
 func exit() -> void:
+	exit_control_state()
 	if _anim_tree_ref and _anim_tree_ref.animation_finished.is_connected(_on_animation_finished):
 		_anim_tree_ref.animation_finished.disconnect(_on_animation_finished)
 	_current_combo_step = 0

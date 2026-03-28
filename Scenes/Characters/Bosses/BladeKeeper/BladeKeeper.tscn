@@ -2,7 +2,6 @@
 
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/BossBase.tscn" id="1_base"]
 [ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/BladeKeeper.gd" id="2_bk"]
-[ext_resource type="Texture2D" path="res://Assets/Art/BLADE_KEEPER/spritesheets/metal_bladekeeper_FREE_v1.1_SpriteSheet_288x128.png" id="3_sprite"]
 [ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/BKAttackManager.gd" id="4_atkmgr"]
 [ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/BKStateMachine.gd" id="5_sm"]
 [ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKIdle.gd" id="6_idle"]
@@ -19,16 +18,156 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bk_collision"]
 size = Vector2(40, 56)
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_idle"]
+animation = &"idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_walk"]
+animation = &"walk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_idle_to_walk"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_walk_to_idle"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_locomotion"]
+states/idle/node = SubResource("AnimationNodeAnimation_idle")
+states/idle/position = Vector2(240, 100)
+states/walk/node = SubResource("AnimationNodeAnimation_walk")
+states/walk/position = Vector2(440, 100)
+transitions = ["idle", "walk", SubResource("AnimationNodeStateMachineTransition_idle_to_walk"), "walk", "idle", SubResource("AnimationNodeStateMachineTransition_walk_to_idle")]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_atk1"]
+animation = &"atk_1"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_atk2"]
+animation = &"atk_2"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_atk3"]
+animation = &"atk_3"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_sp_atk"]
+animation = &"sp_atk"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_defend"]
+animation = &"defend"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_roll"]
+animation = &"roll"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_projectile_cast"]
+animation = &"projectile_cast"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_trap_cast"]
+animation = &"trap_cast"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hit"]
+animation = &"hit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_stun"]
+animation = &"stun"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_death"]
+animation = &"death"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_any"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_atk1_atk2"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_atk2_atk3"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_atk3_sp"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_to_hit"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_to_stun"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_to_death"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_hit_to_death"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_stun_to_death"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_defend_to_atk1"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_roll_to_proj"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="BK_transition_roll_to_trap"]
+xfade_time = 0.05
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_control"]
+states/atk_1/node = SubResource("AnimationNodeAnimation_atk1")
+states/atk_1/position = Vector2(100, -50)
+states/atk_2/node = SubResource("AnimationNodeAnimation_atk2")
+states/atk_2/position = Vector2(280, -50)
+states/atk_3/node = SubResource("AnimationNodeAnimation_atk3")
+states/atk_3/position = Vector2(460, -50)
+states/sp_atk/node = SubResource("AnimationNodeAnimation_sp_atk")
+states/sp_atk/position = Vector2(640, -50)
+states/defend/node = SubResource("AnimationNodeAnimation_defend")
+states/defend/position = Vector2(100, 100)
+states/roll/node = SubResource("AnimationNodeAnimation_roll")
+states/roll/position = Vector2(280, 100)
+states/projectile_cast/node = SubResource("AnimationNodeAnimation_projectile_cast")
+states/projectile_cast/position = Vector2(460, 100)
+states/trap_cast/node = SubResource("AnimationNodeAnimation_trap_cast")
+states/trap_cast/position = Vector2(640, 100)
+states/hit/node = SubResource("AnimationNodeAnimation_hit")
+states/hit/position = Vector2(100, 250)
+states/stun/node = SubResource("AnimationNodeAnimation_stun")
+states/stun/position = Vector2(280, 250)
+states/death/node = SubResource("AnimationNodeAnimation_death")
+states/death/position = Vector2(460, 250)
+transitions = ["atk_1", "atk_2", SubResource("BK_transition_atk1_atk2"), "atk_2", "atk_3", SubResource("BK_transition_atk2_atk3"), "atk_3", "sp_atk", SubResource("BK_transition_atk3_sp"), "defend", "atk_1", SubResource("BK_transition_defend_to_atk1"), "roll", "projectile_cast", SubResource("BK_transition_roll_to_proj"), "roll", "trap_cast", SubResource("BK_transition_roll_to_trap"), "atk_1", "hit", SubResource("BK_transition_to_hit"), "atk_2", "hit", SubResource("BK_transition_to_hit"), "atk_3", "hit", SubResource("BK_transition_to_hit"), "hit", "death", SubResource("BK_transition_hit_to_death"), "stun", "death", SubResource("BK_transition_stun_to_death"), "hit", "stun", SubResource("BK_transition_to_stun")]
+graph_offset = Vector2(-96, 0)
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_control"]
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_loco"]
+
+[sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_ctrl"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_root"]
+graph_offset = Vector2(-292, 133)
+nodes/output/position = Vector2(680, 400)
+nodes/control_blend/node = SubResource("AnimationNodeBlend2_control")
+nodes/control_blend/position = Vector2(460, 340)
+nodes/control_sm/node = SubResource("AnimationNodeStateMachine_control")
+nodes/control_sm/position = Vector2(20, 560)
+nodes/ctrl_timescale/node = SubResource("AnimationNodeTimeScale_ctrl")
+nodes/ctrl_timescale/position = Vector2(260, 560)
+nodes/loco_timescale/node = SubResource("AnimationNodeTimeScale_loco")
+nodes/loco_timescale/position = Vector2(260, 260)
+nodes/locomotion/node = SubResource("AnimationNodeStateMachine_locomotion")
+nodes/locomotion/position = Vector2(-60, 260)
+node_connections = [&"output", 0, &"control_blend", &"control_blend", 0, &"loco_timescale", &"control_blend", 1, &"ctrl_timescale", &"ctrl_timescale", 0, &"control_sm", &"loco_timescale", 0, &"locomotion"]
+
 [node name="BladeKeeper" instance=ExtResource("1_base")]
 script = ExtResource("2_bk")
 max_health = 800
 health = 800
 
 [node name="Sprite2D" parent="." index="0"]
-texture = ExtResource("3_sprite")
 
 [node name="CollisionShape2D" parent="." index="1"]
 shape = SubResource("RectangleShape2D_bk_collision")
+
+[node name="AnimationTree" parent="." index="5"]
+tree_root = SubResource("AnimationNodeBlendTree_root")
+parameters/control_blend/blend_amount = 0.0
+parameters/ctrl_timescale/scale = 1.0
+parameters/loco_timescale/scale = 1.0
 
 [node name="HealthComponent" parent="." index="6"]
 max_health = 800.0
@@ -39,8 +178,9 @@ script = ExtResource("4_atkmgr")
 sword_projectile_scene = ExtResource("14_projscene")
 trap_scene = ExtResource("15_trapscene")
 
-[node name="StateMachine" parent="." index="9"]
+[node name="StateMachine" parent="." index="9" node_paths=PackedStringArray("init_state")]
 script = ExtResource("5_sm")
+init_state = NodePath("Idle")
 
 [node name="Idle" parent="StateMachine" index="0"]
 script = ExtResource("6_idle")

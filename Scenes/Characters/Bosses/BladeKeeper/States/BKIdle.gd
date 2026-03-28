@@ -13,7 +13,7 @@ func enter() -> void:
 	var boss := get_boss()
 	if boss:
 		boss.velocity = Vector2.ZERO
-	set_locomotion(Vector2.ZERO)
+	set_locomotion_state("idle")
 	_timer = get_tree().create_timer(idle_time)
 	_timer.timeout.connect(_on_idle_timeout)
 

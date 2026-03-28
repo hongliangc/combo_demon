@@ -33,10 +33,10 @@ func _execute_attack(entry: Dictionary, target_pos: Vector2) -> void:
 
 func _execute_combo_entry(entry: Dictionary) -> void:
 	var factory_name: String = entry.get("factory", "")
-	var combo := _resolve_bk_combo(factory_name)
-	if combo:
-		# Combo 由 BKAttack 状态逐步执行
-		pass
+	var combo := resolve_bk_combo(factory_name)
+	if not combo.is_empty():
+		# Combo 由 BKAttack 状态逐步执行，这里仅验证工厂名有效
+		DebugConfig.debug("[BKAttackManager] combo resolved: %s" % factory_name, "", "combat")
 
 func fire_sword_projectile(target_pos: Vector2) -> void:
 	if not sword_projectile_scene:
@@ -69,48 +69,49 @@ func place_trap(target_pos: Vector2) -> void:
 func _cleanup_traps() -> void:
 	_active_traps = _active_traps.filter(func(t): return is_instance_valid(t))
 
-## 组合技工厂
-static func _resolve_bk_combo(factory_name: String) -> BossComboAttack:
+## 组合技工厂 — BladeKeeper 使用状态序列式组合技（非 BossComboAttack.AttackStep 类型）
+## 返回包含 combo_name 和 state_steps 的字典
+static func resolve_bk_combo(factory_name: String) -> Dictionary:
 	match factory_name:
 		"blade_storm": return _create_blade_storm()
 		"shadow_strike": return _create_shadow_strike()
 		"ultimate_chain": return _create_ultimate_chain()
-	return null
+	return {}
 
 ## 剑刃风暴: atk_1 → atk_2 → atk_3 → projectile_cast (Phase 1+)
-static func _create_blade_storm() -> BossComboAttack:
-	var combo := BossComboAttack.new()
-	combo.combo_name = "blade_storm"
-	combo.steps = [
-		{"type": "state", "state": "atk_1", "delay": 0.0},
-		{"type": "state", "state": "atk_2", "delay": 0.1},
-		{"type": "state", "state": "atk_3", "delay": 0.1},
-		{"type": "state", "state": "projectile_cast", "delay": 0.2},
-	]
-	return combo
+static func _create_blade_storm() -> Dictionary:
+	return {
+		"combo_name": "blade_storm",
+		"state_steps": [
+			{"state": "atk_1", "delay": 0.0},
+			{"state": "atk_2", "delay": 0.1},
+			{"state": "atk_3", "delay": 0.1},
+			{"state": "projectile_cast", "delay": 0.2},
+		]
+	}
 
 ## 影步突袭: roll → atk_1 → atk_2 → defend (Phase 2+)
-static func _create_shadow_strike() -> BossComboAttack:
-	var combo := BossComboAttack.new()
-	combo.combo_name = "shadow_strike"
-	combo.steps = [
-		{"type": "state", "state": "roll", "delay": 0.0},
-		{"type": "state", "state": "atk_1", "delay": 0.1},
-		{"type": "state", "state": "atk_2", "delay": 0.1},
-		{"type": "state", "state": "defend", "delay": 0.2},
-	]
-	return combo
+static func _create_shadow_strike() -> Dictionary:
+	return {
+		"combo_name": "shadow_strike",
+		"state_steps": [
+			{"state": "roll", "delay": 0.0},
+			{"state": "atk_1", "delay": 0.1},
+			{"state": "atk_2", "delay": 0.1},
+			{"state": "defend", "delay": 0.2},
+		]
+	}
 
 ## 绝剑连环: roll → trap → atk_1 → atk_2 → atk_3 → sp_atk (Phase 3)
-static func _create_ultimate_chain() -> BossComboAttack:
-	var combo := BossComboAttack.new()
-	combo.combo_name = "ultimate_chain"
-	combo.steps = [
-		{"type": "state", "state": "roll", "delay": 0.0},
-		{"type": "state", "state": "trap_cast", "delay": 0.1},
-		{"type": "state", "state": "atk_1", "delay": 0.2},
-		{"type": "state", "state": "atk_2", "delay": 0.1},
-		{"type": "state", "state": "atk_3", "delay": 0.1},
-		{"type": "state", "state": "sp_atk", "delay": 0.3},
-	]
-	return combo
+static func _create_ultimate_chain() -> Dictionary:
+	return {
+		"combo_name": "ultimate_chain",
+		"state_steps": [
+			{"state": "roll", "delay": 0.0},
+			{"state": "trap_cast", "delay": 0.1},
+			{"state": "atk_1", "delay": 0.2},
+			{"state": "atk_2", "delay": 0.1},
+			{"state": "atk_3", "delay": 0.1},
+			{"state": "sp_atk", "delay": 0.3},
+		]
+	}

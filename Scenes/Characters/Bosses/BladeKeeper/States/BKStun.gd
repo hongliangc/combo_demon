@@ -39,6 +39,7 @@ func on_damaged(damage: Damage, _attacker_position: Vector2 = Vector2.ZERO) -> v
 			return
 
 func exit() -> void:
+	exit_control_state()
 	if _timer and _timer.timeout.is_connected(_on_stun_timeout):
 		_timer.timeout.disconnect(_on_stun_timeout)
 	var boss := get_boss()
