@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://cyr2m6q5pv84" path="res://Assets/Art/RGS_Dev/tileset_brown.png" id="1_jjgbg"]
 [ext_resource type="PackedScene" uid="uid://bb3gfgyu0hmh8" path="res://Scenes/Characters/Enemies/Dinosaur/Dinosaur.tscn" id="2_8gbba"]
 [ext_resource type="Script" uid="uid://7t4no0mld71g" path="res://Scenes/CommonScript/PlayerSpawn.gd" id="3_jjvhh"]
-[ext_resource type="PackedScene" uid="uid://dg8ot3heoutwi" path="res://Scenes/Characters/Enemies/Boss/Boss.tscn" id="4_jjvhh"]
+[ext_resource type="PackedScene" uid="uid://dg8ot3heoutwi" path="res://Scenes/Characters/Bosses/Cyclops/Cyclops.tscn" id="4_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://ct7bkafuwgae0" path="res://Scenes/Characters/Enemies/Skull/Skull.tscn" id="4_kry3j"]
 [ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="5_camera"]
 
@@ -286,8 +286,8 @@ min_wander_time = null
 max_wander_time = null
 wander_speed = null
 detection_radius = null
-chase_radius = null
-follow_radius = null
+chase_abandon_distance = null
+attack_activation_radius = null
 chase_speed = null
 max_health = 100000
 health = 100000

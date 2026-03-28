@@ -1,4 +1,5 @@
 extends Resource
+class_name BossPhaseConfig
 
 ## Boss 阶段配置 Resource
 ## 定义单个阶段的攻击池、冷却、行为模式等参数
