@@ -1,0 +1,76 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Templates/BossBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/BladeKeeper.gd" id="2_bk"]
+[ext_resource type="Texture2D" path="res://Assets/Art/BLADE_KEEPER/spritesheets/metal_bladekeeper_FREE_v1.1_SpriteSheet_288x128.png" id="3_sprite"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/BKAttackManager.gd" id="4_atkmgr"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/BKStateMachine.gd" id="5_sm"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKIdle.gd" id="6_idle"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKChase.gd" id="7_chase"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKAttack.gd" id="8_attack"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKDefend.gd" id="9_defend"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKRoll.gd" id="10_roll"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKProjectile.gd" id="11_proj"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKTrap.gd" id="12_trap"]
+[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKStun.gd" id="13_stun"]
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.tscn" id="14_projscene"]
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKTrapEntity.tscn" id="15_trapscene"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bk_collision"]
+size = Vector2(40, 56)
+
+[node name="BladeKeeper" instance=ExtResource("1_base")]
+script = ExtResource("2_bk")
+max_health = 800
+health = 800
+
+[node name="Sprite2D" parent="." index="0"]
+texture = ExtResource("3_sprite")
+
+[node name="CollisionShape2D" parent="." index="1"]
+shape = SubResource("RectangleShape2D_bk_collision")
+
+[node name="HealthComponent" parent="." index="6"]
+max_health = 800.0
+health = 800.0
+
+[node name="BossAttackManager" parent="." index="8"]
+script = ExtResource("4_atkmgr")
+sword_projectile_scene = ExtResource("14_projscene")
+trap_scene = ExtResource("15_trapscene")
+
+[node name="StateMachine" parent="." index="9"]
+script = ExtResource("5_sm")
+
+[node name="Idle" parent="StateMachine" index="0"]
+script = ExtResource("6_idle")
+
+[node name="Patrol" parent="StateMachine" index="1"]
+script = ExtResource("6_idle")
+
+[node name="Chase" parent="StateMachine" index="2"]
+script = ExtResource("7_chase")
+
+[node name="Circle" parent="StateMachine" index="3"]
+script = ExtResource("7_chase")
+
+[node name="Attack" parent="StateMachine" index="4"]
+script = ExtResource("8_attack")
+
+[node name="Retreat" parent="StateMachine" index="5"]
+script = ExtResource("7_chase")
+
+[node name="Stun" parent="StateMachine" index="6"]
+script = ExtResource("13_stun")
+
+[node name="Defend" type="Node" parent="StateMachine"]
+script = ExtResource("9_defend")
+
+[node name="Roll" type="Node" parent="StateMachine"]
+script = ExtResource("10_roll")
+
+[node name="Projectile" type="Node" parent="StateMachine"]
+script = ExtResource("11_proj")
+
+[node name="Trap" type="Node" parent="StateMachine"]
+script = ExtResource("12_trap")
