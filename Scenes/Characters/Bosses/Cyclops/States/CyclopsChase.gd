@@ -34,7 +34,9 @@ func physics_process_state(delta: float) -> void:
 	direction = (direction + random_offset).normalized()
 
 	var cyclops := _boss as Cyclops
-	_boss.velocity = direction * (cyclops.move_speed if cyclops else 150.0)
+	var spd: float = cyclops.move_speed if cyclops else 150.0
+	_boss.velocity = direction * spd
+	set_locomotion(Vector2(direction.x, 1.0))
 
 	# 追击时发动攻击（边追边打）
 	if chase_attack_timer <= 0:
@@ -59,4 +61,4 @@ func _perform_chase_attack() -> void:
 	_dispatch_attack(attack_manager, entry)
 
 func exit():
-	pass
+	set_locomotion(Vector2.ZERO)

@@ -8,7 +8,7 @@ class_name EnemyBase
 ##   1. 继承此类或使用 EnemyBase.tscn 模板场景
 ##   2. 在 Inspector 中配置 AI 参数（或使用 EnemyData 资源）
 ##   3. 重写 _on_enemy_ready() 进行敌人特定初始化
-##   4. 精灵自动查找 Sprite2D 或 AnimatedSprite2D
+##   4. 精灵自动查找 AnimatedSprite2D（优先）或 Sprite2D
 ##
 ## 节点要求:
 ##   必需: HealthComponent, HurtBoxComponent, AnimationPlayer
@@ -25,8 +25,8 @@ class_name EnemyBase
 
 @export_group("Chase")
 @export var detection_radius := 100.0
-@export var chase_radius := 200.0
-@export var follow_radius := 25.0
+@export var chase_abandon_distance := 200.0
+@export var attack_activation_radius := 25.0
 @export var chase_speed := 75
 
 @export_group("Physics")
@@ -48,6 +48,9 @@ var can_move: bool = true  # 用于技能聚集时强制停止移动
 var sprite: Node2D
 
 func _on_character_ready() -> void:
+	assert(anim_player != null, "%s: missing AnimationPlayer child node" % name)
+	assert(anim_tree != null, "%s: missing AnimationTree child node" % name)
+
 	# 应用数据资源（如果配置了）
 	if enemy_data:
 		_apply_enemy_data()
@@ -70,8 +73,10 @@ func _physics_process(delta: float) -> void:
 		elif velocity.y > 0:
 			velocity.y = 0
 
-	# 自动翻转精灵朝向
-	_update_sprite_facing()
+	# 自动翻转精灵朝向（仅在未使用 AnimationTree 时）
+	# BlendSpace2D 已通过 left_walk/right_walk 处理方向，不需要额外 flip_h
+	if not (anim_tree and anim_tree.active):
+		_update_sprite_facing()
 
 ## 死亡处理：停止状态机 → 播放死亡动画（优先使用death动画，否则使用白闪效果） → 删除节点
 func _handle_death() -> void:
@@ -135,13 +140,8 @@ func _find_sprite() -> void:
 func _update_sprite_facing() -> void:
 	if not sprite or not alive or velocity.x == 0:
 		return
-
-	# 注意：velocity.x < 0 表示向左移动，此时翻转精灵
-	# 这是因为敌人精灵资源默认朝向右边
-	if sprite is Sprite2D:
-		(sprite as Sprite2D).flip_h = velocity.x < 0
-	elif sprite is AnimatedSprite2D:
-		(sprite as AnimatedSprite2D).flip_h = velocity.x < 0
+	if "flip_h" in sprite:
+		sprite.flip_h = velocity.x < 0
 
 # ============ 数据驱动 ============
 ## 从 EnemyData 资源加载配置
@@ -155,8 +155,8 @@ func _apply_enemy_data() -> void:
 	max_wander_time = enemy_data.max_wander_time
 	wander_speed = enemy_data.wander_speed
 	detection_radius = enemy_data.detection_radius
-	chase_radius = enemy_data.chase_radius
-	follow_radius = enemy_data.follow_radius
+	chase_abandon_distance = enemy_data.chase_abandon_distance
+	attack_activation_radius = enemy_data.attack_activation_radius
 	chase_speed = enemy_data.chase_speed
 	has_gravity = enemy_data.has_gravity
 	gravity = enemy_data.gravity

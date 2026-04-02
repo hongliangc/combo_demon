@@ -24,4 +24,4 @@ func _on_health_changed(current_health: float, _max_health: float) -> void:
 		can_split = false
 		var sm: Node = get_node_or_null("EnemyStateMachine")
 		if sm and sm.has_method("transition_to"):
-			sm.transition_to("specialskill")
+			sm.transition_to(StateNames.SPECIALSKILL)

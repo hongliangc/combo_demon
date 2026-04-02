@@ -1,4 +1,5 @@
 extends BossStateMachine
+class_name CyclopsStateMachine
 
 ## Cyclops Boss 状态机 — 阶段路由逻辑
 

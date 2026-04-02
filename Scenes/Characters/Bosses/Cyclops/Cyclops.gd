@@ -11,9 +11,6 @@ class_name Cyclops
 ##   - Cyclops: 8方位移动、巡逻路径、纹理选择、旋转逻辑
 
 # ============ 配置参数 ============
-@export_group("Textures")
-@export var textures: Array[Texture2D] = []
-
 @export_group("Movement")
 @export var base_move_speed := 150.0  # 基础移动速度
 @export var rotation_speed := 5.0
@@ -54,15 +51,10 @@ const DIRECTIONS_8 = [
 var circle_direction := 1  # 1=顺时针, -1=逆时针
 
 # ============ 节点引用 ============
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 # ============ Boss 特定初始化 ============
 func _on_boss_ready() -> void:
-	# 随机选择纹理
-	if not textures.is_empty():
-		sprite.texture = textures.pick_random()
-
-	# 设置巡逻点
 	setup_patrol_points()
 
 # ============ 巡逻点设置 ============

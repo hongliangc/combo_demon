@@ -103,7 +103,7 @@ func _resolve_callables() -> void:
 		for pool in [config.attacks, config.chase_attacks, config.retreat_attacks]:
 			for entry in pool:
 				if entry.get("mode") == "combo" and entry.get("factory") is String:
-					var callable := _resolve_combo_factory(entry["factory"])
+					var callable: Callable = CyclopsAttackManager.resolve_combo_factory(entry["factory"])
 					if callable.is_valid():
 						entry["factory"] = callable
 
@@ -156,17 +156,20 @@ func physics_process_state(delta: float) -> void:
 		var distance := get_distance_to_target()
 
 		var cyclops := _boss as Cyclops
-		var spd := cyclops.move_speed if cyclops else 150.0
+		var spd: float = cyclops.move_speed if cyclops else 150.0
 
 		# 距离管理
 		if distance < _boss.min_distance:
 			var away_dir := -get_direction_to_target()
 			_boss.velocity = away_dir * spd
+			set_locomotion(Vector2(away_dir.x, 1.0))
 		elif distance > _boss.attack_range:
 			var direction := get_direction_to_target()
 			_boss.velocity = direction * spd * _config.speed_multiplier
+			set_locomotion(Vector2(direction.x, 1.0))
 		else:
 			_boss.velocity = _boss.velocity.lerp(Vector2.ZERO, CHASE_DECELERATION * delta)
+			set_locomotion(Vector2.ZERO)
 
 		# 普通攻击：cooldown 循环
 		if _boss.attack_cooldown <= 0:
@@ -179,7 +182,7 @@ func physics_process_state(delta: float) -> void:
 
 
 func exit():
-	pass
+	set_locomotion(Vector2.ZERO)
 
 
 func on_damaged(_damage: Damage, _attacker_position: Vector2 = Vector2.ZERO):

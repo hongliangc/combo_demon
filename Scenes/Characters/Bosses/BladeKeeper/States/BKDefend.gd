@@ -23,10 +23,8 @@ func enter() -> void:
 func on_damaged(damage: Damage, _attacker_position: Vector2 = Vector2.ZERO) -> void:
 	# 格挡期间受击：减半伤害 + 标记反击
 	_took_hit = true
-	var boss := get_boss()
-	if boss and boss.health_component:
-		# 恢复 50% 伤害（模拟减伤）
-		boss.health_component.heal(damage.amount * 0.5)
+	# 直接减少传入伤害量（真正的减伤，而非先扣血再补血）
+	damage.amount *= 0.5
 
 func _on_defend_timeout() -> void:
 	exit_control_state()

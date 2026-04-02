@@ -208,10 +208,17 @@ func recover_from_stun() -> void:
 			owner_node.can_move = true
 
 	# 转换到恢复状态（优先 wander，其次 idle）
-	var recovery_state = "wander" if states.has("wander") else "idle"
+	var recovery_state = StateNames.WANDER if states.has(StateNames.WANDER) else StateNames.IDLE
 	if states.has(recovery_state):
 		force_transition(recovery_state)
 		DebugConfig.debug("[StateMachine] 从眩晕恢复 -> %s" % recovery_state, "", "state_machine")
+
+
+## 清理信号连接，防止状态机销毁后信号泄漏
+func _exit_tree() -> void:
+	if is_instance_valid(owner_node) and owner_node.has_signal("damaged"):
+		if owner_node.is_connected("damaged", _on_owner_damaged):
+			owner_node.damaged.disconnect(_on_owner_damaged)
 
 
 # ============ 工具方法 ============

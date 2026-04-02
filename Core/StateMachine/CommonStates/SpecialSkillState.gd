@@ -70,7 +70,7 @@ func execute_skill() -> void:
 func finish_skill() -> void:
 	_cooldown_remaining = skill_cooldown
 	_executing = false
-	transition_to("chase")
+	transition_to(StateNames.CHASE)
 
 
 ## 对玩家施加伤害的工具方法

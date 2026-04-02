@@ -11,8 +11,8 @@ func physics_process_state(_delta: float) -> void:
 		transition_to(default_state_name)
 		return
 
-	var give_up_range: float = get_owner_property("chase_radius", default_give_up_range)
-	var attack_range: float = get_owner_property("follow_radius", default_attack_range)
+	var give_up_range: float = get_owner_property("chase_abandon_distance", default_give_up_range)
+	var attack_range: float = get_owner_property("attack_activation_radius", default_attack_range)
 	var speed: float = get_owner_property("chase_speed", default_chase_speed)
 	var distance = get_distance_to_target()
 

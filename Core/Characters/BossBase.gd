@@ -21,6 +21,10 @@ enum Phase {
 	PHASE_3   # 第三阶段（狂暴）
 }
 
+# ============ 常量 ============
+const PHASE_KNOCKBACK_RADIUS := 200.0
+const PHASE_KNOCKBACK_FORCE := 500.0
+
 # ============ 配置参数 ============
 @export_group("Detection")
 @export var detection_radius := 800.0
@@ -128,8 +132,8 @@ func activate_phase_transition_effect() -> void:
 
 ## 击退周围的单位
 func knockback_nearby_units() -> void:
-	var knockback_radius := 200.0  # 击退范围
-	var knockback_force := 500.0   # 击退力度
+	var knockback_radius := PHASE_KNOCKBACK_RADIUS
+	var knockback_force := PHASE_KNOCKBACK_FORCE
 
 	# 获取范围内的所有物体
 	var space_state = get_world_2d().direct_space_state

@@ -59,6 +59,7 @@ func physics_process_state(delta: float) -> void:
 		var direction := (_boss.global_position - (target_node as Node2D).global_position).normalized()
 		var cyclops := _boss as Cyclops
 		_boss.velocity = direction * (cyclops.move_speed if cyclops else 150.0) * retreat_speed_multiplier
+		set_locomotion(Vector2(direction.x, 1.0))
 
 	# 撤退时发动攻击（边退边打）
 	if retreat_attack_timer <= 0:
@@ -121,7 +122,7 @@ func _perform_retreat_attack() -> void:
 	_dispatch_attack(attack_manager, entry)
 
 func exit():
-	pass
+	set_locomotion(Vector2.ZERO)
 
 # ============ 传送与地图工具方法 ============
 

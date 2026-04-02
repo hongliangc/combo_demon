@@ -24,7 +24,7 @@ func _on_cleave_finished(_anim_name: StringName) -> void:
 	var mgr := get_attack_manager() as DSAttackManager
 	var boss := get_boss()
 	if mgr and boss and target_node:
-		var facing := (target_node.global_position - boss.global_position).normalized()
+		var facing: Vector2 = (target_node.global_position - boss.global_position).normalized()
 		mgr.spawn_fan_shockwave(boss.global_position, facing)
 
 	exit_control_state()

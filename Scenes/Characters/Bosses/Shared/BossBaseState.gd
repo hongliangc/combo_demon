@@ -4,20 +4,6 @@ class_name BossState
 ## Boss 状态基类 - 直接继承 BaseState
 ## 提供 Boss 通用功能：缓存引用、距离决策、攻击分派、动画控制
 
-# ============ Combo 工厂查找 ============
-
-## 将字符串工厂名解析为 Callable（GDScript const 不支持 Callable）
-static func _resolve_combo_factory(factory_name: String) -> Callable:
-	match factory_name:
-		"create_triple_shot": return BossComboAttack.create_triple_shot
-		"create_fan_spiral": return BossComboAttack.create_fan_spiral
-		"create_laser_shockwave": return BossComboAttack.create_laser_shockwave
-		"create_spiral_aoe": return BossComboAttack.create_spiral_aoe
-		"create_laser_barrage": return BossComboAttack.create_laser_barrage
-		"create_ultimate_combo": return BossComboAttack.create_ultimate_combo
-		"create_double_spiral": return BossComboAttack.create_double_spiral
-	return Callable()
-
 func _init():
 	# 默认为行为层，子类可覆盖
 	priority = StatePriority.BEHAVIOR
@@ -56,13 +42,11 @@ func get_boss() -> BossBase:
 
 # ============ 阶段配置访问 ============
 
-## 获取当前阶段的 BossPhaseConfig（从 BossAttack 状态读取）
-func _get_phase_config():
-	if not state_machine or not _boss:
-		return null
-	var attack_state = state_machine.states.get("attack")
-	if attack_state and "phase_configs" in attack_state:
-		return attack_state.phase_configs.get(_boss.current_phase)
+## 获取当前阶段的 BossPhaseConfig（从 BossAttackManager 读取）
+func _get_phase_config() -> BossPhaseConfig:
+	var mgr := get_attack_manager()
+	if mgr:
+		return mgr.get_current_config()
 	return null
 
 # ============ 统一距离决策 ============
@@ -75,32 +59,40 @@ func evaluate_combat_transition(include_attack: bool = true) -> String:
 		return "idle"
 
 	if not is_target_alive():
-		return "patrol"
+		return _resolve_state("patrol", "idle")
 
 	var distance := get_distance_to_target()
 
 	# 超出检测范围 → 脱离战斗
 	if distance > _boss.detection_radius:
-		return "patrol"
+		return _resolve_state("patrol", "idle")
 
 	# 太近 → 撤退
 	if distance < _boss.min_distance:
-		return "retreat"
+		return _resolve_state("retreat", "chase")
 
 	# 在攻击范围内
 	if distance <= _boss.attack_range:
 		if include_attack and _boss.attack_cooldown <= 0:
-			return "attack"
-		return "circle"
+			return _resolve_state("attack", "idle")
+		return _resolve_state("circle", "chase")
 
 	# 攻击范围外但检测范围内 → 追击
-	return "chase"
+	return _resolve_state("chase", "idle")
+
+## 检查状态机是否拥有目标状态，不存在则降级到 fallback
+func _resolve_state(preferred: String, fallback: String) -> String:
+	if state_machine and state_machine.states.has(preferred):
+		return preferred
+	if state_machine and state_machine.states.has(fallback):
+		return fallback
+	return "idle"
 
 # ============ 统一攻击分派 ============
 
 ## 根据攻击条目字典分派具体攻击（委托给 AttackManager）
 func _dispatch_attack(attack_manager: BossAttackManager, entry: Dictionary) -> void:
-	var target_pos := target_node.global_position if target_node else Vector2.ZERO
+	var target_pos: Vector2 = target_node.global_position if target_node else Vector2.ZERO
 	DebugConfig.debug("[BossState] 执行: %s | %s" % [entry.get("mode", ""), entry], "", "combat")
 	attack_manager.execute_attack(entry, target_pos)
 

@@ -1,19 +1,87 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cowywrmxqtktr"]
 
-[ext_resource type="Script" path="res://Core/Characters/BossBase.gd" id="1_bossbase"]
+[ext_resource type="Script" uid="uid://c0ctc7wwyps1y" path="res://Core/Characters/BossBase.gd" id="1_bossbase"]
 [ext_resource type="Script" uid="uid://3cpq40uop66w" path="res://Core/Components/HurtBoxComponent.gd" id="2_hurtbox"]
 [ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="3_health"]
-[ext_resource type="Script" uid="uid://cugytepllupd0" path="res://Scenes/Characters/Bosses/Shared/BossAttackManager.gd" id="4_attackmanager"]
+[ext_resource type="Script" uid="uid://bghl8phehydn7" path="res://Scenes/Characters/Bosses/Shared/BossAttackManager.gd" id="4_attackmanager"]
 [ext_resource type="Script" uid="uid://do3eyt0kvgbl2" path="res://Scenes/Characters/Bosses/Shared/BossStateMachine.gd" id="5_statemachine"]
-[ext_resource type="Script" uid="uid://cgmwp25e3hbwy" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsIdle.gd" id="6_idle"]
-[ext_resource type="Script" uid="uid://d1g6tjh1c6c8r" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsPatrol.gd" id="7_patrol"]
-[ext_resource type="Script" uid="uid://b4gclxub8a2pv" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsChase.gd" id="8_chase"]
-[ext_resource type="Script" uid="uid://cls180jwdct2v" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsCircle.gd" id="9_circle"]
-[ext_resource type="Script" uid="uid://b52hi0ynhj6yf" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsAttack.gd" id="10_attack"]
-[ext_resource type="Script" uid="uid://d3rrlgdbbgerj" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsRetreat.gd" id="11_retreat"]
-[ext_resource type="Script" uid="uid://bdwlrfjvq2fiw" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsStun.gd" id="12_stun"]
+[ext_resource type="Script" uid="uid://dn8wrqnslrsdb" path="res://Scenes/Characters/Bosses/Shared/BossBaseState.gd" id="6_idle"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(40, 40)
+
+[sub_resource type="Animation" id="Animation_RESET"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2D:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("HealthBar:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("HurtBoxComponent/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_main"]
+_data = {
+&"RESET": SubResource("Animation_RESET")
+}
 
 [sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_control"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_attack"]
+animation = &"attack"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_death"]
 animation = &"death"
@@ -23,9 +91,6 @@ animation = &"hit"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_stunned"]
 animation = &"stunned"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_attack"]
-animation = &"attack"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_hit_to_stunned"]
 xfade_time = 0.05
@@ -52,7 +117,7 @@ states/hit/position = Vector2(346, 100)
 states/stunned/node = SubResource("AnimationNodeAnimation_stunned")
 states/stunned/position = Vector2(504, 304)
 transitions = ["hit", "stunned", SubResource("AnimationNodeStateMachineTransition_hit_to_stunned"), "stunned", "death", SubResource("AnimationNodeStateMachineTransition_stunned_to_death"), "hit", "death", SubResource("AnimationNodeStateMachineTransition_hit_to_death"), "attack", "hit", SubResource("AnimationNodeStateMachineTransition_attack_to_hit"), "attack", "death", SubResource("AnimationNodeStateMachineTransition_attack_to_death")]
-graph_offset = Vector2(-96, 0)
+graph_offset = Vector2(-122, -49)
 
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_ctrl"]
 
@@ -64,21 +129,18 @@ animation = &"idle"
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_walk"]
 animation = &"walk"
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_idle_to_walk"]
-xfade_time = 0.1
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_walk_to_idle"]
-xfade_time = 0.1
-
-[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_locomotion"]
-states/idle/node = SubResource("AnimationNodeAnimation_idle")
-states/idle/position = Vector2(240, 100)
-states/walk/node = SubResource("AnimationNodeAnimation_walk")
-states/walk/position = Vector2(440, 100)
-transitions = ["idle", "walk", SubResource("AnimationNodeStateMachineTransition_idle_to_walk"), "walk", "idle", SubResource("AnimationNodeStateMachineTransition_walk_to_idle")]
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_locomotion"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_idle")
+blend_point_0/pos = Vector2(0, 0)
+blend_point_1/node = SubResource("AnimationNodeAnimation_walk")
+blend_point_1/pos = Vector2(-1, 1)
+blend_point_2/node = SubResource("AnimationNodeAnimation_walk")
+blend_point_2/pos = Vector2(1, 1)
+min_space = Vector2(-1, 0)
+blend_mode = 1
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_root"]
-graph_offset = Vector2(-292, 133)
+graph_offset = Vector2(-277.30002, 194.32005)
 nodes/output/position = Vector2(680, 400)
 nodes/control_blend/node = SubResource("AnimationNodeBlend2_control")
 nodes/control_blend/position = Vector2(460, 340)
@@ -88,15 +150,12 @@ nodes/ctrl_timescale/node = SubResource("AnimationNodeTimeScale_ctrl")
 nodes/ctrl_timescale/position = Vector2(260, 560)
 nodes/loco_timescale/node = SubResource("AnimationNodeTimeScale_loco")
 nodes/loco_timescale/position = Vector2(260, 260)
-nodes/locomotion/node = SubResource("AnimationNodeStateMachine_locomotion")
+nodes/locomotion/node = SubResource("AnimationNodeBlendSpace2D_locomotion")
 nodes/locomotion/position = Vector2(-60, 260)
 node_connections = [&"output", 0, &"control_blend", &"control_blend", 0, &"loco_timescale", &"control_blend", 1, &"ctrl_timescale", &"ctrl_timescale", 0, &"control_sm", &"loco_timescale", 0, &"locomotion"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
-size = Vector2(40, 60)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
-size = Vector2(40, 56)
+size = Vector2(40.625, 44)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0, 0, 0, 1)
@@ -114,81 +173,83 @@ func on_health_changed(current_health: float, max_health: float) -> void:
 		value = current_health / max_health
 "
 
-[node name="BossBase" type="CharacterBody2D" groups=["enemy"]]
+[node name="BossBase" type="CharacterBody2D" unique_id=1894661243 groups=["enemy"]]
 collision_layer = 8
 collision_mask = 128
 script = ExtResource("1_bossbase")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1335177902]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=726189404]
 shape = SubResource("RectangleShape2D_floor")
 
-[node name="DamageNumbersAnchor" type="Node2D" parent="."]
-position = Vector2(0, -40)
+[node name="DamageNumbersAnchor" type="Node2D" parent="." unique_id=1984785107]
+position = Vector2(0, -26)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1457446831]
+libraries/ = SubResource("AnimationLibrary_main")
 
-[node name="AnimationTree" type="AnimationTree" parent="."]
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=1779687543]
 tree_root = SubResource("AnimationNodeBlendTree_root")
 anim_player = NodePath("../AnimationPlayer")
 parameters/control_blend/blend_amount = 0.0
 parameters/ctrl_timescale/scale = 1.0
 parameters/loco_timescale/scale = 1.0
+parameters/locomotion/blend_position = Vector2(0, 0)
 
-[node name="HurtBoxComponent" type="Area2D" parent="."]
+[node name="HurtBoxComponent" type="Area2D" parent="." unique_id=1700227824]
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("2_hurtbox")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBoxComponent"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBoxComponent" unique_id=249948921]
 shape = SubResource("RectangleShape2D_hurtbox")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=1260646126]
 script = ExtResource("3_health")
 
-[node name="HealthBar" type="ProgressBar" parent="."]
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=786299893]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -25.0
-offset_top = -50.0
+offset_top = -32.0
 offset_right = 25.0
-offset_bottom = -44.0
+offset_bottom = -26.0
 grow_horizontal = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
 max_value = 1.0
-value = 1.0
+value = 0.5
 show_percentage = false
 script = SubResource("GDScript_boss_healthbar")
 
-[node name="BossAttackManager" type="Node" parent="."]
+[node name="BossAttackManager" type="Node" parent="." unique_id=1446838887]
 script = ExtResource("4_attackmanager")
 
-[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("init_state")]
+[node name="StateMachine" type="Node" parent="." unique_id=1612206536 node_paths=PackedStringArray("init_state")]
 script = ExtResource("5_statemachine")
 init_state = NodePath("Idle")
 
-[node name="Idle" type="Node" parent="StateMachine"]
+[node name="Idle" type="Node" parent="StateMachine" unique_id=1900817675]
 script = ExtResource("6_idle")
 
-[node name="Patrol" type="Node" parent="StateMachine"]
-script = ExtResource("7_patrol")
+[node name="Patrol" type="Node" parent="StateMachine" unique_id=1743223177]
+script = ExtResource("6_idle")
 
-[node name="Chase" type="Node" parent="StateMachine"]
-script = ExtResource("8_chase")
+[node name="Chase" type="Node" parent="StateMachine" unique_id=1179073112]
+script = ExtResource("6_idle")
 
-[node name="Circle" type="Node" parent="StateMachine"]
-script = ExtResource("9_circle")
+[node name="Circle" type="Node" parent="StateMachine" unique_id=701299608]
+script = ExtResource("6_idle")
 
-[node name="Attack" type="Node" parent="StateMachine"]
-script = ExtResource("10_attack")
+[node name="Attack" type="Node" parent="StateMachine" unique_id=112510037]
+script = ExtResource("6_idle")
 
-[node name="Retreat" type="Node" parent="StateMachine"]
-script = ExtResource("11_retreat")
+[node name="Retreat" type="Node" parent="StateMachine" unique_id=2022250956]
+script = ExtResource("6_idle")
 
-[node name="Stun" type="Node" parent="StateMachine"]
-script = ExtResource("12_stun")
+[node name="Stun" type="Node" parent="StateMachine" unique_id=767657071]
+script = ExtResource("6_idle")
 
 [connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

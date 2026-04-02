@@ -7,7 +7,7 @@ func _init():
 	random_direction = false
 	enable_player_detection = true
 	next_state_on_timeout = "idle"
-	enable_sprite_flip = false  # 由主脚本 _physics_process 处理
+	enable_sprite_flip = true
 
 func enter() -> void:
 	# 随机选择左或右方向

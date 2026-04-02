@@ -21,7 +21,7 @@ func physics_process_state(_delta: float) -> void:
 	if distance <= boss.attack_range and boss.attack_cooldown <= 0:
 		# 从攻击池选择
 		var mgr := get_attack_manager()
-		var entry := mgr.pick_attack() if mgr else {}
+		var entry: Dictionary = mgr.pick_attack() if mgr else {}
 		var mode: String = entry.get("mode", "cleave")
 		if mode == "slam":
 			transitioned.emit(self, "slam")
@@ -32,7 +32,9 @@ func physics_process_state(_delta: float) -> void:
 		return
 
 	var ds := boss as DemonSlime
-	var direction := (target_node.global_position - boss.global_position).normalized()
+	if not ds or not target_node:
+		return
+	var direction: Vector2 = (target_node.global_position - boss.global_position).normalized()
 	boss.velocity = direction * ds.move_speed
 	set_locomotion(Vector2(direction.x, 1.0))
 

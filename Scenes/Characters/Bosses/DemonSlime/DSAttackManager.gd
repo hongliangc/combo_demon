@@ -46,13 +46,21 @@ func _get_cleave_radius() -> float:
 		return 260.0
 	return 200.0
 
-func _execute_combo_entry(entry: Dictionary) -> void:
-	var factory_name: String = entry.get("factory", "")
+func _execute_combo_entry(_entry: Dictionary) -> void:
 	# combo 通过状态序列执行，由状态机驱动
 	pass
 
+## DemonSlime 组合技数据（使用 Dictionary 数组，不依赖 BossComboAttack.AttackStep）
+class DSCombo:
+	var combo_name: String
+	var steps: Array[Dictionary] = []
+
+	func _init(_name: String, _steps: Array[Dictionary]) -> void:
+		combo_name = _name
+		steps = _steps
+
 ## 组合技工厂
-static func resolve_ds_combo(factory_name: String) -> BossComboAttack:
+static func resolve_ds_combo(factory_name: String) -> Variant:
 	match factory_name:
 		"earthquake": return _create_earthquake()
 		"devastation": return _create_devastation()
@@ -60,32 +68,23 @@ static func resolve_ds_combo(factory_name: String) -> BossComboAttack:
 	return null
 
 ## 大地震颤: cleave(fan) → 0.3s → cleave(fan, 反方向)
-static func _create_earthquake() -> BossComboAttack:
-	var combo := BossComboAttack.new()
-	combo.combo_name = "earthquake"
-	combo.steps = [
+static func _create_earthquake() -> DSCombo:
+	return DSCombo.new("earthquake", [
 		{"type": "attack", "mode": "cleave", "params": {"direction": "forward"}, "delay": 0.0},
 		{"type": "attack", "mode": "cleave", "params": {"direction": "backward"}, "delay": 0.3},
-	]
-	return combo
+	])
 
 ## 毁灭重压: slam(ring) → 0.5s → cleave(fan, 加大范围)
-static func _create_devastation() -> BossComboAttack:
-	var combo := BossComboAttack.new()
-	combo.combo_name = "devastation"
-	combo.steps = [
+static func _create_devastation() -> DSCombo:
+	return DSCombo.new("devastation", [
 		{"type": "attack", "mode": "slam", "delay": 0.0},
 		{"type": "attack", "mode": "cleave", "params": {"radius_multiplier": 1.3}, "delay": 0.5},
-	]
-	return combo
+	])
 
 ## 灭世连击: cleave → cleave → slam(加大范围)
-static func _create_annihilation() -> BossComboAttack:
-	var combo := BossComboAttack.new()
-	combo.combo_name = "annihilation"
-	combo.steps = [
+static func _create_annihilation() -> DSCombo:
+	return DSCombo.new("annihilation", [
 		{"type": "attack", "mode": "cleave", "delay": 0.0},
 		{"type": "attack", "mode": "cleave", "delay": 0.2},
 		{"type": "attack", "mode": "slam", "params": {"radius_multiplier": 1.3}, "delay": 0.2},
-	]
-	return combo
+	])

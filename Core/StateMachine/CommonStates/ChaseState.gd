@@ -16,9 +16,9 @@ func _init():
 
 # ============ 距离设置 ============
 @export_group("距离设置")
-## 攻击范围（优先使用 owner.follow_radius）
+## 攻击范围（优先使用 owner.attack_activation_radius）
 @export var default_attack_range := 50.0
-## 放弃追击范围（优先使用 owner.chase_radius）
+## 放弃追击范围（优先使用 owner.chase_abandon_distance）
 @export var default_give_up_range := 300.0
 
 # ============ 状态转换 ============
@@ -44,8 +44,8 @@ func physics_process_state(_delta: float) -> void:
 		return
 
 	# 从 owner 获取参数
-	var give_up_range: float = get_owner_property("chase_radius", default_give_up_range)
-	var attack_range: float = get_owner_property("follow_radius", default_attack_range)
+	var give_up_range: float = get_owner_property("chase_abandon_distance", default_give_up_range)
+	var attack_range: float = get_owner_property("attack_activation_radius", default_attack_range)
 	var speed: float = get_owner_property("chase_speed", default_chase_speed)
 	var distance = get_distance_to_target()
 
@@ -55,24 +55,22 @@ func physics_process_state(_delta: float) -> void:
 		return
 
 	# 检查特殊技能（冷却完成 + 概率）
-	var ss := state_machine.states.get("specialskill") as SpecialSkillState
+	var ss := state_machine.states.get(StateNames.SPECIALSKILL) as SpecialSkillState
 	if ss and ss.can_trigger(distance):
-		transition_to("specialskill")
+		transition_to(StateNames.SPECIALSKILL)
 		return
 
 	# 进入攻击范围
 	if distance <= attack_range:
-		transition_to(attack_state_name)
+		var target_state := _on_reached_attack_range()
+		if target_state != "":
+			transition_to(target_state)
 		return
 
 	# 移动向目标
 	move_toward_target(speed)
 
-	# 翻转精灵
-	if enable_sprite_flip:
-		update_sprite_facing()
-
-	# 更新 AnimationTree 的 locomotion 混合
+	# 更新 AnimationTree 的 locomotion 混合（BlendSpace2D 已处理方向）
 	_update_animation_locomotion()
 
 
@@ -98,3 +96,9 @@ func _update_animation_locomotion() -> void:
 	var blend_pos = Vector2(blend_x, blend_y)
 	set_locomotion(blend_pos)
 	#print("[ANIMATION] Chase speed=%.1f blend_x=%.1f blend_y=%.2f" % [speed, blend_x, blend_y])
+
+
+## 到达攻击范围时的状态选择（子类可重写）
+## 默认返回 attack_state_name（通常是 "attack"）
+func _on_reached_attack_range() -> String:
+	return attack_state_name

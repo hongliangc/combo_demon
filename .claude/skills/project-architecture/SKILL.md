@@ -89,3 +89,11 @@ Main.tscn 加载
 | 完整信号链路图、时序图、Autoload 信号列表 | `references/data-flow.md` |
 | 核心类速查（类名→路径→职责→API→依赖） | `references/module-registry.md` |
 | 场景模板、类图、AnimationTree 分层动画、状态流转图 | `references/scene-templates.md` |
+
+### 独立架构文档（docs/）
+
+| 需要了解 | 文档 |
+|---------|------|
+| 总索引 + 新人路线 + 所有文档/skill 导航 | `docs/ARCHITECTURE.md` |
+| mermaid 类图（角色/状态机/组件/Resource/Autoload） | `docs/class-diagrams.md` |
+| mermaid 架构图（分层/伤害时序/状态流转/Boss 阶段/AnimationTree） | `docs/architecture-diagrams.md` |

@@ -3,6 +3,20 @@ class_name CyclopsAttackManager
 
 ## Cyclops Boss 攻击管理器 — 弹幕/激光/AOE/连击
 
+# ============ Combo 工厂查找 ============
+
+## 将字符串工厂名解析为 Callable（Cyclops 专用连击）
+static func resolve_combo_factory(factory_name: String) -> Callable:
+	match factory_name:
+		"create_triple_shot": return BossComboAttack.create_triple_shot
+		"create_fan_spiral": return BossComboAttack.create_fan_spiral
+		"create_laser_shockwave": return BossComboAttack.create_laser_shockwave
+		"create_spiral_aoe": return BossComboAttack.create_spiral_aoe
+		"create_laser_barrage": return BossComboAttack.create_laser_barrage
+		"create_ultimate_combo": return BossComboAttack.create_ultimate_combo
+		"create_double_spiral": return BossComboAttack.create_double_spiral
+	return Callable()
+
 @export var projectile_scene: PackedScene
 @export var laser_scene: PackedScene
 @export var aoe_scene: PackedScene
@@ -34,7 +48,7 @@ func _execute_attack(entry: Dictionary, _target_pos: Vector2) -> void:
 			if factory is Callable:
 				callable = factory
 			elif factory is String:
-				callable = BossState._resolve_combo_factory(factory)
+				callable = CyclopsAttackManager.resolve_combo_factory(factory)
 			if callable.is_valid():
 				var combo: BossComboAttack = callable.call()
 				if combo:
@@ -110,6 +124,8 @@ func fire_spiral_projectiles(count: int = 16, angle_offset: float = 0.0) -> void
 
 func spawn_projectile(angle: float) -> void:
 	var boss := _get_boss()
+	if not boss:
+		return
 	var projectile = projectile_scene.instantiate()
 	get_tree().root.add_child(projectile)
 	projectile.global_position = boss.global_position

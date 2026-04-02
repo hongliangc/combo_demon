@@ -40,11 +40,13 @@ func physics_process_state(_delta: float) -> void:
 	var distance_factor := (distance - desired_distance) / 100.0
 
 	# 组合切向和径向运动
-	_boss.velocity = (tangent + radial * distance_factor).normalized() * cyclops.move_speed * circle_speed_multiplier
+	var move_dir := (tangent + radial * distance_factor).normalized()
+	_boss.velocity = move_dir * cyclops.move_speed * circle_speed_multiplier
+	set_locomotion(Vector2(move_dir.x, 0.8))
 
 	# 随机改变绕圈方向
 	if randf() < 0.01:
 		cyclops.circle_direction *= -1
 
 func exit():
-	pass
+	set_locomotion(Vector2.ZERO)

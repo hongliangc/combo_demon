@@ -129,12 +129,16 @@ func create_effects(body: CharacterBody2D, face_direction: Vector2) -> void:
 	# 使用 call_deferred 避免 "Parent node is busy" 错误
 	body.get_parent().call_deferred("add_child", _current_vortex)
 	await owner_node.get_tree().process_frame
+	if not is_instance_valid(owner_node) or not is_instance_valid(_current_vortex):
+		return
 	_current_vortex.global_position = _gather_position
 	_current_vortex.show_vortex()
 	DebugConfig.debug("特殊攻击: 漩涡特效，聚集位置 %v" % [_gather_position], "", "effect")
 
 	# 等待漩涡出现动画
 	await owner_node.get_tree().create_timer(0.2).timeout
+	if not is_instance_valid(owner_node):
+		return
 
 # ============ Phase 2: 检测敌人 ============
 ## 检测扇形范围内的敌人，返回是否有敌人
@@ -166,6 +170,8 @@ func gather_enemies() -> void:
 
 	# 等待所有聚集完成
 	await owner_node.get_tree().create_timer(gather_duration).timeout
+	if not is_instance_valid(owner_node):
+		return
 	DebugConfig.debug("特殊攻击: 聚集完成", "", "combat")
 
 # ============ Phase 4: 残影冲刺到目标位置 ============
@@ -193,6 +199,8 @@ func dash_to_target(body: CharacterBody2D) -> void:
 
 	# 等待移动完成
 	await tween.finished
+	if not is_instance_valid(owner_node) or not is_instance_valid(body):
+		return
 
 	# 停止残影效果
 	if after_image_effect:
@@ -253,6 +261,8 @@ func _perform_camera_and_gather_sequence(enemies: Array, vortex_pos: Vector2) ->
 		initial_tween.set_trans(Tween.TRANS_CUBIC)
 		initial_tween.tween_property(camera, "global_position", vortex_pos, camera_to_vortex_duration)
 		await initial_tween.finished
+		if not is_instance_valid(owner_node) or not is_instance_valid(camera):
+			return
 
 	# ========== 开启子弹时间 ==========
 	if enable_bullet_time:
@@ -287,17 +297,25 @@ func _perform_camera_and_gather_sequence(enemies: Array, vortex_pos: Vector2) ->
 
 		# 等待聚集完成（使用 process_always=true 忽略时间缩放，保持实际1秒）
 		await owner_node.get_tree().create_timer(gather_time_per_enemy, true, false, true).timeout
+		if not is_instance_valid(owner_node):
+			if enable_bullet_time:
+				_end_bullet_time()
+			return
 
 	# ========== 关闭子弹时间 ==========
 	if enable_bullet_time:
 		_end_bullet_time()
 
 	# 所有敌人聚集完成后，镜头从漩涡平滑切换到玩家
+	if not is_instance_valid(body) or not is_instance_valid(camera):
+		return
 	var final_tween = camera.create_tween()
 	final_tween.set_ease(Tween.EASE_IN_OUT)
 	final_tween.set_trans(Tween.TRANS_CUBIC)
 	final_tween.tween_property(camera, "global_position", body.global_position, camera_to_player_duration)
 	await final_tween.finished
+	if not is_instance_valid(camera):
+		return
 
 	# 镜头序列完成
 	camera.camera_sequence_finished.emit()
@@ -309,6 +327,8 @@ func _perform_camera_and_gather_sequence(enemies: Array, vortex_pos: Vector2) ->
 		zoom_tween.set_trans(Tween.TRANS_QUAD)
 		zoom_tween.tween_property(camera, "zoom", camera.get_saved_zoom(), 0.2)
 		await zoom_tween.finished
+		if not is_instance_valid(camera):
+			return
 
 	camera.is_transitioning = false
 	camera.camera_restored.emit()

@@ -20,7 +20,7 @@ func enter() -> void:
 	_anim_tree_ref = get_anim_tree()
 
 	# 侧向闪避（垂直于面向玩家的方向）
-	var to_player := (target_node.global_position - boss.global_position).normalized()
+	var to_player: Vector2 = (target_node.global_position - boss.global_position).normalized()
 	_roll_direction = Vector2(-to_player.y, to_player.x)
 	if randf() > 0.5:
 		_roll_direction = -_roll_direction
@@ -34,7 +34,9 @@ func physics_process_state(_delta: float) -> void:
 	if boss:
 		boss.velocity = _roll_direction * roll_speed
 
-func _on_roll_finished(_anim_name: StringName) -> void:
+func _on_roll_finished(anim_name: StringName) -> void:
+	if anim_name != &"roll":
+		return
 	var boss := get_boss()
 	if boss:
 		boss.velocity = Vector2.ZERO

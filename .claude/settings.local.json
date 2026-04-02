@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(choco --version:*)",
@@ -73,7 +76,18 @@
       "mcp__filesystem__directory_tree",
       "mcp__filesystem__search_files",
       "Bash(\"E:/workspace/4.godot/combo_demon/.gutconfig.json\":*)",
-      "Bash(\"E:/workspace/4.godot/combo_demon/test/unit/test_damage_system.gd\":*)"
+      "Bash(\"E:/workspace/4.godot/combo_demon/test/unit/test_damage_system.gd\":*)",
+      "mcp__filesystem__list_directory_with_sizes",
+      "Bash(cd:*)",
+      "Read(//c//**)",
+      "Read(//e/workspace/4.godot/**)",
+      "Bash(reg query:*)",
+      "Read(//c/Users/ivan/AppData/Local/Godot//**)",
+      "Read(//d/devtool/**)",
+      "Bash(cmd.exe /c 'where godot')",
+      "Bash(__NEW_LINE_bf926e21757238f2__ echo:*)",
+      "mcp__filesystem__list_allowed_directories",
+      "mcp__godot__get_project_info"
     ],
     "deny": [],
     "ask": []

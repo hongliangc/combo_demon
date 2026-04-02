@@ -144,3 +144,46 @@
 1. 如果技能不应被打断：设置 `priority = StatePriority.CONTROL`
 2. 如果可以被打断但需要清理：在 `exit()` 中清理技能状态
 3. 注意：设为 CONTROL 后，hit/stun 也无法打断，需要权衡
+
+---
+
+## 空引用 / 节点问题
+
+### await 后 self 已被释放
+**原因**：await 异步期间节点被 `queue_free()` 销毁，后续代码访问已释放对象。
+**修复**：
+1. 在每个 await 之后添加 `if not is_instance_valid(self): return`
+2. 高风险位置：`_handle_death()`, `execute_skill()`, combo await 链
+3. 同样检查 `owner_node` 和 `target_node` 的有效性
+
+### @onready 变量为 null
+**原因**：节点路径错误、节点名称拼写错误、或场景树中缺少该节点。
+**修复**：
+1. 检查 .tscn 中节点名称是否与代码中的 `$NodeName` 或 `%UniqueNode` 匹配
+2. 确认节点存在于场景树中（不是被意外删除）
+3. 注意 Inherited Scene 中的覆盖问题
+
+### 信号未连接 / 连接重复
+**原因**：代码中 `.connect()` 调用位置错误或被多次执行。
+**修复**：
+1. 优先在编辑器中连接信号（Inspector → Node → Signals）
+2. 代码连接时用 `if not signal.is_connected(callable): signal.connect(callable)`
+3. 在 `exit()` 中 disconnect 的信号必须在 `enter()` 中重新 connect
+
+---
+
+## 关卡 / UI 问题
+
+### 场景切换后旧引用报错
+**原因**：切换场景后，旧场景节点被释放，但 Autoload 或 Timer 仍持有引用。
+**修复**：
+1. 在场景退出时（`_exit_tree()`）清理所有外部引用
+2. Timer 在 `_exit_tree()` 中停止
+3. Autoload 中不要缓存场景内节点引用
+
+### UI 层级遮挡
+**原因**：UIManager 的 CanvasLayer 排序问题。
+**修复**：
+1. 确认面板添加到正确的 UILayer（GAME=10, MENU=20, POPUP=30）
+2. 检查 CanvasLayer.layer 值
+3. 检查是否有 z_index 覆盖

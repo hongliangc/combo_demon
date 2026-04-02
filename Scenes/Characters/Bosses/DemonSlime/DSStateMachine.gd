@@ -1,4 +1,5 @@
 extends BossStateMachine
+class_name DSStateMachine
 
 ## DemonSlime 状态机 — 阶段路由
 

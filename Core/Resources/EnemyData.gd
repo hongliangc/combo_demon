@@ -22,8 +22,8 @@ class_name EnemyData
 
 @export_group("Chase")
 @export var detection_radius := 100.0
-@export var chase_radius := 200.0
-@export var follow_radius := 25.0
+@export var chase_abandon_distance := 200.0
+@export var attack_activation_radius := 25.0
 @export var chase_speed := 75
 
 @export_group("Physics")
@@ -35,6 +35,6 @@ func debug_print() -> void:
 	print("========== EnemyData ==========")
 	print("Health: %d / %d" % [health, max_health])
 	print("Wander: speed=%.1f time=%.1f~%.1f" % [wander_speed, min_wander_time, max_wander_time])
-	print("Chase: speed=%d detect=%.1f chase=%.1f follow=%.1f" % [chase_speed, detection_radius, chase_radius, follow_radius])
+	print("Chase: speed=%d detect=%.1f abandon=%.1f activation=%.1f" % [chase_speed, detection_radius, chase_abandon_distance, attack_activation_radius])
 	print("Physics: gravity=%s (%.1f)" % [has_gravity, gravity])
 	print("===============================")

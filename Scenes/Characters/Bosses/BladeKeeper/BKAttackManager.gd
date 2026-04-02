@@ -15,7 +15,42 @@ class_name BKAttackManager
 const MAX_TRAPS := 3
 var _active_traps: Array[Node] = []
 
-func _execute_attack(entry: Dictionary, target_pos: Vector2) -> void:
+func _ready() -> void:
+	# 如果编辑器没有配置 damage，使用代码默认值
+	_setup_default_damage()
+	# 如果编辑器没有配置 phase_configs，使用代码默认值
+	if phase_configs.is_empty():
+		_setup_default_phases()
+
+func _setup_default_damage() -> void:
+	if not melee_damage:
+		melee_damage = Damage.new()
+		melee_damage.amount = 15.0
+		melee_damage.min_amount = 12.0
+		melee_damage.max_amount = 18.0
+	if not projectile_damage:
+		projectile_damage = Damage.new()
+		projectile_damage.amount = 20.0
+		projectile_damage.min_amount = 16.0
+		projectile_damage.max_amount = 24.0
+	if not trap_damage:
+		trap_damage = Damage.new()
+		trap_damage.amount = 25.0
+		trap_damage.min_amount = 20.0
+		trap_damage.max_amount = 30.0
+		var stun_eff := StunEffect.new()
+		stun_eff.stun_duration = 1.0
+		trap_damage.effects.append(stun_eff)
+	if not special_damage:
+		special_damage = Damage.new()
+		special_damage.amount = 35.0
+		special_damage.min_amount = 30.0
+		special_damage.max_amount = 40.0
+		var kb_eff := KnockBackEffect.new()
+		kb_eff.knockback_force = 300.0
+		special_damage.effects.append(kb_eff)
+
+func _execute_attack(entry: Dictionary, _target_pos: Vector2) -> void:
 	var mode: String = entry.get("mode", "")
 	match mode:
 		"attack":
@@ -115,3 +150,46 @@ static func _create_ultimate_chain() -> Dictionary:
 			{"state": "sp_atk", "delay": 0.3},
 		]
 	}
+
+## ============ 默认阶段配置 ============
+func _setup_default_phases() -> void:
+	# Phase 1: 基础近战 + 偶尔防御
+	var p1 := BossPhaseConfig.new()
+	p1.cooldown = 1.5
+	p1.attacks = [
+		{"mode": "attack", "weight": 5},
+		{"mode": "defend", "weight": 2},
+		{"mode": "roll_projectile", "weight": 1},
+	]
+	phase_configs[BossBase.Phase.PHASE_1] = p1
+
+	# Phase 2: 加入翻滚/陷阱 + 组合技
+	var p2 := BossPhaseConfig.new()
+	p2.cooldown = 1.2
+	p2.attacks = [
+		{"mode": "attack", "weight": 4},
+		{"mode": "defend", "weight": 2},
+		{"mode": "roll_projectile", "weight": 2},
+		{"mode": "roll_trap", "weight": 2},
+		{"mode": "special", "weight": 1},
+		{"mode": "combo", "factory": "blade_storm", "weight": 1},
+		{"mode": "combo", "factory": "shadow_strike", "weight": 1},
+	]
+	phase_configs[BossBase.Phase.PHASE_2] = p2
+
+	# Phase 3: 全技能解锁 + 更激进
+	var p3 := BossPhaseConfig.new()
+	p3.cooldown = 0.8
+	p3.attacks = [
+		{"mode": "attack", "weight": 3},
+		{"mode": "defend", "weight": 1},
+		{"mode": "roll_projectile", "weight": 2},
+		{"mode": "roll_trap", "weight": 2},
+		{"mode": "special", "weight": 2},
+		{"mode": "combo", "factory": "blade_storm", "weight": 2},
+		{"mode": "combo", "factory": "shadow_strike", "weight": 2},
+		{"mode": "combo", "factory": "ultimate_chain", "weight": 1},
+	]
+	phase_configs[BossBase.Phase.PHASE_3] = p3
+
+	DebugConfig.debug("[BKAttackManager] 默认阶段配置已加载 (3 phases)", "", "combat")

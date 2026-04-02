@@ -5,12 +5,14 @@ class_name StunState
 ## 控制层最高优先级，不可被打断
 ## 支持眩晕期间的物理模拟
 
+const KNOCKBACK_SPEED_THRESHOLD := 10.0
+
 func _init():
 	priority = StatePriority.CONTROL
 	can_be_interrupted = false
 	animation_state = "stunned"
 	# 眩晕恢复后默认进入 wander
-	default_state_name = "wander"
+	default_state_name = StateNames.WANDER
 
 # ============ 眩晕设置 ============
 @export_group("眩晕设置")
@@ -30,7 +32,7 @@ func enter() -> void:
 	# 如果没有击退，立即停止移动
 	if owner_node is CharacterBody2D:
 		var body = owner_node as CharacterBody2D
-		var has_knockback = body.velocity.length() > 10.0
+		var has_knockback = body.velocity.length() > KNOCKBACK_SPEED_THRESHOLD
 		if not has_knockback:
 			stop_movement()
 
@@ -58,7 +60,7 @@ func physics_process_state(delta: float) -> void:
 
 	# 眩晕期间保持静止（除非有击退效果正在应用）
 	# 检查是否有击退速度（由 KnockBackEffect 设置）
-	var has_knockback = body.velocity.length() > 10.0
+	var has_knockback = body.velocity.length() > KNOCKBACK_SPEED_THRESHOLD
 	if has_knockback:
 		# 应用摩擦力让击退自然减速
 		body.velocity = body.velocity.lerp(Vector2.ZERO, knockback_friction * delta)
@@ -81,7 +83,16 @@ func exit() -> void:
 	if "stunned" in owner_node:
 		owner_node.stunned = false
 
+	# 子类钩子（如设置眩晕免疫）
+	_on_stun_exit()
+
 	DebugConfig.debug("眩晕: %s 结束" % owner_node.name, "", "state_machine")
+
+
+## 眩晕退出钩子（子类可重写）
+## 用于设置眩晕免疫等 Boss 特有逻辑
+func _on_stun_exit() -> void:
+	pass
 
 
 ## 受到伤害时的回调 - 重置眩晕时间

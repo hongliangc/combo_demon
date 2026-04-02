@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://enemy_bear00001"]
+[gd_scene format=3 uid="uid://dbpf2ynq77ulh"]
 
 [ext_resource type="PackedScene" uid="uid://bbpsfxynbhnpn" path="res://Scenes/Characters/Templates/EnemyBase.tscn" id="1_base"]
 [ext_resource type="Texture2D" uid="uid://ug1ea3rvyytg" path="res://Assets/Art/Ninja_Adventure/Actor/Monsters/Bear/SpriteSheet.png" id="2_texture"]
@@ -18,7 +18,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [0]
 }
-
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
@@ -31,7 +30,6 @@ tracks/1/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1)]
 }
-
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
@@ -44,7 +42,6 @@ tracks/2/keys = {
 "update": 0,
 "values": [0.0]
 }
-
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
@@ -57,7 +54,6 @@ tracks/3/keys = {
 "update": 0,
 "values": [Vector2(0, 0)]
 }
-
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
@@ -70,7 +66,6 @@ tracks/4/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1)]
 }
-
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
@@ -116,7 +111,6 @@ tracks/0/keys = {
 "update": 1,
 "values": [0, 4, 8, 12]
 }
-
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
@@ -129,7 +123,6 @@ tracks/1/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
-
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
@@ -142,7 +135,6 @@ tracks/2/keys = {
 "update": 0,
 "values": [0.0, 6.28319]
 }
-
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
@@ -155,7 +147,6 @@ tracks/3/keys = {
 "update": 0,
 "values": [Vector2(0, 0), Vector2(0, -14)]
 }
-
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
@@ -168,7 +159,6 @@ tracks/4/keys = {
 "update": 1,
 "values": [true]
 }
-
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
@@ -181,7 +171,6 @@ tracks/5/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
-
 tracks/6/type = "method"
 tracks/6/imported = false
 tracks/6/enabled = true
@@ -345,50 +334,51 @@ radius = 8.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
 radius = 8.0
 
-[node name="Bear" instance=ExtResource("1_base")]
+[node name="Bear" unique_id=680662468 instance=ExtResource("1_base")]
 scale = Vector2(2, 2)
 collision_mask = 129
 min_wander_time = 3.0
 max_wander_time = 8.0
 wander_speed = 25.0
 detection_radius = 130.0
-follow_radius = 25.0
 chase_speed = 55
-max_health = 100
-health = 100
+
+[node name="AnimationPlayer" parent="." index="1" unique_id=1378411187]
+libraries/ = SubResource("AnimationLibrary_bear")
+
+[node name="HurtBoxComponent" parent="." index="3" unique_id=1540730912]
+position = Vector2(0, 8)
+
+[node name="CollisionShape2D" parent="HurtBoxComponent" index="0" unique_id=318857879]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_hurtbox")
+
+[node name="FloorCollision" parent="." index="4" unique_id=458168996]
+shape = SubResource("CircleShape2D_floor")
+
+[node name="Attack" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="3" unique_id=1291631262]
+script = ExtResource("3_attack")
+skill_probability = 0.2
+slam_radius = 80.0
+slam_damage = 18.0
+slam_knockback = 280.0
+
+[node name="HitBoxComponent" parent="." index="7" unique_id=764109139]
+position = Vector2(0, 8)
+
+[node name="CollisionShape2D" parent="HitBoxComponent" index="0" unique_id=733792945]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_hitbox")
+
+[node name="HealthBar" parent="." index="8" unique_id=553338694]
+offset_top = -14.0
+offset_bottom = -10.0
+metadata/_edit_use_anchors_ = true
+
+[node name="DamageNumbersAnchor" parent="." index="9" unique_id=578664619]
+position = Vector2(0, -3)
 
 [node name="Sprite2D" parent="." index="0"]
 texture = ExtResource("2_texture")
 hframes = 4
 vframes = 4
-
-[node name="AnimationPlayer" parent="." index="1"]
-libraries/ = SubResource("AnimationLibrary_bear")
-
-[node name="HurtBoxComponent" parent="." index="3"]
-position = Vector2(0, 8)
-
-[node name="CollisionShape2D" parent="HurtBoxComponent" index="0"]
-position = Vector2(0, -8)
-shape = SubResource("CircleShape2D_hurtbox")
-
-[node name="FloorCollision" parent="." index="4"]
-shape = SubResource("CircleShape2D_floor")
-
-[node name="HitBoxComponent" parent="." index="7"]
-position = Vector2(0, 8)
-
-[node name="CollisionShape2D" parent="HitBoxComponent" index="0"]
-position = Vector2(0, -8)
-shape = SubResource("CircleShape2D_hitbox")
-
-[node name="HealthBar" parent="." index="8"]
-offset_top = -14.0
-offset_bottom = -10.0
-metadata/_edit_use_anchors_ = true
-
-[node name="DamageNumbersAnchor" parent="." index="9"]
-position = Vector2(0, -3)
-
-[node name="Attack" parent="EnemyStateMachine"]
-script = ExtResource("3_attack")

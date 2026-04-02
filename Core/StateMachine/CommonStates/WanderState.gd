@@ -72,11 +72,7 @@ func physics_process_state(_delta: float) -> void:
 		body.velocity = wander_direction * speed
 		body.move_and_slide()
 
-		# 翻转精灵
-		if enable_sprite_flip:
-			update_sprite_facing()
-
-		# 更新 AnimationTree 的 locomotion 混合
+		# 更新 AnimationTree 的 locomotion 混合（BlendSpace2D 已处理方向）
 		# Wander 速度较低，blend_y 应在 0.0-0.5 之间（walk 速度）
 		var blend_x = sign(wander_direction.x) if abs(wander_direction.x) > 0.1 else 0.0
 		# 使用 chase_speed 作为最大速度参考，使 wander 显示为 walk 而不是 run

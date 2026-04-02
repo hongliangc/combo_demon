@@ -1,4 +1,5 @@
 extends BossStateMachine
+class_name BKStateMachine
 
 ## BladeKeeper 状态机 — 阶段路由
 

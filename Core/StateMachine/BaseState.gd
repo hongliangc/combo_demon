@@ -111,7 +111,7 @@ func is_target_alive() -> bool:
 
 ## 尝试转换到攻击状态（当目标在攻击范围内时跳过追击）
 func try_attack(radius: float = -1.0) -> bool:
-	var effective_radius = radius if radius > 0 else get_owner_property("follow_radius", -1.0)
+	var effective_radius = radius if radius > 0 else get_owner_property("attack_activation_radius", -1.0)
 	if effective_radius <= 0:
 		return false
 	if is_target_alive() and get_distance_to_target() <= effective_radius:
@@ -292,11 +292,10 @@ func update_sprite_facing(use_velocity: bool = true) -> void:
 	if not owner_node:
 		return
 
-	var sprite: Sprite2D = null
-	if "sprite" in owner_node and owner_node.sprite is Sprite2D:
-		sprite = owner_node.sprite
-
-	if not sprite:
+	var sprite_node: CanvasItem = null
+	if "sprite" in owner_node and owner_node.sprite is CanvasItem:
+		sprite_node = owner_node.sprite
+	if not sprite_node or not "flip_h" in sprite_node:
 		return
 
 	var direction_x: float
@@ -306,7 +305,7 @@ func update_sprite_facing(use_velocity: bool = true) -> void:
 		direction_x = get_direction_to_target().x
 
 	if abs(direction_x) > 0.1:
-		sprite.flip_h = direction_x < 0
+		sprite_node.flip_h = direction_x < 0
 
 
 ## 播放动画（如果 owner 支持）

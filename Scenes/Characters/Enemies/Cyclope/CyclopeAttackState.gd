@@ -58,7 +58,7 @@ func _release_charge() -> void:
 	if not is_instance_valid(target_node):
 		return
 	var dist: float = owner_node.global_position.distance_to(target_node.global_position)
-	var effective_range: float = get_owner_property("follow_radius", default_attack_range)
+	var effective_range: float = get_owner_property("attack_activation_radius", default_attack_range)
 	if dist > effective_range * 1.5:
 		return
 	var dmg := Damage.new()

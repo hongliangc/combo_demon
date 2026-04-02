@@ -23,7 +23,7 @@ func _on_body_entered(body: Node2D) -> void:
 	_triggered = true
 	_trigger(body)
 
-func _trigger(_body: Node2D) -> void:
+func _trigger(body: Node2D) -> void:
 	modulate.a = 1.0
 	# 通过 HurtBoxComponent 应用伤害
 	if damage_config:
@@ -31,8 +31,14 @@ func _trigger(_body: Node2D) -> void:
 		var stun_effect := ForceStunEffect.new()
 		stun_effect.duration = stun_duration
 		dmg.effects.append(stun_effect)
+		# 查找 body 上的 HurtBoxComponent 并应用伤害
+		for child in body.get_children():
+			if child.has_method("take_damage"):
+				child.take_damage(dmg, global_position)
+				break
 	await get_tree().create_timer(0.3).timeout
-	queue_free()
+	if is_instance_valid(self):
+		queue_free()
 
 func _expire() -> void:
 	if _triggered:

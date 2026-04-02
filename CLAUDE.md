@@ -33,7 +33,9 @@ DebugConfig.debug("message", "", "channel")
 
 ## Architecture (Quick Reference)
 
-> **详细架构** → 触发 `project-architecture` skill | **编码规范** → 触发 `godot-coding-standards` skill
+> **架构总索引** → `docs/ARCHITECTURE.md` | **详细架构** → 触发 `project-architecture` skill | **编码规范** → 触发 `godot-coding-standards` skill
+> **类图** → `docs/class-diagrams.md` | **架构图** → `docs/architecture-diagrams.md`
+> **重构/优化** → 触发 `feature-development` skill（已支持重构类型）
 
 **State Machine** — 三层优先级: `CONTROL(2) > REACTION(1) > BEHAVIOR(0)`。BaseStateMachine + EnemyStateMachine(BASIC/RANGED/BOSS) + 7 CommonStates。
 

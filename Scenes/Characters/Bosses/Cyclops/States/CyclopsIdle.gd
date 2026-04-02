@@ -1,16 +1,9 @@
-extends "res://Core/StateMachine/CommonStates/IdleState.gd"
+extends "res://Scenes/Characters/Bosses/Shared/BossIdleState.gd"
 
-## Boss Idle 状态 - 继承通用 IdleState
-## 基类自动从 owner 获取参数
-
-## Boss 特有配置
-@export var boss_idle_time := 2.0
-@export var boss_next_state := "patrol"
+## Cyclops Idle — 继承 BossIdleState，覆盖参数
 
 func _init():
 	super._init()
-	use_fixed_time = true
-	stop_immediately = true
 
 func _ready():
 	min_idle_time = boss_idle_time

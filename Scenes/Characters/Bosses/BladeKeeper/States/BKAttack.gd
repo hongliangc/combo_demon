@@ -22,7 +22,7 @@ func enter() -> void:
 
 	# 从攻击管理器选择攻击类型
 	var mgr := get_attack_manager()
-	var entry := mgr.pick_attack() if mgr else {}
+	var entry: Dictionary = mgr.pick_attack() if mgr else {}
 	var mode: String = entry.get("mode", "attack")
 
 	boss.attack_cooldown = mgr.get_cooldown() if mgr else 1.5
@@ -38,7 +38,8 @@ func enter() -> void:
 		transitioned.emit(self, "roll")
 		return
 	elif mode.begins_with("combo"):
-		# TODO: combo 序列由 BossComboAttack 驱动
+		# TODO: combo 序列由 BossComboAttack 驱动（暂未实现，降级为普通连击）
+		DebugConfig.debug("[BKAttack] combo 模式暂未实现，降级为普通 3 段连击", "", "combat")
 		_is_special = false
 		_current_combo_step = 0
 		enter_control_state(COMBO_ANIMS[0])
@@ -50,9 +51,14 @@ func enter() -> void:
 	if _anim_tree_ref:
 		_anim_tree_ref.animation_finished.connect(_on_animation_finished)
 
-func _on_animation_finished(_anim_name: StringName) -> void:
+func _on_animation_finished(anim_name: StringName) -> void:
 	if _is_special:
-		_finish_attack()
+		if anim_name == &"sp_atk":
+			_finish_attack()
+		return
+
+	# 只响应当前 combo 步骤的动画结束
+	if _current_combo_step < COMBO_ANIMS.size() and anim_name != COMBO_ANIMS[_current_combo_step]:
 		return
 
 	_current_combo_step += 1

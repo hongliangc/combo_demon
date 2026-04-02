@@ -46,6 +46,6 @@ func exit() -> void:
 func on_damaged(damage: Damage, _attacker_position: Vector2) -> void:
 	# 检查是否有眩晕效果（切换到控制状态）
 	if damage.has_effect("StunEffect") or damage.has_effect("ForceStunEffect"):
-		transition_to("stun")
+		transition_to(StateNames.STUN)
 		return
 	# 击退中再次被击退：叠加速度（由 Effect 处理）

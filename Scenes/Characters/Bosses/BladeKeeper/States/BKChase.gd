@@ -1,40 +1,25 @@
-extends BossState
+extends "res://Core/StateMachine/CommonStates/ChaseState.gd"
 
-## BladeKeeper Chase 状态
+## BladeKeeper Chase 状态 — 继承通用 ChaseState
+## 每次 enter 读取 Boss 参数（支持阶段变速），重写攻击冷却检查
 
-func _init() -> void:
-	priority = StatePriority.BEHAVIOR
-	can_be_interrupted = true
+func _init():
+	super._init()
+	enable_sprite_flip = true
+	give_up_state_name = "idle"
 
 func enter() -> void:
-	pass  # locomotion 由 physics_process 驱动
-
-func physics_process_state(_delta: float) -> void:
-	var boss := get_boss()
-	if not boss or not is_target_alive():
-		transitioned.emit(self, "idle")
-		return
-
-	var distance := get_distance_to_target()
-
-	if distance > boss.detection_radius:
-		transitioned.emit(self, "idle")
-		return
-
-	if distance <= boss.attack_range and boss.attack_cooldown <= 0:
-		transitioned.emit(self, "attack")
-		return
-
-	# 移动
-	var bk := boss as BladeKeeper
-	var direction := (target_node.global_position - boss.global_position).normalized()
-	boss.velocity = direction * bk.move_speed
-
-	# 更新 locomotion 动画（使用 StateMachine locomotion）
-	set_locomotion_state("walk")
-
-func exit() -> void:
-	var boss := get_boss()
+	# 每次进入 chase 时读取当前 Boss 参数（支持阶段变速）
+	var boss := owner_node as BossBase
 	if boss:
-		boss.velocity = Vector2.ZERO
-	set_locomotion_state("idle")
+		default_chase_speed = (boss as BladeKeeper).move_speed if boss is BladeKeeper else 180.0
+		default_attack_range = boss.attack_range
+		default_give_up_range = boss.detection_radius
+	super.enter()
+
+## 重写：检查攻击冷却
+func _on_reached_attack_range() -> String:
+	var boss := owner_node as BossBase
+	if boss and boss.attack_cooldown > 0:
+		return ""  # 冷却中，不转换（留在 chase）
+	return "attack"

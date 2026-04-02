@@ -1,7 +1,7 @@
 extends "res://Core/StateMachine/CommonStates/AttackState.gd"
 
 ## Enemy Attack 状态 - 使用通用 AttackState 模板
-## 简化版：AttackState 现在自动从 owner 获取参数（follow_radius）
+## 简化版：AttackState 现在自动从 owner 获取参数（attack_activation_radius）
 
 func _init():
 	super._init()

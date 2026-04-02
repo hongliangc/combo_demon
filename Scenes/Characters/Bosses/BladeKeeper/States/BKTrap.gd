@@ -14,7 +14,9 @@ func enter() -> void:
 	if _anim_tree_ref:
 		_anim_tree_ref.animation_finished.connect(_on_cast_finished)
 
-func _on_cast_finished(_anim_name: StringName) -> void:
+func _on_cast_finished(anim_name: StringName) -> void:
+	if anim_name != &"trap_cast":
+		return
 	var mgr := get_attack_manager() as BKAttackManager
 	if mgr and target_node:
 		mgr.place_trap(target_node.global_position)

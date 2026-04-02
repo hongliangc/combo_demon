@@ -4,15 +4,15 @@ extends "res://Core/StateMachine/CommonStates/ChaseState.gd"
 
 func _init():
 	super._init()
-	enable_sprite_flip = false  # 由主脚本 _physics_process 处理
+	enable_sprite_flip = true
 
 func physics_process_state(_delta: float) -> void:
 	if not is_target_alive():
 		transition_to(default_state_name)
 		return
 
-	var give_up_range: float = get_owner_property("chase_radius", default_give_up_range)
-	var attack_range: float = get_owner_property("follow_radius", default_attack_range)
+	var give_up_range: float = get_owner_property("chase_abandon_distance", default_give_up_range)
+	var attack_range: float = get_owner_property("attack_activation_radius", default_attack_range)
 	var speed: float = get_owner_property("chase_speed", default_chase_speed)
 	var distance = get_distance_to_target()
 

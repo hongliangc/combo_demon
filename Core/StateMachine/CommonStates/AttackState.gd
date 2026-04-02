@@ -59,7 +59,7 @@ func physics_process_state(delta: float) -> void:
 	# 攻击时持续面向目标（基于 direction_to_target 而非 velocity）
 	update_sprite_facing(false)
 
-	var effective_range = get_owner_property("follow_radius", default_attack_range)
+	var effective_range = get_owner_property("attack_activation_radius", default_attack_range)
 	var distance = get_distance_to_target()
 
 	if distance > effective_range:
@@ -79,9 +79,9 @@ func physics_process_state(delta: float) -> void:
 	if attack_timer <= 0:
 		attack_timer = attack_interval
 		# 检查特殊技能（Group B 独立状态，在攻击间隔时触发）
-		var ss := state_machine.states.get("specialskill") as SpecialSkillState
+		var ss := state_machine.states.get(StateNames.SPECIALSKILL) as SpecialSkillState
 		if ss and ss.can_trigger(distance):
-			transition_to("specialskill")
+			transition_to(StateNames.SPECIALSKILL)
 			return
 		perform_attack()
 

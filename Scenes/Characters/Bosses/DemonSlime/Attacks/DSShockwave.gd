@@ -30,7 +30,7 @@ func _update_collision() -> void:
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
-	var timer := get_tree().create_timer(shockwave_lifetime)
+	var timer: SceneTreeTimer = get_tree().create_timer(shockwave_lifetime)
 	timer.timeout.connect(queue_free)
 
 func _on_body_entered(body: Node2D) -> void:
@@ -40,7 +40,7 @@ func _on_body_entered(body: Node2D) -> void:
 	# 扇形模式：检查角度
 	if _mode == "fan":
 		var to_body := (body.global_position - global_position).normalized()
-		var angle_diff := abs(_fan_direction.angle_to(to_body))
+		var angle_diff: float = absf(_fan_direction.angle_to(to_body))
 		if angle_diff > _fan_angle / 2.0:
 			return  # 不在扇形范围内
 

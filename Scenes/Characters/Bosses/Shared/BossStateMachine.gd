@@ -1,4 +1,4 @@
-extends BaseStateMachine
+extends EnemyStateMachine
 class_name BossStateMachine
 
 ## 通用 Boss 状态机基类
@@ -27,6 +27,8 @@ func _on_phase_changed(new_phase: int) -> void:
 		force_transition(target_state)
 
 	await get_tree().create_timer(phase_transition_duration).timeout
+	if not is_instance_valid(self):
+		return
 	is_transitioning_phase = false
 
 ## 子类钩子：返回阶段切换时的目标状态名，空字符串表示不强制切换

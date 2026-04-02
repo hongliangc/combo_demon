@@ -28,6 +28,7 @@ func physics_process_state(_delta: float) -> void:
 	var direction := (target_patrol_point - _boss.global_position).normalized()
 	var cyclops := _boss as Cyclops
 	_boss.velocity = direction * (cyclops.move_speed if cyclops else 150.0) * patrol_speed_multiplier
+	set_locomotion(Vector2(direction.x, 0.5))
 
 	# 到达巡逻点
 	if _boss.is_at_position(target_patrol_point):
@@ -37,4 +38,4 @@ func physics_process_state(_delta: float) -> void:
 			transitioned.emit(self, "idle")
 
 func exit():
-	pass
+	set_locomotion(Vector2.ZERO)

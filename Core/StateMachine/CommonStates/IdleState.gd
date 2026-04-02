@@ -69,11 +69,17 @@ func physics_process_state(delta: float) -> void:
 func process_state(_delta: float) -> void:
 	# 检测玩家
 	if enable_player_detection:
-		# 优先检查攻击范围：在攻击范围内直接进入攻击，跳过追击
-		if try_attack():
-			return
-		if try_chase():
-			return
+		_evaluate_idle_transition()
+
+
+## 评估 Idle 状态中的转换（子类可重写）
+## 默认行为：检查攻击范围 → 检查追击范围
+func _evaluate_idle_transition() -> void:
+	# 优先检查攻击范围：在攻击范围内直接进入攻击，跳过追击
+	if try_attack():
+		return
+	if try_chase():
+		return
 
 
 func _on_idle_timeout() -> void:

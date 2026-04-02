@@ -12,7 +12,7 @@ const PHASE_SPEED := {
 
 @export var base_move_speed := 180.0
 
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 var move_speed: float:
 	get: return base_move_speed * PHASE_SPEED.get(current_phase, 1.0)

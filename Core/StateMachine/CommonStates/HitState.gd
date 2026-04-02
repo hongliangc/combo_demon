@@ -49,12 +49,12 @@ func exit() -> void:
 func on_damaged(damage: Damage, _attacker_position: Vector2) -> void:
 	# 检查是否有眩晕效果（切换到控制状态）
 	if damage.has_effect("StunEffect") or damage.has_effect("ForceStunEffect"):
-		transition_to("stun")
+		transition_to(StateNames.STUN)
 		return
 
 	# 检查是否有击退效果（切换到击退状态）
 	if damage.has_effect("KnockBackEffect") or damage.has_effect("KnockUpEffect"):
-		transition_to("knockback")
+		transition_to(StateNames.KNOCKBACK)
 		return
 
 	# 普通伤害：重置硬直时间

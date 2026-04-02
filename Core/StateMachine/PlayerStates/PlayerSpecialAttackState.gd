@@ -62,7 +62,7 @@ func _run_flow() -> void:
 
 	# Phase 1: 创建特效
 	await sm.create_effects(body, face_direction)
-	if not _flow_active:
+	if not _flow_active or not is_instance_valid(owner_node):
 		return
 
 	# Phase 2: 检测敌人
@@ -79,12 +79,12 @@ func _run_flow() -> void:
 
 	# Phase 3: 聚集敌人
 	await sm.gather_enemies()
-	if not _flow_active:
+	if not _flow_active or not is_instance_valid(owner_node):
 		return
 
 	# Phase 4: 残影冲刺
 	await sm.dash_to_target(body)
-	if not _flow_active:
+	if not _flow_active or not is_instance_valid(owner_node):
 		return
 
 	# Phase 5: 状态机驱动攻击动画
