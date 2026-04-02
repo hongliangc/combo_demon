@@ -6,16 +6,13 @@ class_name EnemyBase
 ##
 ## 使用方法:
 ##   1. 继承此类或使用 EnemyBase.tscn 模板场景
-##   2. 在 Inspector 中配置 AI 参数（或使用 EnemyData 资源）
+##   2. 在 Inspector 中配置 AI 参数
 ##   3. 重写 _on_enemy_ready() 进行敌人特定初始化
 ##   4. 精灵自动查找 AnimatedSprite2D（优先）或 Sprite2D
 ##
 ## 节点要求:
 ##   必需: HealthComponent, HurtBoxComponent, AnimationPlayer
 ##   可选: AnimationTree, EnemyStateMachine, HealthBar, DamageNumbersAnchor
-
-# ============ 数据驱动配置（可选）============
-@export var enemy_data: EnemyData = null
 
 # ============ AI 配置参数 ============
 @export_group("Wander")
@@ -33,9 +30,6 @@ class_name EnemyBase
 @export var has_gravity := false
 @export var gravity := 800.0
 
-@export_group("Animation")
-@export var use_animation_tree := true
-
 # ============ 运行时变量 ============
 var stunned: bool = false
 var can_move: bool = true  # 用于技能聚集时强制停止移动
@@ -51,16 +45,8 @@ func _on_character_ready() -> void:
 	assert(anim_player != null, "%s: missing AnimationPlayer child node" % name)
 	assert(anim_tree != null, "%s: missing AnimationTree child node" % name)
 
-	# 应用数据资源（如果配置了）
-	if enemy_data:
-		_apply_enemy_data()
-
 	# 查找精灵节点
 	_find_sprite()
-
-	# 激活 AnimationTree（可通过 use_animation_tree 关闭）
-	if anim_tree and use_animation_tree:
-		anim_tree.active = true
 
 	# 子类钩子
 	_on_enemy_ready()
@@ -73,7 +59,7 @@ func _physics_process(delta: float) -> void:
 		elif velocity.y > 0:
 			velocity.y = 0
 
-	# 自动翻转精灵朝向（仅在未使用 AnimationTree 时）
+	# 自动翻转精灵朝向（仅在 AnimationTree 未激活时）
 	# BlendSpace2D 已通过 left_walk/right_walk 处理方向，不需要额外 flip_h
 	if not (anim_tree and anim_tree.active):
 		_update_sprite_facing()
@@ -142,24 +128,6 @@ func _update_sprite_facing() -> void:
 		return
 	if "flip_h" in sprite:
 		sprite.flip_h = velocity.x < 0
-
-# ============ 数据驱动 ============
-## 从 EnemyData 资源加载配置
-func _apply_enemy_data() -> void:
-	if not enemy_data:
-		return
-
-	max_health = enemy_data.max_health
-	health = enemy_data.health
-	min_wander_time = enemy_data.min_wander_time
-	max_wander_time = enemy_data.max_wander_time
-	wander_speed = enemy_data.wander_speed
-	detection_radius = enemy_data.detection_radius
-	chase_abandon_distance = enemy_data.chase_abandon_distance
-	attack_activation_radius = enemy_data.attack_activation_radius
-	chase_speed = enemy_data.chase_speed
-	has_gravity = enemy_data.has_gravity
-	gravity = enemy_data.gravity
 
 # ============ 子类钩子 ============
 ## 敌人特定初始化（在 _on_character_ready 末尾调用）

@@ -121,24 +121,6 @@ func _create_state(script_path: String, state_name: String) -> BaseState:
 
 
 # ============ 便捷方法 ============
-## 强制进入眩晕状态
-func force_stun(duration: float = -1.0) -> void:
-	if duration > 0 and states.has("stun"):
-		var stun_state = states["stun"] as StunState
-		stun_state.stun_duration = duration
-	force_transition("stun")
-
-
-## 强制进入受击状态
-func force_hit() -> void:
-	force_transition("hit")
-
-
-## 强制进入击退状态
-func force_knockback() -> void:
-	force_transition("knockback")
-
-
 ## 检查是否处于控制状态（眩晕/冰冻）
 func is_controlled() -> bool:
 	return current_state and current_state.priority == BaseState.StatePriority.CONTROL

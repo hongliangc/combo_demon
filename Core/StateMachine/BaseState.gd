@@ -274,18 +274,6 @@ func move_toward_target(speed: float, call_move_slide: bool = true) -> void:
 			body.move_and_slide()
 
 
-## 远离目标移动
-## @param speed: 移动速度
-## @param call_move_slide: 是否调用 move_and_slide（默认 true）
-func move_away_from_target(speed: float, call_move_slide: bool = true) -> void:
-	if owner_node is CharacterBody2D:
-		var body = owner_node as CharacterBody2D
-		var direction = -get_direction_to_target()
-		body.velocity = direction * speed
-		if call_move_slide:
-			body.move_and_slide()
-
-
 ## 更新精灵朝向（根据速度或目标方向）
 ## @param use_velocity: true=根据速度方向，false=根据目标方向
 func update_sprite_facing(use_velocity: bool = true) -> void:
@@ -339,17 +327,6 @@ func can_transition_to(new_state: BaseState) -> bool:
 	# 当前状态可以主动转换到低优先级状态（自愿结束控制）
 	# 例如：StunState 结束后转换到 WanderState
 	return true
-
-
-## 获取当前状态的动画参数（子类可重写）
-## 返回用于 AnimationTree 或 AnimationHandler 的参数
-func get_animation_params() -> Dictionary:
-	return {
-		"velocity": owner_node.velocity if owner_node is CharacterBody2D else Vector2.ZERO,
-		"animation_state": animation_state,
-		"priority": priority,
-		"can_be_interrupted": can_be_interrupted
-	}
 
 
 # ============ AnimationTree 控制方法 ============
@@ -428,12 +405,6 @@ func set_control_time_scale(scale: float) -> void:
 	var tree = get_anim_tree()
 	if tree:
 		tree.set("parameters/ctrl_timescale/scale", scale)
-
-
-## 重置所有 TimeScale 为正常速度
-func reset_time_scale() -> void:
-	set_locomotion_time_scale(1.0)
-	set_control_time_scale(1.0)
 
 
 ## 切换 locomotion 状态机动画（适用于 StateMachine 类型的 locomotion 节点）

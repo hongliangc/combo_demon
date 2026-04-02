@@ -55,10 +55,6 @@ var current_patrol_index := 0
 @onready var anim_tree: AnimationTree = $AnimationTree if has_node("AnimationTree") else null
 
 func _on_character_ready() -> void:
-	# 激活 AnimationTree
-	if anim_tree:
-		anim_tree.active = true
-
 	# 监听生命值变化以检查阶段转换
 	if health_component:
 		health_component.health_changed.connect(_on_health_changed)
