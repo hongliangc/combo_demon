@@ -237,6 +237,50 @@ func decide_next_state() -> void:
 		transition_to(default_state_name)
 
 
+## 统一距离决策：根据 owner 类型和距离选择下一个状态
+## Boss: 考虑 attack_range, min_distance, detection_radius, attack_cooldown
+## Enemy: 考虑 detection_radius + attack_activation_radius
+## @return 推荐的状态名
+func evaluate_transition() -> String:
+	if not is_target_alive():
+		return _resolve_eval_state("patrol", default_state_name)
+
+	var distance := get_distance_to_target()
+	var config := _get_config()
+
+	# Boss 决策路径
+	if owner_node is BossBase:
+		var boss := owner_node as BossBase
+		var det_radius := config.detection_radius if config and config.is_boss else boss.detection_radius
+		var atk_range := config.attack_range if config and config.is_boss else boss.attack_range
+		var min_dist := config.min_distance if config and config.is_boss else boss.min_distance
+
+		if distance > det_radius:
+			return _resolve_eval_state("patrol", default_state_name)
+		if distance < min_dist:
+			return _resolve_eval_state("retreat", chase_state_name)
+		if distance <= atk_range and boss.attack_cooldown <= 0:
+			return _resolve_eval_state("attack", default_state_name)
+		return _resolve_eval_state("circle", chase_state_name)
+
+	# Enemy 决策路径
+	var det_radius := config.detection_radius if config else get_owner_property("detection_radius", detection_radius)
+	var atk_radius := config.attack_activation_radius if config else get_owner_property("attack_activation_radius", -1.0)
+
+	if atk_radius > 0 and distance <= atk_radius:
+		return _resolve_eval_state("attack", default_state_name)
+	if distance <= det_radius:
+		return chase_state_name
+	return default_state_name
+
+
+## 检查首选状态是否存在，fallback 到备选
+func _resolve_eval_state(preferred: String, fallback: String) -> String:
+	if state_machine and state_machine.states.has(preferred):
+		return preferred
+	return fallback
+
+
 ## 安全的状态转换（检查目标状态是否存在）
 func transition_to(state_name: String) -> bool:
 	if state_machine and state_machine.states.has(state_name.to_lower()):
@@ -308,6 +352,14 @@ func get_owner_property(property_name: String, default_value: Variant) -> Varian
 	if owner_node and property_name in owner_node:
 		return owner_node.get(property_name)
 	return default_value
+
+
+## 获取 owner 的 BehaviorConfig（如果有）
+## CommonStates 使用此方法获取配置，优先级: config > owner property > @export default
+func _get_config() -> BehaviorConfig:
+	if owner_node and "behavior_config" in owner_node:
+		return owner_node.behavior_config
+	return null
 
 # ============ 状态优先级方法 ============
 ## 检查是否可以转换到目标状态
