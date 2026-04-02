@@ -25,7 +25,10 @@ func _init():
 
 
 func enter() -> void:
-	start_timer(stun_duration)
+	var config := _get_config()
+	var duration := config.stun_duration if config else stun_duration
+	var anim_speed := config.stun_anim_speed if config else stun_anim_speed
+	start_timer(duration)
 
 	# 检查是否有击退速度（由 KnockBackEffect 在状态转换前设置）
 	# 如果有击退，保留速度让 physics_process_state 处理减速
@@ -36,13 +39,9 @@ func enter() -> void:
 		if not has_knockback:
 			stop_movement()
 
-	# 进入控制层状态：stunned
 	enter_control_state("stunned")
+	set_control_time_scale(anim_speed)
 
-	# 设置眩晕动画播放速度
-	set_control_time_scale(stun_anim_speed)
-
-	# 标记为眩晕状态
 	if "stunned" in owner_node:
 		owner_node.stunned = true
 
@@ -90,9 +89,25 @@ func exit() -> void:
 
 
 ## 眩晕退出钩子（子类可重写）
-## 用于设置眩晕免疫等 Boss 特有逻辑
+## Boss: 设置眩晕免疫计时器
 func _on_stun_exit() -> void:
-	pass
+	if owner_node is BossBase:
+		var boss := owner_node as BossBase
+		var config := _get_config()
+		var immunity := config.stun_immunity_duration if config and config.is_boss else 1.5
+		boss.stun_immunity = immunity
+
+
+## 根据玩家距离决定下一个状态
+## Boss: 使用 evaluate_transition() 统一决策
+## Enemy: 使用 BaseState 默认行为
+func decide_next_state() -> void:
+	if owner_node is BossBase:
+		var next := evaluate_transition()
+		transition_to(next)
+		return
+	# Enemy 默认
+	super.decide_next_state()
 
 
 ## 受到伤害时的回调 - 重置眩晕时间

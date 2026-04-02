@@ -21,6 +21,11 @@ func _init():
 ## 放弃追击范围（优先使用 owner.chase_abandon_distance）
 @export var default_give_up_range := 300.0
 
+# ============ 移动设置 ============
+@export_group("移动设置")
+## 水平移动模式（仅 X 轴，用于地面敌人如 Snail/Boar）
+@export var ground_only := false
+
 # ============ 状态转换 ============
 @export_group("状态转换")
 ## 进入攻击范围时的状态
@@ -43,10 +48,13 @@ func physics_process_state(_delta: float) -> void:
 		transition_to(default_state_name)
 		return
 
-	# 从 owner 获取参数
-	var give_up_range: float = get_owner_property("chase_abandon_distance", default_give_up_range)
-	var attack_range: float = get_owner_property("attack_activation_radius", default_attack_range)
-	var speed: float = get_owner_property("chase_speed", default_chase_speed)
+	# 从 config 或 owner 获取参数
+	var config := _get_config()
+	var give_up_range: float = config.chase_abandon_distance if config else get_owner_property("chase_abandon_distance", default_give_up_range)
+	var attack_range: float = config.attack_activation_radius if config else get_owner_property("attack_activation_radius", default_attack_range)
+	var speed: float = config.chase_speed if config else get_owner_property("chase_speed", default_chase_speed)
+	var is_ground: bool = config.ground_only if config else ground_only
+
 	var distance = get_distance_to_target()
 
 	# 距离太远，放弃追击
@@ -68,9 +76,12 @@ func physics_process_state(_delta: float) -> void:
 		return
 
 	# 移动向目标
-	move_toward_target(speed)
+	if is_ground:
+		_move_ground_only(speed)
+	else:
+		move_toward_target(speed)
 
-	# 更新 AnimationTree 的 locomotion 混合（BlendSpace2D 已处理方向）
+	# 更新动画
 	_update_animation_locomotion()
 
 
@@ -98,7 +109,24 @@ func _update_animation_locomotion() -> void:
 	#print("[ANIMATION] Chase speed=%.1f blend_x=%.1f blend_y=%.2f" % [speed, blend_x, blend_y])
 
 
+## 地面模式移动：仅 X 轴
+func _move_ground_only(speed: float) -> void:
+	if owner_node is not CharacterBody2D:
+		return
+	var body := owner_node as CharacterBody2D
+	var dir := get_direction_to_target()
+	body.velocity.x = sign(dir.x) * speed
+	# 保留 Y 轴速度（重力由 EnemyBase._physics_process 处理）
+	body.move_and_slide()
+
+
 ## 到达攻击范围时的状态选择（子类可重写）
-## 默认返回 attack_state_name（通常是 "attack"）
+## Boss: 检查攻击冷却
+## Enemy: 直接进入攻击
 func _on_reached_attack_range() -> String:
+	if owner_node is BossBase:
+		var boss := owner_node as BossBase
+		if boss.attack_cooldown > 0:
+			return ""  # 空字符串 = 继续当前行为
+		return attack_state_name
 	return attack_state_name

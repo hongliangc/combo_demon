@@ -37,8 +37,12 @@ func _init():
 
 
 func enter() -> void:
-	# 设置待机时间
-	var duration = min_idle_time if use_fixed_time else randf_range(min_idle_time, max_idle_time)
+	# 从 config 读取 idle 时间（如果可用）
+	var config := _get_config()
+	var min_t := config.min_idle_time if config else min_idle_time
+	var max_t := config.max_idle_time if config else max_idle_time
+
+	var duration = min_t if use_fixed_time else randf_range(min_t, max_t)
 	start_timer(duration, _on_idle_timeout)
 
 	# 停止移动
@@ -73,9 +77,25 @@ func process_state(_delta: float) -> void:
 
 
 ## 评估 Idle 状态中的转换（子类可重写）
-## 默认行为：检查攻击范围 → 检查追击范围
+## Boss: 使用 attack_range + detection_radius + cooldown 决策
+## Enemy: 检查攻击范围 → 检查追击范围
 func _evaluate_idle_transition() -> void:
-	# 优先检查攻击范围：在攻击范围内直接进入攻击，跳过追击
+	# Boss 决策路径
+	if owner_node is BossBase:
+		var boss := owner_node as BossBase
+		if not is_target_alive():
+			return
+		var distance := get_distance_to_target()
+		var config := _get_config()
+		var atk_range := config.attack_range if config and config.is_boss else boss.attack_range
+		var det_radius := config.detection_radius if config and config.is_boss else boss.detection_radius
+		if distance <= atk_range and boss.attack_cooldown <= 0:
+			transition_to("attack")
+		elif distance <= det_radius:
+			transition_to("chase")
+		return
+
+	# Enemy 默认行为
 	if try_attack():
 		return
 	if try_chase():

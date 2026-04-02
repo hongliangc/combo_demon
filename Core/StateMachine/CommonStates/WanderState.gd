@@ -46,15 +46,21 @@ var wander_direction: Vector2
 
 
 func enter() -> void:
+	var config := _get_config()
+	var is_ground: bool = config.ground_only if config else false
+
 	# 设置方向
-	if random_direction:
+	if is_ground:
+		# 地面模式：随机左或右
+		wander_direction = Vector2.RIGHT if randf() > 0.5 else Vector2.LEFT
+	elif random_direction:
 		wander_direction = Vector2.RIGHT.rotated(randf_range(0, TAU))
 	else:
 		wander_direction = fixed_direction.normalized()
 
 	# 设置定时器
-	var min_time = get_owner_property("min_wander_time", min_wander_time)
-	var max_time = get_owner_property("max_wander_time", max_wander_time)
+	var min_time: float = config.min_wander_time if config else get_owner_property("min_wander_time", min_wander_time)
+	var max_time: float = config.max_wander_time if config else get_owner_property("max_wander_time", max_wander_time)
 	start_timer(randf_range(min_time, max_time), _on_wander_timeout)
 
 
@@ -67,19 +73,23 @@ func physics_process_state(_delta: float) -> void:
 	# 移动
 	if owner_node is CharacterBody2D:
 		var body = owner_node as CharacterBody2D
-		var speed = get_owner_property("wander_speed", default_wander_speed)
+		var config := _get_config()
+		var speed: float = config.wander_speed if config else get_owner_property("wander_speed", default_wander_speed)
+		var is_ground: bool = config.ground_only if config else false
 
-		body.velocity = wander_direction * speed
+		if is_ground:
+			# 地面模式：仅 X 轴移动
+			body.velocity.x = sign(wander_direction.x) * speed
+		else:
+			body.velocity = wander_direction * speed
+
 		body.move_and_slide()
 
-		# 更新 AnimationTree 的 locomotion 混合（BlendSpace2D 已处理方向）
-		# Wander 速度较低，blend_y 应在 0.0-0.5 之间（walk 速度）
+		# 更新动画
 		var blend_x = sign(wander_direction.x) if abs(wander_direction.x) > 0.1 else 0.0
-		# 使用 chase_speed 作为最大速度参考，使 wander 显示为 walk 而不是 run
-		var max_speed = get_owner_property("chase_speed", 100.0)
-		var blend_y = clampf(speed / max_speed, 0.0, 0.5)  # Wander 限制在 0.5（walk 速度）
+		var max_speed: float = config.chase_speed if config else get_owner_property("chase_speed", 100.0)
+		var blend_y = clampf(speed / max_speed, 0.0, 0.5)
 		set_locomotion(Vector2(blend_x, blend_y))
-		#print("[ANIMATION] Wander: speed=%.1f blend_x=%.1f blend_y=%.2f" % [speed, blend_x, blend_y])
 
 
 func _on_wander_timeout() -> void:
