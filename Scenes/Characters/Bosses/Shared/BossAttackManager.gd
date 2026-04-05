@@ -9,6 +9,8 @@ class_name BossAttackManager
 
 var _boss_cache: BossBase
 var _cached_player: Node2D
+## 最近一次 pick_attack() 的结果（供状态读取，避免重复调用）
+var last_picked_entry: Dictionary = {}
 
 func _get_boss() -> BossBase:
 	if not is_instance_valid(_boss_cache):
@@ -33,12 +35,14 @@ func get_cooldown() -> float:
 	var config := get_current_config()
 	return config.cooldown if config else 1.5
 
-## 从当前阶段攻击池加权选取
+## 从当前阶段攻击池加权选取（结果缓存到 last_picked_entry）
 func pick_attack() -> Dictionary:
 	var config := get_current_config()
 	if not config:
-		return {}
-	return config.pick_attack()
+		last_picked_entry = {}
+		return last_picked_entry
+	last_picked_entry = config.pick_attack()
+	return last_picked_entry
 
 ## 执行攻击入口（调用子类钩子）
 func execute_attack(entry: Dictionary, target_pos: Vector2) -> void:
