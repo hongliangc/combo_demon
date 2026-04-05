@@ -14,6 +14,9 @@ class_name EnemyBase
 ##   必需: HealthComponent, HurtBoxComponent, AnimationPlayer
 ##   可选: AnimationTree, EnemyStateMachine, HealthBar, DamageNumbersAnchor
 
+# ============ 行为配置（优先于散落 @export）============
+@export var behavior_config: BehaviorConfig = null
+
 # ============ AI 配置参数 ============
 @export_group("Wander")
 @export var min_wander_time := 2.5
@@ -45,6 +48,10 @@ func _on_character_ready() -> void:
 	assert(anim_player != null, "%s: missing AnimationPlayer child node" % name)
 	assert(anim_tree != null, "%s: missing AnimationTree child node" % name)
 
+	# 应用行为配置（如果有）
+	if behavior_config:
+		_apply_behavior_config()
+
 	# 查找精灵节点
 	_find_sprite()
 
@@ -64,41 +71,8 @@ func _physics_process(delta: float) -> void:
 	if not (anim_tree and anim_tree.active):
 		_update_sprite_facing()
 
-## 死亡处理：停止状态机 → 播放死亡动画（优先使用death动画，否则使用白闪效果） → 删除节点
-func _handle_death() -> void:
-	# 停止状态机
-	var state_machine = get_node_or_null("EnemyStateMachine")
-	if state_machine:
-		state_machine.set_physics_process(false)
-		state_machine.set_process(false)
-
-	# 检查是否有 death 动画
-	var has_death_animation = false
-	if anim_player and anim_player.has_animation("death"):
-		has_death_animation = true
-
-	# 方案1：有 death 动画，使用 AnimationTree 播放
-	if anim_tree and anim_tree.active and has_death_animation:
-		# 切换到 control 层，启动 death 状态
-		anim_tree.set("parameters/control_blend/blend_amount", 1.0)
-		var playback = anim_tree.get("parameters/control_sm/playback")
-		if playback:
-			playback.start("death", true)
-
-		# 等待动画结束（使用动画长度定时，避免 AnimationTree 下信号不触发）
-		var death_anim = anim_player.get_animation("death")
-		var wait_time = death_anim.length if death_anim else 0.5
-		await get_tree().create_timer(wait_time).timeout
-		queue_free()
-
-	# 方案2：没有 death 动画，使用白闪效果
-	else:
-		await _play_default_death_animation()
-		queue_free()
-
-
-## 默认死亡动画：白闪3次 + 淡出
-func _play_default_death_animation() -> void:
+## 白闪 fallback（重写 BaseCharacter._play_fallback_death）
+func _play_fallback_death() -> void:
 	if not sprite:
 		await get_tree().create_timer(0.5).timeout
 		return
@@ -128,6 +102,27 @@ func _update_sprite_facing() -> void:
 		return
 	if "flip_h" in sprite:
 		sprite.flip_h = velocity.x < 0
+
+# ============ 数据驱动 ============
+## 从 BehaviorConfig 应用配置到本地属性（向后兼容）
+func _apply_behavior_config() -> void:
+	if not behavior_config:
+		return
+	max_health = behavior_config.max_health
+	health = behavior_config.health
+	min_wander_time = behavior_config.min_wander_time
+	max_wander_time = behavior_config.max_wander_time
+	wander_speed = behavior_config.wander_speed
+	detection_radius = behavior_config.detection_radius
+	chase_abandon_distance = behavior_config.chase_abandon_distance
+	attack_activation_radius = behavior_config.attack_activation_radius
+	chase_speed = int(behavior_config.chase_speed)
+	has_gravity = behavior_config.has_gravity
+	gravity = behavior_config.gravity
+	# 同步到 HealthComponent
+	if health_component:
+		health_component.max_health = max_health
+		health_component.health = health
 
 # ============ 子类钩子 ============
 ## 敌人特定初始化（在 _on_character_ready 末尾调用）

@@ -10,6 +10,27 @@ func _init():
 	can_be_interrupted = true
 	animation_state = "idle"
 
+# ============ 占位状态默认行为 ============
+# BossBase 模板创建的 Retreat/Circle/Patrol 等状态使用 BossState 脚本但无具体逻辑。
+# 以下 enter()/process_state() 仅对这些占位状态生效（子类覆盖后不受影响）。
+
+func enter() -> void:
+	# 确保占位状态可被打断（防止场景序列化导致 can_be_interrupted 为 false）
+	can_be_interrupted = true
+	# 重置控制层动画，防止攻击/眩晕画面残留
+	exit_control_state()
+	set_locomotion(Vector2(0, 0))
+
+func process_state(_delta: float) -> void:
+	# 仅对未被子类覆盖的占位状态（脚本 == BossState 本身）生效
+	if get_script() != BossState:
+		return
+	var next := evaluate_combat_transition()
+	if next == name.to_lower():
+		next = _resolve_state("chase", "idle")
+	# 使用 force_transition 绕过优先级检查，确保占位状态始终能退出
+	state_machine.force_transition(next)
+
 # ============ 缓存的 Boss 引用 ============
 
 var _boss_cache: BossBase

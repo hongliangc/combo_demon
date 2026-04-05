@@ -1,25 +1,26 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cecnqhyi5nu00"]
 
-[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.gd" id="1_script"]
-[ext_resource type="Script" path="res://Core/Components/HitBoxComponent.gd" id="2_hitbox"]
+[ext_resource type="Script" uid="uid://b3m77he62kwgd" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cht3c8hvinusb" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/projectile_throw/projectile_throw.png" id="2_7a1t7"]
+[ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="2_hitbox"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_proj"]
-radius = 10.0
 
-[node name="BKSwordProjectile" type="Area2D"]
+[node name="BKSwordProjectile" type="Area2D" unique_id=1476907732]
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1125890329]
 scale = Vector2(1.5, 1.5)
+texture = ExtResource("2_7a1t7")
 
-[node name="HitBoxComponent" type="Area2D" parent="."]
+[node name="HitBoxComponent" type="Area2D" parent="." unique_id=821707110]
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("2_hitbox")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent" unique_id=1913969331]
 shape = SubResource("CircleShape2D_proj")
 
 [connection signal="area_entered" from="HitBoxComponent" to="." method="_on_hitbox_area_entered"]

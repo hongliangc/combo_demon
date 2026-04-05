@@ -11,13 +11,13 @@
 [ext_resource type="Resource" uid="uid://blfx5oww3g2r4" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossProjectileDamage.tres" id="8_proj_dmg"]
 [ext_resource type="Resource" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossLaserDamage.tres" id="9_laser_dmg"]
 [ext_resource type="Resource" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossAoeDamage.tres" id="10_aoe_dmg"]
-[ext_resource type="Script" uid="uid://bsbrp6ivroqq3" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsIdle.gd" id="11_idle"]
+[ext_resource type="Script" uid="uid://bmcqbqdytrj1v" path="res://Core/StateMachine/CommonStates/IdleState.gd" id="11_idle"]
 [ext_resource type="Script" uid="uid://b12130rp1xqwu" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsPatrol.gd" id="12_patrol"]
 [ext_resource type="Script" uid="uid://dlp2t5ntytfsp" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsChase.gd" id="13_chase"]
 [ext_resource type="Script" uid="uid://dfinmg32j140l" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsCircle.gd" id="14_circle"]
 [ext_resource type="Script" uid="uid://c2xjiv77mtrlo" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsAttack.gd" id="15_attack"]
 [ext_resource type="Script" uid="uid://j76hygp3qi8v" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsRetreat.gd" id="16_retreat"]
-[ext_resource type="Script" uid="uid://bj5ka5dx6tsrw" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsStun.gd" id="17_stun"]
+[ext_resource type="Script" uid="uid://fyj4em6c6s13" path="res://Core/StateMachine/CommonStates/StunState.gd" id="17_stun"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_j6k8p"]
 animations = [{
@@ -72,9 +72,9 @@ script = ExtResource("4_sm")
 
 [node name="Idle" parent="StateMachine" index="0" unique_id=1900817675]
 script = ExtResource("11_idle")
-boss_idle_time = 2.0
-boss_next_state = "patrol"
-min_idle_time = 1.0
+use_fixed_time = true
+min_idle_time = 2.0
+next_state_on_timeout = "patrol"
 max_idle_time = 3.0
 use_fixed_time = false
 enable_player_detection = true
@@ -104,7 +104,6 @@ retreat_attack_cooldown = 0.8
 
 [node name="Stun" parent="StateMachine" index="6" unique_id=767657071]
 script = ExtResource("17_stun")
-stun_immunity_duration = 1.5
 stun_duration = 1.0
 stun_anim_speed = 1.0
 reset_on_damage = true

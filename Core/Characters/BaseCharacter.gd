@@ -60,15 +60,64 @@ func _on_health_component_damaged(damage_data: Damage, attacker_position: Vector
 
 ## 死亡处理入口
 func _on_died() -> void:
+	if not alive:
+		return
 	alive = false
 	velocity = Vector2.ZERO
-	_handle_death()
+	await _handle_death()
 
 # ============ 子类钩子方法（可重写）============
 ## 角色初始化完成后调用（在 _ready 末尾）
 func _on_character_ready() -> void:
 	pass
 
-## 自定义死亡逻辑（由 _on_died 调用）
+## 默认死亡处理：停止状态机 → 播放 death 动画 → queue_free
+## 子类可重写此方法以自定义死亡逻辑
 func _handle_death() -> void:
-	pass
+	# 停止状态机
+	_stop_state_machine()
+
+	# 尝试播放死亡动画
+	var played := await _play_death_animation()
+	if not played:
+		await _play_fallback_death()
+
+	queue_free()
+
+
+## 停止所有状态机子节点
+func _stop_state_machine() -> void:
+	for child in get_children():
+		if child is BaseStateMachine:
+			child.set_physics_process(false)
+			child.set_process(false)
+			break
+
+
+## 尝试通过 AnimationTree 播放 death 动画，返回是否成功
+func _play_death_animation() -> bool:
+	var anim_tree_node := get_node_or_null("AnimationTree") as AnimationTree
+	var anim_player_node := get_node_or_null("AnimationPlayer") as AnimationPlayer
+
+	if anim_tree_node and anim_tree_node.active and anim_player_node and anim_player_node.has_animation("death"):
+		anim_tree_node.set("parameters/control_blend/blend_amount", 1.0)
+		var playback = anim_tree_node.get("parameters/control_sm/playback")
+		if playback:
+			playback.start("death", true)
+			var death_anim = anim_player_node.get_animation("death")
+			var wait_time = death_anim.length if death_anim else 0.5
+			await get_tree().create_timer(wait_time).timeout
+			return true
+
+	# Fallback: 直接用 AnimationPlayer
+	if anim_player_node and anim_player_node.has_animation("death"):
+		anim_player_node.play("death")
+		await anim_player_node.animation_finished
+		return true
+
+	return false
+
+
+## 默认死亡动画回退：简单延迟（子类可重写为白闪等）
+func _play_fallback_death() -> void:
+	await get_tree().create_timer(0.5).timeout

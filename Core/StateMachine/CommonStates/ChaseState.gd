@@ -84,6 +84,10 @@ func physics_process_state(_delta: float) -> void:
 	# 更新动画
 	_update_animation_locomotion()
 
+	# 翻转精灵朝向
+	if enable_sprite_flip:
+		update_sprite_facing(false)
+
 
 func _update_animation_locomotion() -> void:
 	if owner_node is not CharacterBody2D:

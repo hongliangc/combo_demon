@@ -107,7 +107,10 @@ func _on_idle_timeout() -> void:
 		transition_to(next_state_on_timeout)
 	else:
 		# 重新开始待机
-		var duration = min_idle_time if use_fixed_time else randf_range(min_idle_time, max_idle_time)
+		var config := _get_config()
+		var min_t := config.min_idle_time if config else min_idle_time
+		var max_t := config.max_idle_time if config else max_idle_time
+		var duration = min_t if use_fixed_time else randf_range(min_t, max_t)
 		start_timer(duration, _on_idle_timeout)
 
 

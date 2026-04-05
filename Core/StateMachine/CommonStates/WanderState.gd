@@ -85,6 +85,10 @@ func physics_process_state(_delta: float) -> void:
 
 		body.move_and_slide()
 
+		# 翻转精灵朝向
+		if enable_sprite_flip:
+			update_sprite_facing()
+
 		# 更新动画
 		var blend_x = sign(wander_direction.x) if abs(wander_direction.x) > 0.1 else 0.0
 		var max_speed: float = config.chase_speed if config else get_owner_property("chase_speed", 100.0)

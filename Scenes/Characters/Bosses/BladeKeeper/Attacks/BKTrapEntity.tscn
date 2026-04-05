@@ -1,16 +1,18 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dqjprnns73oqg"]
 
-[ext_resource type="Script" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKTrapEntity.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dk5ypjwxphkqo" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKTrapEntity.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://che3p5824itf0" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_throw/trap_throw.png" id="2_o5qq4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_trap"]
-radius = 20.0
+radius = 7.071068
 
-[node name="BKTrapEntity" type="Area2D"]
+[node name="BKTrapEntity" type="Area2D" unique_id=440037974]
 collision_layer = 16
 collision_mask = 2
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=417380891]
+texture = ExtResource("2_o5qq4")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=15312615]
 shape = SubResource("CircleShape2D_trap")

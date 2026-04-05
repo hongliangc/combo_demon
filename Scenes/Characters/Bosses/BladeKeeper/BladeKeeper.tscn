@@ -12,7 +12,7 @@
 [ext_resource type="Script" uid="uid://dcqv6xsq8u4kb" path="res://Scenes/Characters/Bosses/BladeKeeper/BKStateMachine.gd" id="5_sm"]
 [ext_resource type="Texture2D" uid="uid://dc1wcvlj617kk" path="res://Assets/Art/BLADE_KEEPER/PNG animations/01_idle/01_idle_4.png" id="6_3gls1"]
 [ext_resource type="Texture2D" uid="uid://bhl1r1bqm7k21" path="res://Assets/Art/BLADE_KEEPER/PNG animations/07_1_atk/07_1_atk_4.png" id="6_87mxq"]
-[ext_resource type="Script" uid="uid://d4b4ptns5jngp" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKIdle.gd" id="6_idle"]
+[ext_resource type="Script" uid="uid://bmcqbqdytrj1v" path="res://Core/StateMachine/CommonStates/IdleState.gd" id="6_idle"]
 [ext_resource type="Texture2D" uid="uid://cryir703ynnks" path="res://Assets/Art/BLADE_KEEPER/PNG animations/07_1_atk/07_1_atk_5.png" id="7_71vmu"]
 [ext_resource type="Script" uid="uid://bk57hf862uhi" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKChase.gd" id="7_chase"]
 [ext_resource type="Texture2D" uid="uid://bea0dt0h028h6" path="res://Assets/Art/BLADE_KEEPER/PNG animations/01_idle/01_idle_5.png" id="7_kp5o6"]
@@ -36,9 +36,9 @@
 [ext_resource type="Script" uid="uid://ch1jnbnbvsbkf" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKStun.gd" id="13_stun"]
 [ext_resource type="Texture2D" uid="uid://cnv83cxxqlps3" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_up/03_jump_up_1.png" id="14_da7nw"]
 [ext_resource type="Texture2D" uid="uid://62if5r1mx2yk" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_6.png" id="14_hvdqb"]
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.tscn" id="14_projscene"]
+[ext_resource type="PackedScene" uid="uid://cecnqhyi5nu00" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.tscn" id="14_projscene"]
 [ext_resource type="Texture2D" uid="uid://4ij6p8xsm7dv" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_up/03_jump_up_2.png" id="15_fps0p"]
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKTrapEntity.tscn" id="15_trapscene"]
+[ext_resource type="PackedScene" uid="uid://dqjprnns73oqg" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKTrapEntity.tscn" id="15_trapscene"]
 [ext_resource type="Texture2D" uid="uid://7fq7c6bhanex" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_7.png" id="15_xudoa"]
 [ext_resource type="Texture2D" uid="uid://b07ue6kh3k0vx" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_up/03_jump_up_3.png" id="16_jkvjd"]
 [ext_resource type="Texture2D" uid="uid://btsq60edhkc5q" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_8.png" id="16_r7lhx"]
@@ -970,6 +970,7 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_cdaud"]
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -1130,7 +1131,6 @@ min_space = Vector2(-1, 0)
 blend_mode = 1
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_root"]
-graph_offset = Vector2(-465.8874, 219.14163)
 nodes/output/position = Vector2(680, 400)
 nodes/control_blend/node = SubResource("AnimationNodeBlend2_control")
 nodes/control_blend/position = Vector2(460, 340)
@@ -1145,6 +1145,7 @@ nodes/locomotion/position = Vector2(-60, 260)
 node_connections = [&"output", 0, &"control_blend", &"control_blend", 0, &"loco_timescale", &"control_blend", 1, &"ctrl_timescale", &"ctrl_timescale", 0, &"control_sm", &"loco_timescale", 0, &"locomotion"]
 
 [node name="BladeKeeper" unique_id=1437296221 instance=ExtResource("1_base")]
+collision_mask = 129
 script = ExtResource("2_bk")
 base_move_speed = 180.0
 max_health = 800
@@ -1153,7 +1154,7 @@ health = 800
 [node name="AnimatedSprite2D" parent="." index="0" unique_id=1335177902]
 position = Vector2(0, -42)
 sprite_frames = SubResource("SpriteFrames_nw0us")
-animation = &"atk_1"
+animation = &"idle"
 frame = 5
 
 [node name="CollisionShape2D" parent="." index="1" unique_id=726189404]
@@ -1166,7 +1167,6 @@ autoplay = &"walk"
 
 [node name="AnimationTree" parent="." index="4" unique_id=1779687543]
 tree_root = SubResource("AnimationNodeBlendTree_root")
-parameters/control_blend/blend_amount = 0.0
 parameters/locomotion/blend_position = Vector2(-0.039641917, 0.13506496)
 
 [node name="CollisionShape2D" parent="HurtBoxComponent" parent_id_path=PackedInt32Array(1700227824) index="0" unique_id=249948921]
@@ -1193,8 +1193,6 @@ script = ExtResource("5_sm")
 
 [node name="Idle" parent="StateMachine" index="0" unique_id=1900817675]
 script = ExtResource("6_idle")
-boss_idle_time = 2.0
-boss_next_state = "chase"
 min_idle_time = 1.0
 max_idle_time = 3.0
 use_fixed_time = false
@@ -1208,16 +1206,21 @@ script = ExtResource("7_chase")
 default_chase_speed = 100.0
 default_attack_range = 50.0
 default_give_up_range = 300.0
+ground_only = false
 attack_state_name = "attack"
 give_up_state_name = "wander"
 enable_sprite_flip = true
 
 [node name="Attack" parent="StateMachine" index="4" unique_id=112510037]
 script = ExtResource("8_attack")
+can_be_interrupted = false
+
+[node name="Retreat" parent="StateMachine" index="5" unique_id=2022250956]
+can_be_interrupted = false
 
 [node name="Stun" parent="StateMachine" index="6" unique_id=767657071]
 script = ExtResource("13_stun")
-stun_duration = 1.5
+stun_duration = 0.1
 
 [node name="Defend" type="Node" parent="StateMachine" index="7" unique_id=893849711]
 script = ExtResource("9_defend")

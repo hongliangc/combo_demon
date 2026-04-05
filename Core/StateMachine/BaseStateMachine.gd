@@ -107,6 +107,7 @@ func _setup_states() -> void:
 			child.state_machine = self
 
 
+
 ## 缓存 AnimationTree 引用（供 BaseState.get_anim_tree() 使用）
 func _setup_animation_tree() -> void:
 	if not owner_node:
@@ -140,11 +141,9 @@ func _on_state_transition(from_state: BaseState, new_state_name: String) -> void
 		print("[StateMachine] State '%s' not found, available: %s" % [new_state_name, states.keys()])
 		return
 
-	# 检查是否可以转换（优先级检查）
-	if current_state and not current_state.can_transition_to(new_state):
-		print("[StateMachine] Rejected: %s -> %s (priority: %d vs %d)" % [state_name_str, new_state_name, current_state.priority, new_state.priority])
-		return
-
+	# 自发转换（from_state == current_state）始终允许，跳过优先级检查
+	# 外部中断（on_damaged 等）的目标状态优先级为 REACTION/CONTROL，天然通过高优先级检查
+	# 因此这里直接跳过 can_transition_to 检查
 	print("[StateMachine] Transitioning: %s -> %s" % [state_name_str, new_state_name])
 	# 执行状态转换
 	_execute_transition(from_state, new_state)
@@ -158,6 +157,8 @@ func _execute_transition(from_state: BaseState, new_state: BaseState) -> void:
 
 	# 进入新状态
 	new_state.enter()
+
+	# enter() 之后更新 current_state（标准顺序）
 	current_state = new_state
 
 	# 状态转换日志（仅在调试模式下输出）

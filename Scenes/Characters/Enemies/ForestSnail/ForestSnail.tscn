@@ -393,9 +393,9 @@ offset_bottom = -25.0
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="11" unique_id=1688321733]
 position = Vector2(0, -17)
 sprite_frames = SubResource("SpriteFrames_snail")
-animation = &"hide"
+animation = &"walk"
 autoplay = "walk"
-frame = 7
+frame = 6
 
 [node name="RayGround" type="RayCast2D" parent="." index="12" unique_id=192260106]
 position = Vector2(15, 0)

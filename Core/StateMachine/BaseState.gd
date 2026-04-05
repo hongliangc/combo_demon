@@ -251,21 +251,21 @@ func evaluate_transition() -> String:
 	# Boss 决策路径
 	if owner_node is BossBase:
 		var boss := owner_node as BossBase
-		var det_radius := config.detection_radius if config and config.is_boss else boss.detection_radius
-		var atk_range := config.attack_range if config and config.is_boss else boss.attack_range
-		var min_dist := config.min_distance if config and config.is_boss else boss.min_distance
+		var boss_det := config.detection_radius if config and config.is_boss else boss.detection_radius
+		var boss_atk := config.attack_range if config and config.is_boss else boss.attack_range
+		var boss_min := config.min_distance if config and config.is_boss else boss.min_distance
 
-		if distance > det_radius:
+		if distance > boss_det:
 			return _resolve_eval_state("patrol", default_state_name)
-		if distance < min_dist:
+		if distance < boss_min:
 			return _resolve_eval_state("retreat", chase_state_name)
-		if distance <= atk_range and boss.attack_cooldown <= 0:
+		if distance <= boss_atk and boss.attack_cooldown <= 0:
 			return _resolve_eval_state("attack", default_state_name)
 		return _resolve_eval_state("circle", chase_state_name)
 
 	# Enemy 决策路径
-	var det_radius := config.detection_radius if config else get_owner_property("detection_radius", detection_radius)
-	var atk_radius := config.attack_activation_radius if config else get_owner_property("attack_activation_radius", -1.0)
+	var det_radius: float = config.detection_radius if config else get_owner_property("detection_radius", detection_radius)
+	var atk_radius: float = config.attack_activation_radius if config else get_owner_property("attack_activation_radius", -1.0)
 
 	if atk_radius > 0 and distance <= atk_radius:
 		return _resolve_eval_state("attack", default_state_name)

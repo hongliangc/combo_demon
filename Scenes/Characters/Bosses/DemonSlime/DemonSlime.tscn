@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://1xtt4qf4aywf" path="res://Scenes/Characters/Bosses/DemonSlime/DemonSlime.gd" id="2_ds"]
 [ext_resource type="Script" uid="uid://cp1eaxnld4008" path="res://Scenes/Characters/Bosses/DemonSlime/DSAttackManager.gd" id="4_atkmgr"]
 [ext_resource type="Script" uid="uid://ckc72180wmadu" path="res://Scenes/Characters/Bosses/DemonSlime/DSStateMachine.gd" id="5_sm"]
-[ext_resource type="Script" uid="uid://g7hd01js6hk5" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSIdle.gd" id="6_idle"]
+[ext_resource type="Script" uid="uid://bmcqbqdytrj1v" path="res://Core/StateMachine/CommonStates/IdleState.gd" id="6_idle"]
 [ext_resource type="Script" uid="uid://cxi8mhloaga6o" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSChase.gd" id="7_chase"]
 [ext_resource type="Script" uid="uid://dydx5o23bgwjw" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSCleave.gd" id="8_cleave"]
 [ext_resource type="Script" uid="uid://cmjnlwnf7ho78" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSSlam.gd" id="9_slam"]
@@ -120,7 +120,9 @@ script = ExtResource("5_sm")
 
 [node name="Idle" parent="StateMachine" index="0" unique_id=1900817675]
 script = ExtResource("6_idle")
-idle_time = 2.0
+use_fixed_time = true
+min_idle_time = 2.0
+next_state_on_timeout = "chase"
 
 [node name="Chase" parent="StateMachine" index="2" unique_id=1179073112]
 script = ExtResource("7_chase")

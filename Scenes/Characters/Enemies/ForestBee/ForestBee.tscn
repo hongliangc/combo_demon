@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://b3hrcqby6bx7f" path="res://Assets/Art/HighForest/Mob/Small Bee/Hit/Hit-Sheet.png" id="5_hit"]
 [ext_resource type="Script" uid="uid://d0fnj08f30kyf" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeIdle.gd" id="6_idle"]
 [ext_resource type="Script" uid="uid://c2g4sd80013wq" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeWander.gd" id="7_wander"]
-[ext_resource type="Script" uid="uid://hdv15migumde" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeChase.gd" id="8_chase"]
+[ext_resource type="Script" uid="uid://b83ysewfnyeco" path="res://Core/StateMachine/CommonStates/ChaseState.gd" id="8_chase"]
 [ext_resource type="Script" uid="uid://cmdcbin3ei58f" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeAttack.gd" id="9_attack"]
 [ext_resource type="Script" uid="uid://c6asbaaqtflf6" path="res://Scenes/Characters/Enemies/ForestBee/States/BeeStun.gd" id="10_stun"]
 
@@ -342,6 +342,7 @@ script = ExtResource("7_wander")
 
 [node name="Chase" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="2" unique_id=1244169998]
 script = ExtResource("8_chase")
+enable_sprite_flip = false
 
 [node name="Attack" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="3" unique_id=1291631262]
 script = ExtResource("9_attack")

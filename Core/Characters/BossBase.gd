@@ -25,6 +25,9 @@ enum Phase {
 const PHASE_KNOCKBACK_RADIUS := 200.0
 const PHASE_KNOCKBACK_FORCE := 500.0
 
+# ============ 行为配置（可选）============
+@export var behavior_config: BehaviorConfig = null
+
 # ============ 配置参数 ============
 @export_group("Detection")
 @export var detection_radius := 800.0
@@ -55,6 +58,12 @@ var current_patrol_index := 0
 @onready var anim_tree: AnimationTree = $AnimationTree if has_node("AnimationTree") else null
 
 func _on_character_ready() -> void:
+	# 应用行为配置（如果有）
+	if behavior_config and behavior_config.is_boss:
+		detection_radius = behavior_config.detection_radius
+		attack_range = behavior_config.attack_range
+		min_distance = behavior_config.min_distance
+
 	# 监听生命值变化以检查阶段转换
 	if health_component:
 		health_component.health_changed.connect(_on_health_changed)
@@ -168,23 +177,7 @@ func knockback_nearby_units() -> void:
 
 func _handle_death() -> void:
 	boss_defeated.emit()
-
-	# 优先通过 AnimationTree 播放死亡动画（必须确认动画存在）
-	if anim_tree and anim_tree.active and anim_player and anim_player.has_animation("death"):
-		anim_tree.set("parameters/control_blend/blend_amount", 1.0)
-		var playback = anim_tree.get("parameters/control_sm/playback")
-		if playback:
-			playback.start("death", true)
-			await anim_tree.animation_finished
-			queue_free()
-			return
-
-	# 回退到直接 AnimationPlayer
-	if anim_player and anim_player.has_animation("death"):
-		anim_player.play("death")
-		await anim_player.animation_finished
-
-	queue_free()
+	await super._handle_death()
 
 # ============ 巡逻点工具方法 ============
 
