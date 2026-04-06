@@ -1,8 +1,44 @@
 [gd_scene format=3 uid="uid://cecnqhyi5nu00"]
 
 [ext_resource type="Script" uid="uid://b3m77he62kwgd" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://cht3c8hvinusb" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/projectile_throw/projectile_throw.png" id="2_7a1t7"]
 [ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="2_hitbox"]
+[ext_resource type="Texture2D" uid="uid://cht3c8hvinusb" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/projectile_throw/projectile_throw.png" id="3_throw"]
+[ext_resource type="Texture2D" uid="uid://dmpfa8qaueekp" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/projectile_land/projectile_land_1.png" id="4_land1"]
+[ext_resource type="Texture2D" uid="uid://500l30torvo6" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/projectile_land/projectile_land_2.png" id="5_land2"]
+[ext_resource type="Texture2D" uid="uid://daexr6x168mml" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/projectile_land/projectile_land_3.png" id="6_land3"]
+[ext_resource type="Texture2D" uid="uid://c4s6jbngspnsl" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/projectile_land/projectile_land_4.png" id="7_land4"]
+[ext_resource type="Texture2D" uid="uid://c8xcf751e0smu" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/projectile_land/projectile_land_5.png" id="8_land5"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_proj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_throw")
+}],
+"loop": true,
+"name": &"throw",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_land1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_land2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_land3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_land4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_land5")
+}],
+"loop": false,
+"name": &"land",
+"speed": 12.0
+}]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_proj"]
 
@@ -11,9 +47,10 @@ collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1125890329]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1125890329]
 scale = Vector2(1.5, 1.5)
-texture = ExtResource("2_7a1t7")
+sprite_frames = SubResource("SpriteFrames_proj")
+animation = &"throw"
 
 [node name="HitBoxComponent" type="Area2D" parent="." unique_id=821707110]
 collision_layer = 16

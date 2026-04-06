@@ -73,7 +73,8 @@ func physics_process_state(_delta: float) -> void:
 		var target_state := _on_reached_attack_range()
 		if target_state != "":
 			transition_to(target_state)
-		return
+			return
+		# 冷却中：继续移动跟随，不卡死
 
 	# 移动向目标
 	if is_ground:

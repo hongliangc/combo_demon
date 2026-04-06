@@ -33,10 +33,25 @@ const PHASE_KNOCKBACK_FORCE := 500.0
 @export var detection_radius := 800.0
 @export var attack_range := 300.0
 @export var min_distance := 150.0  # 保持最小距离
+@export var is_melee := false       ## 近战 Boss 不使用 min_distance 撤退机制
+
+@export_group("Physics")
+@export var has_gravity := false
+@export var gravity := 800.0
 
 @export_group("Phase Settings")
 @export var phase_2_health_percent := 0.66  # 第二阶段触发血量
 @export var phase_3_health_percent := 0.33  # 第三阶段触发血量
+
+@export_group("Evasion")
+@export var evasion_enabled := false         ## 是否启用受击闪避机制
+@export var evasion_chance_per_phase: Dictionary = {} ## {Phase: 概率}
+
+@export_group("Poise / Counter")
+@export var poise_enabled := false          ## 是否启用韧性反击系统
+@export var max_poise := 5                  ## 默认韧性值
+@export var poise_per_phase: Dictionary = {} ## 可选：{Phase.PHASE_2: 4, Phase.PHASE_3: 3}
+@export var poise_immunity_time := 1.5      ## 反击后免疫窗口
 
 # ============ 运行时变量 ============
 var current_phase: Phase = Phase.PHASE_1
@@ -48,6 +63,10 @@ var attack_cooldown := 0.0
 
 # 眩晕免疫冷却（防止 stunlock）
 var stun_immunity := 0.0
+
+# 韧性（Poise）
+var current_poise: int = 0
+var poise_immunity: float = 0.0
 
 # 巡逻相关
 var patrol_points: Array[Vector2] = []
@@ -64,6 +83,10 @@ func _on_character_ready() -> void:
 		attack_range = behavior_config.attack_range
 		min_distance = behavior_config.min_distance
 
+	# 初始化韧性
+	if poise_enabled:
+		current_poise = max_poise
+
 	# 监听生命值变化以检查阶段转换
 	if health_component:
 		health_component.health_changed.connect(_on_health_changed)
@@ -72,11 +95,20 @@ func _on_character_ready() -> void:
 	_on_boss_ready()
 
 func _physics_process(delta: float) -> void:
+	# 应用重力（如果启用）
+	if has_gravity:
+		if not is_on_floor():
+			velocity.y += gravity * delta
+		elif velocity.y > 0:
+			velocity.y = 0
+			
 	# 更新攻击冷却
 	if attack_cooldown > 0:
 		attack_cooldown -= delta
 	if stun_immunity > 0:
 		stun_immunity -= delta
+	if poise_immunity > 0:
+		poise_immunity -= delta
 
 	# 应用移动
 	move_and_slide()
@@ -173,6 +205,21 @@ func knockback_nearby_units() -> void:
 			if "velocity" in collider:
 				collider.velocity += direction * strength
 
+# ============ 韧性系统 ============
+
+## 扣减韧性，返回是否触发反击
+func take_poise_hit() -> bool:
+	if not poise_enabled or poise_immunity > 0:
+		return false
+	current_poise -= 1
+	return current_poise <= 0
+
+## 反击后重置韧性
+func reset_poise() -> void:
+	var phase_poise: int = poise_per_phase.get(current_phase, max_poise)
+	current_poise = phase_poise
+	poise_immunity = poise_immunity_time
+
 # ============ 死亡处理 ============
 
 func _handle_death() -> void:
@@ -202,7 +249,10 @@ func _on_boss_ready() -> void:
 
 ## 子类阶段转换钩子（在 change_phase 之后调用）
 func _on_phase_transition() -> void:
-	pass  # 子类可覆盖
+	# 阶段切换时更新韧性
+	if poise_enabled:
+		var phase_poise: int = poise_per_phase.get(current_phase, max_poise)
+		current_poise = phase_poise
 
 ## 子类朝向更新钩子（在 _physics_process 中调用）
 func _update_facing() -> void:

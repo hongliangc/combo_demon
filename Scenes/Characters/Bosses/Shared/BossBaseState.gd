@@ -88,8 +88,8 @@ func evaluate_combat_transition(include_attack: bool = true) -> String:
 	if distance > _boss.detection_radius:
 		return _resolve_state("patrol", "idle")
 
-	# 太近 → 撤退
-	if distance < _boss.min_distance:
+	# 太近 → 撤退（仅远程 Boss）
+	if not _boss.is_melee and distance < _boss.min_distance:
 		return _resolve_state("retreat", "chase")
 
 	# 在攻击范围内
@@ -141,13 +141,30 @@ func finish_boss_anim() -> void:
 
 # ============ 受伤响应 ============
 
-## Boss 特有的 on_damaged 实现：第三阶段/眩晕免疫期间不会被击晕
+## Boss 特有的 on_damaged 实现
+## 优先级：poise 反击 > 闪避(defend/roll) > Phase 3 免疫 > stun
 func on_damaged(_damage: Damage, _attacker_position: Vector2 = Vector2.ZERO) -> void:
 	var boss := get_boss()
 	if not boss:
 		return
-	if boss.current_phase == BossBase.Phase.PHASE_3:
-		return
 	if boss.stun_immunity > 0:
 		return
+
+	# Poise 检查（优先于闪避和 stun）
+	if boss.poise_enabled and boss.take_poise_hit():
+		transitioned.emit(self, "counter")
+		return
+
+	# 闪避检查：概率触发 defend 或 roll
+	if boss.evasion_enabled:
+		var chance: float = boss.evasion_chance_per_phase.get(boss.current_phase, 0.0)
+		if chance > 0 and randf() < chance:
+			var evasion_state: String = ["defend", "roll"].pick_random()
+			transitioned.emit(self, evasion_state)
+			return
+
+	# Phase 3 眩晕免疫
+	if boss.current_phase == BossBase.Phase.PHASE_3:
+		return
+
 	transitioned.emit(self, "stun")

@@ -14,6 +14,11 @@ func _init() -> void:
 	can_be_interrupted = true
 
 func enter() -> void:
+	var boss := get_boss()
+	if boss:
+		boss.velocity = Vector2.ZERO
+		boss.can_move = false
+	_face_player()
 	_took_hit = false
 	_anim_tree_ref = get_anim_tree()
 	enter_control_state("defend")
@@ -35,7 +40,17 @@ func _on_defend_timeout() -> void:
 		var next := evaluate_combat_transition()
 		transitioned.emit(self, next)
 
+func _face_player() -> void:
+	if not target_node or not owner_node:
+		return
+	var sprite := owner_node.get_node_or_null("AnimatedSprite2D") as Node2D
+	if sprite and "flip_h" in sprite:
+		sprite.flip_h = owner_node.global_position.x > target_node.global_position.x
+
 func exit() -> void:
 	exit_control_state()
 	if _timer and _timer.timeout.is_connected(_on_defend_timeout):
 		_timer.timeout.disconnect(_on_defend_timeout)
+	var boss := get_boss()
+	if boss:
+		boss.can_move = true

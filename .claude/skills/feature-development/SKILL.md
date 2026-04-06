@@ -56,6 +56,12 @@ description: "General-purpose development skill for Combo Demon. Use when implem
 ### Step 5: Code Review
 触发 `code-review` skill，审查代码质量和架构合规。
 
+### Step 5.5: 提交（CR 通过后）
+**禁止边开发边提交。** 所有修改完成 + 测试通过 + CR 无问题后，才统一提交：
+- 不要修改一个文件就 commit 一次
+- 将所有相关变更合并为一个或少数几个逻辑性 commit
+- 如果使用 subagent-driven-development，subagent 也不应在每个 task 后单独提交，而是等全部 task + CR 完成后统一提交
+
 ### Step 6: 架构文档与 Skill 更新（CR 通过后）
 **仅在开发完毕 + 测试通过 + CR 无问题后**，触发 `context-updater` skill，按更新检查矩阵逐项判断：
 - 架构文档（ARCHITECTURE.md、class-diagrams.md、architecture-diagrams.md）
@@ -92,6 +98,9 @@ description: "General-purpose development skill for Combo Demon. Use when implem
 ### Step 5: Code Review
 触发 `code-review` skill，审查重构质量和架构合规。
 
+### Step 5.5: 提交（CR 通过后）
+**禁止边开发边提交。** 所有修改完成 + 测试通过 + CR 无问题后，才统一提交。
+
 ### Step 6: 架构文档与 Skill 更新（CR 通过后）
 **仅在开发完毕 + 测试通过 + CR 无问题后**，触发 `context-updater` skill：
 - 如果改变了类结构/继承关系 → 更新 `docs/class-diagrams.md`
@@ -104,7 +113,7 @@ description: "General-purpose development skill for Combo Demon. Use when implem
 ```
 实现 → 测试(testing) → CR(code-review) → [CR 通过?]
                                               │
-                                    Yes ──→ 更新文档(context-updater)
+                                    Yes ──→ 统一提交(git commit) → 更新文档(context-updater)
                                     No  ──→ 返回修改 → 重新测试 → 重新 CR
 ```
 

@@ -71,3 +71,10 @@ func pick_chase_attack() -> Dictionary:
 func pick_retreat_attack() -> Dictionary:
 	var pool := retreat_attacks if not retreat_attacks.is_empty() else attacks
 	return _pick_from_pool(pool)
+
+## 从攻击池中选取反击招式（筛选 counter=true，空则回退到主攻击池）
+func pick_counter_attack() -> Dictionary:
+	var pool := attacks.filter(func(e): return e.get("counter", false))
+	if pool.is_empty():
+		pool = attacks
+	return _pick_from_pool(pool)

@@ -17,11 +17,19 @@ const PHASE_SPEED := {
 var move_speed: float:
 	get: return base_move_speed * PHASE_SPEED.get(current_phase, 1.0)
 
-func _on_boss_ready() -> void:
+func _init() -> void:
+	# 覆盖 BossBase 默认值（inspector 可进一步调整）
 	detection_radius = 800.0
 	attack_range = 200.0
-	min_distance = 100.0
+	is_melee = true
+	# 闪避反应
+	evasion_enabled = true
+	evasion_chance_per_phase = {Phase.PHASE_1: 0.15, Phase.PHASE_2: 0.25, Phase.PHASE_3: 0.35}
+	# Poise 反击系统
+	poise_enabled = true
+	max_poise = 5
+	poise_per_phase = {Phase.PHASE_2: 4, Phase.PHASE_3: 3}
 
 func _update_facing() -> void:
-	if velocity.x != 0 and sprite:
+	if velocity.x != 0 and sprite: 
 		sprite.flip_h = velocity.x < 0

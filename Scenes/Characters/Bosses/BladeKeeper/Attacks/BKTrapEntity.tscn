@@ -1,7 +1,60 @@
 [gd_scene format=3 uid="uid://dqjprnns73oqg"]
 
 [ext_resource type="Script" uid="uid://dk5ypjwxphkqo" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKTrapEntity.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://che3p5824itf0" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_throw/trap_throw.png" id="2_o5qq4"]
+[ext_resource type="Texture2D" uid="uid://che3p5824itf0" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_throw/trap_throw.png" id="2_throw"]
+[ext_resource type="Texture2D" uid="uid://dipwkvh23co5r" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_land/trap_land_1.png" id="3_land1"]
+[ext_resource type="Texture2D" uid="uid://cerlit2ah6old" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_land/trap_land_2.png" id="4_land2"]
+[ext_resource type="Texture2D" uid="uid://dsbl1leg2jkgc" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_land/trap_land_3.png" id="5_land3"]
+[ext_resource type="Texture2D" uid="uid://cwvr683hn87o3" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_detonate/trap_detonate_1.png" id="6_det1"]
+[ext_resource type="Texture2D" uid="uid://borqgciusgryh" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_detonate/trap_detonate_2.png" id="7_det2"]
+[ext_resource type="Texture2D" uid="uid://84vwngir0hrp" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_detonate/trap_detonate_3.png" id="8_det3"]
+[ext_resource type="Texture2D" uid="uid://ck0yj85s2unsq" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_detonate/trap_detonate_4.png" id="9_det4"]
+[ext_resource type="Texture2D" uid="uid://2de7ws86ksdn" path="res://Assets/Art/BLADE_KEEPER/PNG animations/projectile_and_trap/trap_detonate/trap_detonate_5.png" id="10_det5"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_trap"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_det1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_det2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_det3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_det4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_det5")
+}],
+"loop": false,
+"name": &"detonate",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_land1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_land2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_land3")
+}],
+"loop": false,
+"name": &"land",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_throw")
+}],
+"loop": true,
+"name": &"throw",
+"speed": 1.0
+}]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_trap"]
 radius = 7.071068
@@ -11,8 +64,9 @@ collision_layer = 16
 collision_mask = 2
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=417380891]
-texture = ExtResource("2_o5qq4")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=417380891]
+sprite_frames = SubResource("SpriteFrames_trap")
+animation = &"throw"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=15312615]
 shape = SubResource("CircleShape2D_trap")
