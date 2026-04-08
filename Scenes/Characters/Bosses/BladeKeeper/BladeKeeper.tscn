@@ -31,10 +31,10 @@
 [ext_resource type="Texture2D" uid="uid://bodgc2vaomtvo" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_4.png" id="12_532rr"]
 [ext_resource type="Script" uid="uid://focvg1u76x07" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKTrap.gd" id="12_trap"]
 [ext_resource type="Texture2D" uid="uid://bvj7i2k1nm80y" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_down/03_jump_down_2.png" id="12_x7hmv"]
+[ext_resource type="Script" uid="uid://bmlepq5g4a4jv" path="res://Scenes/Characters/Bosses/Shared/BossCounterState.gd" id="13_counter"]
 [ext_resource type="Texture2D" uid="uid://c1om553421pb2" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_5.png" id="13_fap8e"]
 [ext_resource type="Texture2D" uid="uid://3arqwp0hj6lt" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_down/03_jump_down_3.png" id="13_nhah7"]
 [ext_resource type="Script" uid="uid://ch1jnbnbvsbkf" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKStun.gd" id="13_stun"]
-[ext_resource type="Script" path="res://Scenes/Characters/Bosses/Shared/BossCounterState.gd" id="13_counter"]
 [ext_resource type="Texture2D" uid="uid://cnv83cxxqlps3" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_up/03_jump_up_1.png" id="14_da7nw"]
 [ext_resource type="Texture2D" uid="uid://62if5r1mx2yk" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_6.png" id="14_hvdqb"]
 [ext_resource type="PackedScene" uid="uid://cecnqhyi5nu00" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.tscn" id="14_projscene"]
@@ -1427,9 +1427,12 @@ collision_mask = 129
 script = ExtResource("2_bk")
 base_move_speed = 180.0
 attack_range = 30.0
+is_melee = true
 has_gravity = true
-max_health = 800
-health = 800
+evasion_enabled = true
+poise_enabled = true
+max_health = 10000
+health = 10000
 
 [node name="AnimatedSprite2D" parent="." index="0" unique_id=1335177902]
 position = Vector2(0, -42)
@@ -1456,8 +1459,8 @@ shape = SubResource("RectangleShape2D_4qryw")
 disabled = true
 
 [node name="HealthComponent" parent="." index="7" unique_id=1260646126]
-max_health = 800.0
-health = 800.0
+max_health = 100000.0
+health = 100000.0
 
 [node name="HealthBar" parent="." index="8" unique_id=786299893]
 value = 0.3
@@ -1486,7 +1489,7 @@ script = ExtResource("8_attack")
 
 [node name="Stun" type="Node" parent="StateMachine" index="3" unique_id=767657071]
 script = ExtResource("13_stun")
-stun_duration = 0.1
+stun_duration = 0.5
 priority = 2
 can_be_interrupted = false
 
@@ -1502,5 +1505,5 @@ script = ExtResource("11_proj")
 [node name="Trap" type="Node" parent="StateMachine" index="7" unique_id=1365279449]
 script = ExtResource("12_trap")
 
-[node name="Counter" type="Node" parent="StateMachine" index="8"]
+[node name="Counter" type="Node" parent="StateMachine" index="8" unique_id=686840991]
 script = ExtResource("13_counter")
