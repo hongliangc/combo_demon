@@ -57,7 +57,11 @@
       "mcp__godot__create_scene",
       "mcp__godot__add_node",
       "mcp__godot__save_scene",
-      "Agent"
+      "Agent",
+      "WebFetch(domain:forum.gamemaker.io)",
+      "WebFetch(domain:forum.godotengine.org)",
+      "WebFetch(domain:iknowabit.com)",
+      "WebFetch(domain:critpoints.net)"
     ],
     "deny": [
       "Bash(git rm:*)",

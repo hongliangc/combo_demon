@@ -131,38 +131,12 @@ func try_chase(radius: float = -1.0) -> bool:
 
 
 ## 受到伤害时的回调（子类可重写）
-## 根据伤害类型决定转换到哪个状态：
-## - 有眩晕效果 → stun
-## - 有击退/击飞效果 → knockback
-## - 普通伤害 → hit
-func on_damaged(damage: Damage, _attacker_position: Vector2) -> void:
+## 统一路由到 hit 状态，由 HitState 根据效果类型决定动画和行为
+func on_damaged(_damage: Damage, _attacker_position: Vector2) -> void:
 	if not state_machine:
-		print("[BaseState] on_damaged: no state_machine for %s" % name)
 		return
-
-	var owner_name: String = str(owner_node.name) if owner_node else "?"
-	print("[BaseState] %s on_damaged, state=%s" % [owner_name, name])
-
-	# 检查眩晕效果（最高优先级）
-	if damage and (damage.has_effect("StunEffect") or damage.has_effect("ForceStunEffect")):
-		if state_machine.states.has("stun"):
-			DebugConfig.debug("[%s] -> stun (has stun effect)" % name, "", "state_machine")
-			transitioned.emit(self, "stun")
-			return
-
-	# 检查击退/击飞效果
-	if damage and (damage.has_effect("KnockBackEffect") or damage.has_effect("KnockUpEffect")):
-		if state_machine.states.has("knockback"):
-			DebugConfig.debug("[%s] -> knockback (has knockback effect)" % name, "", "state_machine")
-			transitioned.emit(self, "knockback")
-			return
-
-	# 默认：切换到 hit 状态
 	if state_machine.states.has("hit"):
-		print("[BaseState] %s -> hit (emitting transition)" % name)
 		transitioned.emit(self, "hit")
-	else:
-		print("[BaseState] %s no hit state available, states=%s" % [name, state_machine.states.keys()])
 
 
 # ============ Timer 管理方法 ============
@@ -221,7 +195,7 @@ func reset_timer() -> void:
 
 ## 定时器超时回调（子类可重写）
 func _on_timer_timeout() -> void:
-	print("[BaseState] timer timeout: %s" % name)
+	DebugConfig.debug("[BaseState] timer timeout: %s" % name, "", "state_machine")
 	decide_next_state()
 
 
@@ -377,7 +351,7 @@ func can_transition_to(new_state: BaseState) -> bool:
 	if new_state.priority == priority:
 		return can_be_interrupted
 	# 当前状态可以主动转换到低优先级状态（自愿结束控制）
-	# 例如：StunState 结束后转换到 WanderState
+	# 例如：HitState 结束后转换到 WanderState
 	return true
 
 

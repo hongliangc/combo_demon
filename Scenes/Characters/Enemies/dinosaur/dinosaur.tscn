@@ -11,10 +11,8 @@
 [ext_resource type="Script" uid="uid://ddn5uriyxwwl8" path="res://Core/StateMachine/EnemyStateMachine.gd" id="9_o6n8k"]
 [ext_resource type="Script" uid="uid://86x4tr6apx2u" path="res://Scenes/Characters/Enemies/Dinosaur/Scripts/States/EnemyIdle.gd" id="11_m53w6"]
 [ext_resource type="Script" uid="uid://cep4mchlvn1up" path="res://Scenes/Characters/Enemies/Dinosaur/Scripts/States/EnemyWander.gd" id="12_nltsn"]
-[ext_resource type="Script" uid="uid://3u7x8q6guvnv" path="res://Scenes/Characters/Enemies/Dinosaur/Scripts/States/EnemyStun.gd" id="13_lik7o"]
 [ext_resource type="Script" uid="uid://b7yd6l0d8qq6h" path="res://Scenes/Characters/Enemies/Dinosaur/Scripts/States/EnemyAttack.gd" id="14_e2cp7"]
 [ext_resource type="Script" uid="uid://d10wvnas7327v" path="res://Core/StateMachine/CommonStates/HitState.gd" id="15_hit"]
-[ext_resource type="Script" uid="uid://cx4hx0vi34say" path="res://Core/StateMachine/CommonStates/KnockbackState.gd" id="16_knockback"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xb68c"]
 radius = 12.0
@@ -499,17 +497,12 @@ script = ExtResource("11_m53w6")
 [node name="Wander" type="Node" parent="EnemyStateMachine" unique_id=231789051]
 script = ExtResource("12_nltsn")
 
-[node name="Stun" type="Node" parent="EnemyStateMachine" unique_id=269923157]
-script = ExtResource("13_lik7o")
-
 [node name="Attack" type="Node" parent="EnemyStateMachine" unique_id=1515897196]
 script = ExtResource("14_e2cp7")
 
 [node name="Hit" type="Node" parent="EnemyStateMachine" unique_id=946157992]
 script = ExtResource("15_hit")
 
-[node name="Knockback" type="Node" parent="EnemyStateMachine" unique_id=1650094293]
-script = ExtResource("16_knockback")
 
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=932980834]
 anchors_preset = 5

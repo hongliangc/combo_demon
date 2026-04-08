@@ -10,8 +10,6 @@
 [ext_resource type="Script" uid="uid://b83ysewfnyeco" path="res://Core/StateMachine/CommonStates/ChaseState.gd" id="8_chase"]
 [ext_resource type="Script" uid="uid://cyyjfkg78kmrv" path="res://Core/StateMachine/CommonStates/AttackState.gd" id="9_attack"]
 [ext_resource type="Script" uid="uid://d10wvnas7327v" path="res://Core/StateMachine/CommonStates/HitState.gd" id="10_hit"]
-[ext_resource type="Script" uid="uid://fyj4em6c6s13" path="res://Core/StateMachine/CommonStates/StunState.gd" id="11_stun"]
-[ext_resource type="Script" uid="uid://cx4hx0vi34say" path="res://Core/StateMachine/CommonStates/KnockbackState.gd" id="12_knockback"]
 
 [sub_resource type="Animation" id="Animation_RESET"]
 length = 0.001
@@ -258,11 +256,6 @@ script = ExtResource("9_attack")
 [node name="Hit" type="Node" parent="EnemyStateMachine" unique_id=840107965]
 script = ExtResource("10_hit")
 
-[node name="Stun" type="Node" parent="EnemyStateMachine" unique_id=283105885]
-script = ExtResource("11_stun")
-
-[node name="Knockback" type="Node" parent="EnemyStateMachine" unique_id=186048944]
-script = ExtResource("12_knockback")
 
 [node name="HitBoxComponent" type="Area2D" parent="." unique_id=764109139]
 collision_layer = 8

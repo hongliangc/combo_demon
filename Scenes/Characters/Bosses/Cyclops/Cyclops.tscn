@@ -17,7 +17,7 @@
 [ext_resource type="Script" uid="uid://dfinmg32j140l" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsCircle.gd" id="14_circle"]
 [ext_resource type="Script" uid="uid://c2xjiv77mtrlo" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsAttack.gd" id="15_attack"]
 [ext_resource type="Script" uid="uid://j76hygp3qi8v" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsRetreat.gd" id="16_retreat"]
-[ext_resource type="Script" uid="uid://fyj4em6c6s13" path="res://Core/StateMachine/CommonStates/StunState.gd" id="17_stun"]
+[ext_resource type="Script" uid="uid://d10wvnas7327v" path="res://Core/StateMachine/CommonStates/HitState.gd" id="17_hit"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_j6k8p"]
 animations = [{
@@ -50,15 +50,15 @@ shape = SubResource("RectangleShape2D_boss_collision")
 [node name="DamageNumbersAnchor" parent="." index="2" unique_id=1984785107]
 position = Vector2(0, -22)
 
-[node name="HealthComponent" parent="." index="6" unique_id=1260646126]
+[node name="HealthComponent" parent="." index="7" unique_id=1260646126]
 max_health = 1000.0
 health = 1000.0
 
-[node name="HealthBar" parent="." index="7" unique_id=786299893]
+[node name="HealthBar" parent="." index="8" unique_id=786299893]
 offset_top = -28.0
 offset_bottom = -22.0
 
-[node name="BossAttackManager" parent="." index="8" unique_id=1446838887]
+[node name="BossAttackManager" parent="." index="9" unique_id=1446838887]
 script = ExtResource("3_atkmgr")
 projectile_scene = ExtResource("5_projectile")
 laser_scene = ExtResource("6_laser")
@@ -67,44 +67,28 @@ projectile_damage = ExtResource("8_proj_dmg")
 laser_damage = ExtResource("9_laser_dmg")
 aoe_damage = ExtResource("10_aoe_dmg")
 
-[node name="StateMachine" parent="." index="9" unique_id=1612206536]
+[node name="StateMachine" parent="." index="10" unique_id=1612206536 node_paths=PackedStringArray("init_state")]
 script = ExtResource("4_sm")
+init_state = NodePath("Idle")
 
-[node name="Idle" type="Node" parent="StateMachine" unique_id=1900817675]
+[node name="Idle" type="Node" parent="StateMachine" index="0" unique_id=1900817675]
 script = ExtResource("11_idle")
-use_fixed_time = true
 min_idle_time = 2.0
-next_state_on_timeout = "patrol"
-max_idle_time = 3.0
-use_fixed_time = false
-enable_player_detection = true
-next_state_on_timeout = "wander"
-stop_immediately = true
-deceleration_rate = 5.0
 
-[node name="Patrol" type="Node" parent="StateMachine" unique_id=1743223177]
+[node name="Patrol" type="Node" parent="StateMachine" index="1" unique_id=1743223177]
 script = ExtResource("12_patrol")
-patrol_speed_multiplier = 0.5
 
-[node name="Chase" type="Node" parent="StateMachine" unique_id=1179073112]
+[node name="Chase" type="Node" parent="StateMachine" index="2" unique_id=1179073112]
 script = ExtResource("13_chase")
-chase_attack_cooldown = 1.2
 
-[node name="Circle" type="Node" parent="StateMachine" unique_id=701299608]
+[node name="Circle" type="Node" parent="StateMachine" index="3" unique_id=701299608]
 script = ExtResource("14_circle")
-circle_speed_multiplier = 0.8
 
-[node name="Attack" type="Node" parent="StateMachine" unique_id=112510037]
+[node name="Attack" type="Node" parent="StateMachine" index="4" unique_id=112510037]
 script = ExtResource("15_attack")
 
-[node name="Retreat" type="Node" parent="StateMachine" unique_id=2022250956]
+[node name="Retreat" type="Node" parent="StateMachine" index="5" unique_id=2022250956]
 script = ExtResource("16_retreat")
-retreat_speed_multiplier = 1.2
-retreat_attack_cooldown = 0.8
 
-[node name="Stun" type="Node" parent="StateMachine" unique_id=767657071]
-script = ExtResource("17_stun")
-stun_duration = 1.0
-stun_anim_speed = 1.0
-reset_on_damage = true
-knockback_friction = 8.0
+[node name="Hit" type="Node" parent="StateMachine" index="6" unique_id=767657071]
+script = ExtResource("17_hit")

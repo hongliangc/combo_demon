@@ -12,7 +12,6 @@
 [ext_resource type="Script" uid="uid://b3f4otqel76ur" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarWander.gd" id="9_wander"]
 [ext_resource type="Script" uid="uid://c70xwtnjp4bsr" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarChase.gd" id="10_chase"]
 [ext_resource type="Script" uid="uid://veflmqdlprv0" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarAttack.gd" id="11_attack"]
-[ext_resource type="Script" uid="uid://ccvcw825pql6b" path="res://Scenes/Characters/Enemies/ForestBoar/States/BoarStun.gd" id="12_stun"]
 
 [sub_resource type="Animation" id="Animation_kbt0a"]
 length = 0.5
@@ -483,8 +482,6 @@ script = ExtResource("10_chase")
 [node name="Attack" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="3" unique_id=1291631262]
 script = ExtResource("11_attack")
 
-[node name="Stun" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="5" unique_id=283105885]
-script = ExtResource("12_stun")
 
 [node name="HitBoxComponent" parent="." index="7" unique_id=764109139]
 damage = SubResource("Resource_damage")

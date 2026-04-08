@@ -5,8 +5,6 @@ class_name StateNames
 const IDLE := "idle"
 const CHASE := "chase"
 const ATTACK := "attack"
-const STUN := "stun"
 const HIT := "hit"
-const KNOCKBACK := "knockback"
 const WANDER := "wander"
 const SPECIALSKILL := "specialskill"

@@ -15,29 +15,16 @@ func _setup_signals() -> void:
 			owner_node.phase_changed.connect(_on_phase_changed)
 
 func _on_owner_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
-	var _boss_dbg := owner_node as BossBase
-	var _st_name: String = str(current_state.name) if current_state else "null"
-	if _boss_dbg:
-		print("[BossSM] _on_owner_damaged: boss=%s state=%s phase_lock=%s poise=%s/%s(on=%s) evasion=%s stun_imm=%.2f" % [
-			_boss_dbg.name, _st_name, is_transitioning_phase,
-			_boss_dbg.current_poise, _boss_dbg.max_poise, _boss_dbg.poise_enabled,
-			_boss_dbg.evasion_enabled, _boss_dbg.stun_immunity])
 	if is_transitioning_phase:
 		return
 
-	# Boss 受伤拦截：poise/evasion 检查必须在这里执行
-	# 原因：HealthComponent.apply_attack_effects() 在 damaged 信号之前执行，
-	# StunEffect 会 force_transition("stun")，导致 current_state 已变成 StunState。
-	# StunState 继承 BaseState 而非 BossState，不包含 poise/evasion 逻辑。
-	# 因此将检查提升到状态机层面，直接读取 Boss 数据判断。
 	var boss := owner_node as BossBase
 	if boss:
 		if boss.stun_immunity > 0:
 			return
 
-		# Poise 检查（优先于闪避和 stun）
+		# Poise 检查（优先于闪避）
 		if boss.poise_enabled and boss.take_poise_hit():
-			print("[BossStateMachine] poise broken → counter")
 			force_transition("counter")
 			return
 
@@ -46,10 +33,10 @@ func _on_owner_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO
 			var chance: float = boss.evasion_chance_per_phase.get(boss.current_phase, 0.0)
 			if chance > 0 and randf() < chance:
 				var evasion_state: String = ["defend", "roll"].pick_random()
-				print("[BossStateMachine] evasion triggered → %s" % evasion_state)
 				force_transition(evasion_state)
 				return
 
+	# 通过决策链 → 缓存伤害 + 传递给当前状态
 	super._on_owner_damaged(damage, attacker_position)
 
 func _on_phase_changed(new_phase: int) -> void:

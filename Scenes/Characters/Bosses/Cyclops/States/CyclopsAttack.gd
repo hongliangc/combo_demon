@@ -188,7 +188,7 @@ func exit():
 func on_damaged(_damage: Damage, _attacker_position: Vector2 = Vector2.ZERO):
 	if _config and _config.immune:
 		return
-	transitioned.emit(self, "stun")
+	transitioned.emit(self, "hit")
 
 # ============ 攻击执行 ============
 

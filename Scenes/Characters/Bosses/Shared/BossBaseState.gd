@@ -142,19 +142,14 @@ func finish_boss_anim() -> void:
 # ============ 受伤响应 ============
 
 ## Boss 特有的 on_damaged 实现
-## 注意：poise 反击和闪避(defend/roll) 已提升到 BossStateMachine._on_owner_damaged()
-## 原因：HealthComponent.apply_attack_effects() 在 damaged 信号之前执行，
-## StunEffect 会 force_transition("stun")，导致 on_damaged 在错误的状态上执行。
-## 此处仅保留 Phase 3 免疫和 stun 降级逻辑。
+## poise 反击和闪避已提升到 BossStateMachine._on_owner_damaged()
+## 此处仅保留 Phase 3 免疫，其余统一路由到 hit
 func on_damaged(_damage: Damage, _attacker_position: Vector2 = Vector2.ZERO) -> void:
 	var boss := get_boss()
 	if not boss:
 		return
 	if boss.stun_immunity > 0:
 		return
-
-	# Phase 3 眩晕免疫
 	if boss.current_phase == BossBase.Phase.PHASE_3:
 		return
-
-	transitioned.emit(self, "stun")
+	transitioned.emit(self, "hit")

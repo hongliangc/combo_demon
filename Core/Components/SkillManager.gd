@@ -364,7 +364,7 @@ func _end_bullet_time() -> void:
 
 # ============ 内部方法：敌人眩晕管理 ============
 ## 眩晕敌人（内部方法）
-## 强制敌人进入stun状态并停止自动恢复timer，直到V技能结束
+## 强制敌人进入 hit 状态并停止自动恢复 timer，直到V技能结束
 func _stun_enemy(enemy: Node) -> void:
 	if not is_instance_valid(enemy):
 		return
@@ -379,18 +379,18 @@ func _stun_enemy(enemy: Node) -> void:
 	if enemy is CharacterBody2D:
 		(enemy as CharacterBody2D).velocity = Vector2.ZERO
 
-	# 强制切换到 stun 状态
+	# 强制切换到 hit 状态
 	var state_machine = _find_state_machine(enemy)
 	if state_machine:
 		if state_machine.has_method("force_transition"):
-			state_machine.force_transition("stun")
-			# 关键：停止stun状态的自动恢复timer，防止敌人在V技能结束前恢复
-			var stun_state = state_machine.states.get("stun")
-			if stun_state and stun_state.has_method("stop_timer"):
-				stun_state.stop_timer()
+			state_machine.force_transition("hit")
+			# 关键：停止 hit 状态的自动恢复 timer，防止敌人在V技能结束前恢复
+			var hit_state = state_machine.states.get("hit")
+			if hit_state and hit_state.has_method("stop_timer"):
+				hit_state.stop_timer()
 
 ## 恢复所有被眩晕的敌人（内部方法）
-## 重启 stun timer 让敌人自然恢复
+## 调用 recover_from_stun 清理标记并恢复行为
 func _unstun_all_enemies() -> void:
 	var all_enemies = owner_node.get_tree().get_nodes_in_group("enemy")
 	for enemy in all_enemies:

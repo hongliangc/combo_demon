@@ -36,6 +36,10 @@ var target_node: Node
 ## AnimationTree 节点引用（缓存供 BaseState.get_anim_tree() 使用）
 var anim_tree: AnimationTree
 
+## 缓存最近一次伤害数据（供 HitState.enter() 读取）
+var last_damage: Damage = null
+var last_attacker_position: Vector2 = Vector2.ZERO
+
 # ============ 生命周期 ============
 func _ready() -> void:
 	# 获取 owner 节点（CharacterBody2D等）
@@ -127,25 +131,18 @@ func _setup_signals() -> void:
 
 ## 状态转换处理（带优先级检查）
 func _on_state_transition(from_state: BaseState, new_state_name: String) -> void:
-	var state_name_str = str(current_state.name) if current_state else "null"
+	var _owner_name := str(owner_node.name) if owner_node else "Unknown"
 
-	var _owner_name = str(owner_node.name) if owner_node else "Unknown"
 	# 只处理当前状态的转换请求
 	if from_state != current_state:
-		var from_name = str(from_state.name) if from_state else "null"
-		print("[StateMachine] [%s] Ignoring transition from %s (current=%s)" % [_owner_name, from_name, state_name_str])
 		return
 
 	# 查找新状态
 	var new_state = states.get(new_state_name.to_lower())
 	if not new_state:
-		print("[StateMachine] [%s] State '%s' not found, available: %s" % [_owner_name, new_state_name, states.keys()])
+		push_warning("[StateMachine] [%s] State '%s' not found, available: %s" % [_owner_name, new_state_name, states.keys()])
 		return
 
-	# 自发转换（from_state == current_state）始终允许，跳过优先级检查
-	# 外部中断（on_damaged 等）的目标状态优先级为 REACTION/CONTROL，天然通过高优先级检查
-	# 因此这里直接跳过 can_transition_to 检查
-	print("[StateMachine] [%s] Transitioning: %s -> %s" % [_owner_name, state_name_str, new_state_name])
 	# 执行状态转换
 	_execute_transition(from_state, new_state)
 
@@ -170,9 +167,8 @@ func _execute_transition(from_state: BaseState, new_state: BaseState) -> void:
 
 ## 当 owner 受到伤害时
 func _on_owner_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
-	var _oname: String = owner_node.name if owner_node else "Unknown"
-	var _sname: String = str(current_state.name) if current_state else "null"
-	print("[StateMachine] [%s] _on_owner_damaged in state=%s has_on_damaged=%s" % [_oname, _sname, current_state.has_method("on_damaged") if current_state else false])
+	last_damage = damage
+	last_attacker_position = attacker_position
 	if current_state and current_state.has_method("on_damaged"):
 		current_state.on_damaged(damage, attacker_position)
 
@@ -199,7 +195,7 @@ func is_in_state(state_name: String) -> bool:
 
 
 ## 从眩晕状态恢复（供外部调用，如技能结束后）
-## 会停止 stun timer、重置 owner 的 stunned 标志、并转换到恢复状态
+## 直接清理标记并转换到恢复状态
 func recover_from_stun() -> void:
 	# 停止当前状态的 timer（如果有）
 	if current_state and current_state.has_method("stop_timer"):

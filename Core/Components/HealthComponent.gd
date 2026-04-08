@@ -14,9 +14,8 @@ class_name HealthComponent
 ##   HurtBoxComponent.damaged → HealthComponent.take_damage()
 ##       ├─→ 扣血
 ##       ├─→ 显示伤害数字
-##       ├─→ 应用攻击特效
 ##       ├─→ 发出 health_changed 信号 → 血条 UI
-##       └─→ 发出 damaged 信号 → 状态机响应
+##       └─→ 发出 damaged 信号 → 状态机响应（HitState 应用攻击特效）
 
 # ============ 信号 ============
 ## 生命值变化时发出（用于血条 UI 更新、阶段检测等）
@@ -78,11 +77,6 @@ func take_damage(damage_data: Damage, attacker_position: Vector2 = Vector2.ZERO)
 	# 显示伤害数字
 	display_damage_number(damage_data)
 
-	# 应用攻击特效（击退、击飞等）- 必须在发出 damaged 信号之前
-	# 因为状态机响应 damaged 信号时会设置 velocity=0，
-	# 如果先发信号再应用特效，击退速度会被覆盖
-	apply_attack_effects(damage_data, attacker_position)
-
 	# 发出信号（让状态机等监听者响应）
 	health_changed.emit(health, max_health)
 	damaged.emit(damage_data, attacker_position)
@@ -100,12 +94,6 @@ func display_damage_number(damage_data: Damage) -> void:
 		if damage_data.max_amount > 0:
 			is_critical = damage_data.amount > damage_data.max_amount * critical_threshold
 		DamageNumbers.display_number(int(damage_data.amount), damage_anchor.global_position, is_critical)
-
-## 应用攻击特效
-func apply_attack_effects(damage_data: Damage, attacker_position: Vector2) -> void:
-	for effect in damage_data.effects:
-		if effect != null and effect.has_method("apply_effect"):
-			effect.apply_effect(owner_body, attacker_position)
 
 ## 治疗
 ## @param amount: 治疗量

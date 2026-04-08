@@ -13,7 +13,7 @@ class_name EnemyStateMachine
 # ============ 预设类型 ============
 enum Preset {
 	CUSTOM,   # 自定义（不自动创建状态）
-	BASIC,    # 基础敌人（idle, wander, chase, attack, hit, knockback, stun）
+	BASIC,    # 基础敌人（idle, wander, chase, attack, hit）
 	RANGED,   # 远程敌人（增加 retreat 状态）
 	BOSS      # Boss（增加更多状态）
 }
@@ -30,8 +30,6 @@ enum Preset {
 @export var idle_time_range := Vector2(1.0, 3.0)
 ## Wander 状态的巡游时间范围
 @export var wander_time_range := Vector2(2.0, 5.0)
-## Stun 状态的眩晕时间
-@export var stun_duration := 1.0
 ## Hit 状态的硬直时间
 @export var hit_duration := 0.2
 
@@ -76,16 +74,9 @@ func _create_basic_states() -> void:
 	# Attack
 	_create_state("res://Core/StateMachine/CommonStates/AttackState.gd", "Attack")
 
-	# Hit (反应层)
+	# Hit (反应层) - 统一受击状态
 	var hit = _create_state("res://Core/StateMachine/CommonStates/HitState.gd", "Hit")
 	hit.hit_duration = hit_duration
-
-	# Knockback (反应层)
-	_create_state("res://Core/StateMachine/CommonStates/KnockbackState.gd", "Knockback")
-
-	# Stun (控制层)
-	var stun = _create_state("res://Core/StateMachine/CommonStates/StunState.gd", "Stun")
-	stun.stun_duration = stun_duration
 
 	# 设置初始状态
 	init_state = idle

@@ -34,7 +34,7 @@
 [ext_resource type="Script" uid="uid://bmlepq5g4a4jv" path="res://Scenes/Characters/Bosses/Shared/BossCounterState.gd" id="13_counter"]
 [ext_resource type="Texture2D" uid="uid://c1om553421pb2" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_5.png" id="13_fap8e"]
 [ext_resource type="Texture2D" uid="uid://3arqwp0hj6lt" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_down/03_jump_down_3.png" id="13_nhah7"]
-[ext_resource type="Script" uid="uid://ch1jnbnbvsbkf" path="res://Scenes/Characters/Bosses/BladeKeeper/States/BKStun.gd" id="13_stun"]
+[ext_resource type="Script" path="res://Core/StateMachine/CommonStates/HitState.gd" id="13_hit"]
 [ext_resource type="Texture2D" uid="uid://cnv83cxxqlps3" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_up/03_jump_up_1.png" id="14_da7nw"]
 [ext_resource type="Texture2D" uid="uid://62if5r1mx2yk" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_6.png" id="14_hvdqb"]
 [ext_resource type="PackedScene" uid="uid://cecnqhyi5nu00" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.tscn" id="14_projscene"]
@@ -1487,11 +1487,8 @@ script = ExtResource("7_chase")
 [node name="Attack" type="Node" parent="StateMachine" index="2" unique_id=112510037]
 script = ExtResource("8_attack")
 
-[node name="Stun" type="Node" parent="StateMachine" index="3" unique_id=767657071]
-script = ExtResource("13_stun")
-stun_duration = 0.5
-priority = 2
-can_be_interrupted = false
+[node name="Hit" type="Node" parent="StateMachine" index="3" unique_id=767657071]
+script = ExtResource("13_hit")
 
 [node name="Defend" type="Node" parent="StateMachine" index="4" unique_id=893849711]
 script = ExtResource("9_defend")

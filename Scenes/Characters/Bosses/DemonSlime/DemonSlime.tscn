@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://cxi8mhloaga6o" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSChase.gd" id="7_chase"]
 [ext_resource type="Script" uid="uid://dydx5o23bgwjw" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSCleave.gd" id="8_cleave"]
 [ext_resource type="Script" uid="uid://cmjnlwnf7ho78" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSSlam.gd" id="9_slam"]
-[ext_resource type="Script" uid="uid://bbusd5dblsjc7" path="res://Scenes/Characters/Bosses/DemonSlime/States/DSStun.gd" id="10_stun"]
+[ext_resource type="Script" uid="uid://d10wvnas7327v" path="res://Core/StateMachine/CommonStates/HitState.gd" id="10_hit"]
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Bosses/DemonSlime/Attacks/DSShockwave.tscn" id="11_shockwave"]
 [ext_resource type="Resource" path="res://Scenes/Characters/Bosses/DemonSlime/Resources/DSCleaveDamage.tres" id="12_cleave_dmg"]
 [ext_resource type="Resource" path="res://Scenes/Characters/Bosses/DemonSlime/Resources/DSSlamDamage.tres" id="13_slam_dmg"]
@@ -105,37 +105,37 @@ shape = SubResource("RectangleShape2D_ds_collision")
 [node name="AnimationTree" parent="." index="4" unique_id=1779687543]
 tree_root = SubResource("AnimationNodeBlendTree_root")
 
-[node name="HealthComponent" parent="." index="6" unique_id=1260646126]
+[node name="HealthComponent" parent="." index="7" unique_id=1260646126]
 max_health = 1200.0
 health = 1200.0
 
-[node name="BossAttackManager" parent="." index="8" unique_id=1446838887]
+[node name="BossAttackManager" parent="." index="9" unique_id=1446838887]
 script = ExtResource("4_atkmgr")
 shockwave_scene = ExtResource("11_shockwave")
 cleave_damage = ExtResource("12_cleave_dmg")
 slam_damage = ExtResource("13_slam_dmg")
 
-[node name="StateMachine" parent="." index="9" unique_id=1612206536]
+[node name="StateMachine" parent="." index="10" unique_id=1612206536 node_paths=PackedStringArray("init_state")]
 script = ExtResource("5_sm")
+init_state = NodePath("Idle")
 
-[node name="Idle" type="Node" parent="StateMachine" unique_id=1900817675]
+[node name="Idle" type="Node" parent="StateMachine" index="0" unique_id=1900817675]
 script = ExtResource("6_idle")
-use_fixed_time = true
 min_idle_time = 2.0
+use_fixed_time = true
 next_state_on_timeout = "chase"
 
-[node name="Chase" type="Node" parent="StateMachine" unique_id=1179073112]
+[node name="Chase" type="Node" parent="StateMachine" index="1" unique_id=1179073112]
 script = ExtResource("7_chase")
 
-[node name="Attack" type="Node" parent="StateMachine" unique_id=112510037]
+[node name="Attack" type="Node" parent="StateMachine" index="2" unique_id=112510037]
 script = ExtResource("8_cleave")
 
-[node name="Stun" type="Node" parent="StateMachine" unique_id=767657071]
-script = ExtResource("10_stun")
-stun_duration = 1.5
+[node name="Hit" type="Node" parent="StateMachine" index="3" unique_id=767657071]
+script = ExtResource("10_hit")
 
-[node name="Cleave" type="Node" parent="StateMachine" index="7" unique_id=1901149883]
+[node name="Cleave" type="Node" parent="StateMachine" index="4" unique_id=1901149883]
 script = ExtResource("8_cleave")
 
-[node name="Slam" type="Node" parent="StateMachine" index="8" unique_id=1377681166]
+[node name="Slam" type="Node" parent="StateMachine" index="5" unique_id=1377681166]
 script = ExtResource("9_slam")
