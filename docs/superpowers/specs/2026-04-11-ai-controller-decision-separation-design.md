@@ -1,9 +1,13 @@
 # AI Controller — State Machine 与 Decision 分离架构设计
 
 - **日期**: 2026-04-11
-- **范围**: 试点 Boss DemonSlime（并行目录 `DemonSlime2`），验证通过后可推广
-- **设计目标**: 把"决策逻辑"从状态内剥离到声明式 Decision Table，状态机变成纯执行层；简化架构、方便后续维护与新敌人开发
-- **非目标**: StatusEffectComponent / DoT 系统（独立 spec 处理）、现有 `DemonSlime/` 目录的兼容性、其他 Boss/Enemy 的迁移
+- **范围**:
+  - 新建 Scene 模板 `EnemyAIBase.tscn` / `BossAIBase.tscn`，新敌人/Boss 通过继承模板零配置即可运行
+  - 新建 Core/AI 子系统：Blackboard + DecisionTable + AIController + 纯执行器 State 层
+  - 试点 Boss DemonSlime（并行目录 `DemonSlime2/`，继承 BossAIBase 模板）
+  - 出 stock 决策表 + stock guard 库 + 脚本模板
+- **设计目标**: 把决策逻辑从状态内剥离到声明式 Decision Table；状态机退化成纯执行层；简化架构、降低新敌人创作成本（目标 < 10 分钟从零到能跑）
+- **非目标**: StatusEffectComponent / DoT 系统（独立 spec）、现有 `DemonSlime/` 目录的兼容性、旧模板的敌人迁移
 
 ---
 
@@ -383,35 +387,36 @@ DemonSlime2._on_died (监听 HealthComponent.died)
 
 ## 5. DemonSlime2 试点实现
 
-### 5.1 目录结构
+### 5.1 目录结构（继承 BossAIBase 模板）
 
 ```
 Scenes/Characters/Bosses/DemonSlime2/
-├── DemonSlime2.gd              extends BossBase
-├── DemonSlime2.tscn            新场景
+├── DemonSlime2.gd              extends BossBase, 使用 enemy_ai_root 脚本模板
+├── DemonSlime2.tscn            ← inherited scene from BossAIBase.tscn
 ├── AI/
-│   ├── DS2Blackboard.tres      Blackboard 资源实例
-│   ├── DS2DecisionTable.tres   决策表实例
+│   ├── DS2DecisionTable.tres   base_table = StandardBossDecision.tres
 │   └── Guards/
-│       ├── can_cleave.gd       static func check(bb)
+│       ├── can_cleave.gd       (DS2 特有, 非 stock)
 │       ├── can_slam.gd
-│       ├── should_retreat.gd
-│       ├── hp_below_30.gd
-│       ├── should_counter.gd
-│       └── should_evade.gd
-├── States/
-│   ├── DS2Idle.gd
-│   ├── DS2Chase.gd             纯移动+动画
-│   ├── DS2Cleave.gd            播动画+生成扇形冲击波
-│   ├── DS2Slam.gd              播动画+生成 slam 伤害区
-│   ├── DS2Hit.gd               受击动画+timer
-│   ├── DS2Stun.gd              眩晕动画+timer
-│   └── DS2Death.gd
-└── Attacks/
-    └── (复用或新建)
+│       ├── poise_broken.gd
+│       ├── evasion_rolled_defend.gd
+│       └── evasion_rolled_roll.gd
+├── States/                     (DS2 特有状态, 放入 StateMachine 作为 inherited scene 新增子节点)
+│   ├── DS2Cleave.gd            播动画 + 生成扇形冲击波 + emit attack_finished
+│   ├── DS2Slam.gd              播动画 + 生成 slam 伤害区 + emit attack_finished
+│   ├── DS2Counter.gd           反击动作 + emit reaction_finished
+│   ├── DS2Defend.gd            格挡动作 + emit reaction_finished
+│   └── DS2Roll.gd              翻滚回避 + emit reaction_finished
+└── Attacks/                    (效果场景)
+    ├── FanShockwave.tscn
+    └── SlamImpact.tscn
 ```
 
-**明确放弃**：不在旧 `DemonSlime/` 上修改；不引用旧 `DSChase / DSCleave / DSSlam / DSStateMachine / DSAttackManager`；如需复用攻击效果 Scene，直接 preload。
+**说明**：
+- **Idle / Chase / Hit / Stun / Death 全部从 BossAIBase 模板继承**，不在 DS2 目录里重写
+- DS2 特有状态（Cleave/Slam/Counter/Defend/Roll）作为 inherited scene 的新增子节点，加入 `StateMachine` 容器
+- `DS2DecisionTable.base_table = StandardBossDecision.tres`，只写 16 条增量规则（§14.4）
+- **明确放弃**：不在旧 `DemonSlime/` 上修改；不引用旧 DS 状态；如需复用攻击效果 Scene，直接 preload
 
 ### 5.2 DS2 决策表规则全表
 
@@ -627,15 +632,42 @@ func _on_phase_changed(_new_phase: int) -> void:
 
 ## 9. 交付物
 
-1. `Core/AI/Blackboard.gd` + .uid
-2. `Core/AI/TransitionRule.gd` + .uid
-3. `Core/AI/DecisionTable.gd` + .uid
-4. `Core/AI/State.gd` + .uid
-5. `Core/AI/AIController.gd` + .uid
-6. `Core/AI/AIEvents.gd`（事件常量）
-7. `Scenes/Characters/Bosses/DemonSlime2/` 完整目录
-8. `Tests/AI/` GUT 测试套件
-9. 本 spec 的 README 链接更新到 `CLAUDE.md` 的 Architecture 部分（实现完成后由 context-updater 技能处理）
+### 9.1 核心类 (Core/AI/)
+1. `Blackboard.gd` + .uid
+2. `TransitionRule.gd` + .uid
+3. `DecisionTable.gd` + .uid（含 §14 继承机制）
+4. `State.gd` + .uid
+5. `AIController.gd` + .uid
+6. `AIEvents.gd`（事件常量）
+
+### 9.2 Stock 状态库 (Core/AI/Stock/)
+7. `IdleState.gd` / `ChaseState.gd` / `WanderState.gd` / `HitState.gd` / `StunState.gd` / `DeathState.gd`
+
+### 9.3 Stock Guard 库 (Core/AI/Guards/)
+8. `guard_target_alive.gd` / `guard_target_lost.gd` / `guard_in_detection_range.gd` / `guard_in_attack_range.gd` / `guard_in_melee_range.gd` / `guard_attack_cooldown_ready.gd` / `guard_global_cooldown_ready.gd` / `guard_hp_below_threshold.gd` / `guard_stun_applied.gd`
+
+### 9.4 Stock 决策表 (Core/AI/Templates/)
+9. `StandardEnemyDecision.tres`
+10. `PatrolEnemyDecision.tres`
+11. `StandardBossDecision.tres`
+
+### 9.5 场景模板 (Scenes/Characters/Templates/)
+12. `EnemyAIBase.tscn`（预装 AIController + StateMachine + 4 stock 状态）
+13. `BossAIBase.tscn`（预装 AIController + StateMachine + 5 stock 状态 + BossAttackManager）
+
+### 9.6 Godot 脚本模板 (script_templates/)
+14. `Node/ai_state.gd`
+15. `RefCounted/ai_guard.gd`
+16. `CharacterBody2D/enemy_ai_root.gd`
+
+### 9.7 DemonSlime2 试点 (Scenes/Characters/Bosses/DemonSlime2/)
+17. 完整目录，详见 §5.1
+
+### 9.8 测试 (Tests/AI/)
+18. `test_blackboard.gd` / `test_decision_table.gd`（含继承） / `test_transition_rule.gd` / `test_ai_controller.gd` / `test_stock_states.gd` / `test_ds2_integration.gd`
+
+### 9.9 文档
+19. 本 spec 实现完成后由 `context-updater` skill 更新 `CLAUDE.md` Architecture 章节、`docs/class-diagrams.md`、`docs/architecture-diagrams.md`
 
 ---
 
@@ -645,3 +677,313 @@ func _on_phase_changed(_new_phase: int) -> void:
 - DecisionTable 的自定义 Inspector 插件
 - Blackboard 的信号式变化通知（目前是 Pull，未来可加 `bb_changed` 信号让 AIController 立即重评估而非等 safety tick）
 - 嵌套 AIController（LimboAI 式 HSM 嵌套），用于表达多层"战斗模式"
+
+---
+
+## 11. 场景模板架构（Template Inheritance）
+
+参考 LimboAI 的 `agent_base.tscn` 模式：新敌人通过继承共享模板，继承所有基础设施 + 预装 AI 管线，只需调整贴图/数值/添加特有攻击状态即可运行。
+
+### 11.1 两套新模板
+
+| 模板 | 用于 | 主要差异 |
+|---|---|---|
+| `Scenes/Characters/Templates/EnemyAIBase.tscn` | 普通敌人 | `Sprite2D` 视觉、小号 HealthBar、无 BossAttackManager |
+| `Scenes/Characters/Templates/BossAIBase.tscn` | Boss | `AnimatedSprite2D` 视觉、大号 HealthBar、带 BossAttackManager、多一个预装 StunState |
+
+两套模板**不**共享一个更底层的 `AgentBase` —— 它们的 Sprite 类型、HealthBar 尺寸、collision 配置差异太大，多一层基类收益抵不上认知复杂度。
+
+### 11.2 EnemyAIBase.tscn 节点结构
+
+```
+EnemyAIBase (CharacterBody2D, script=Core/Characters/EnemyBase.gd, groups=["enemy"])
+├── Sprite2D                          空 texture, 待子场景覆盖
+├── AnimationPlayer
+├── AnimationTree
+│     参数路径约定:
+│       parameters/locomotion/blend_position  (Vector2, 移动混合)
+│       parameters/control_sm/playback        (StateMachine, hit/stun/attack 动画)
+│       parameters/control_blend/blend_amount (float, locomotion ↔ control_sm)
+│       parameters/attack_oneshot/request     (OneShot, 攻击动画触发)
+├── CollisionShape2D                  空 shape, 待子场景覆盖
+├── FloorCollision                    CollisionShape2D
+├── HurtBoxComponent (Area2D)
+│   └── CollisionShape2D
+├── HitBoxComponent (Area2D)
+│   └── CollisionShape2D
+├── HealthComponent                   max_health=100 默认
+├── HealthBar (ProgressBar)           小尺寸预设
+├── DamageNumbersAnchor (Node2D)
+└── AIController (Node)
+     @export decision_table = Core/AI/Templates/StandardEnemyDecision.tres  (默认)
+     @export initial_state_name = &"idle"
+     └── StateMachine (Node)          纯容器，不带脚本
+          ├── IdleState   (script=Core/AI/Stock/IdleState.gd)
+          ├── ChaseState  (script=Core/AI/Stock/ChaseState.gd)
+          ├── HitState    (script=Core/AI/Stock/HitState.gd)
+          └── DeathState  (script=Core/AI/Stock/DeathState.gd)
+```
+
+### 11.3 BossAIBase.tscn 增量（相对 Enemy）
+
+- 根节点 `script = Core/Characters/BossBase.gd`
+- `Sprite2D` → `AnimatedSprite2D`
+- 新增 `BossAttackManager (Node, script=Scenes/Characters/Bosses/Shared/BossAttackManager.gd)`
+- `HealthBar` 尺寸更大
+- `AIController.decision_table` 默认 = `Core/AI/Templates/StandardBossDecision.tres`
+- `StateMachine` 额外预装 `StunState`（Boss 专用，眩晕时间长、配合 stun_immunity）
+
+### 11.3b 模板里的 Resource 绑定约定
+
+Godot 的 `@export var decision_table: DecisionTable` 字段在模板 `.tscn` 里通过 `ExtResource` 绑定到具体 .tres。**注意**：继承模板的子场景如果想换一张决策表，必须在子场景里显式覆盖该字段，不能靠"清空"—— 清空会变成 null 而不是"回到默认"。这是 Godot inherited scene 的固有行为，spec 不做特殊处理，工作流文档里会提示。
+
+### 11.4 旧模板处理
+
+`Scenes/Characters/Templates/EnemyBase.tscn` / `BossBase.tscn` **保留不动**（现有敌人还在用），在模板顶部的 `_comment` 节点或 README 里标注 `@deprecated — 新敌人请使用 EnemyAIBase.tscn`。未来全面迁移完成后再删。
+
+---
+
+## 12. Core/AI 目录结构（新）
+
+```
+Core/AI/
+├── Blackboard.gd                     §3.1
+├── TransitionRule.gd                 §3.2
+├── DecisionTable.gd                  §3.3  + §14 继承机制
+├── State.gd                          §3.4
+├── AIController.gd                   §3.5
+├── AIEvents.gd                       事件常量集中
+│
+├── Stock/                            预装的通用状态（模板内被引用）
+│   ├── IdleState.gd
+│   ├── ChaseState.gd
+│   ├── WanderState.gd               (PatrolEnemy 用)
+│   ├── HitState.gd
+│   ├── StunState.gd                  (Boss 用)
+│   └── DeathState.gd
+│
+├── Guards/                           通用 guard 函数库，规则可直接引用
+│   ├── guard_target_alive.gd
+│   ├── guard_target_lost.gd
+│   ├── guard_in_detection_range.gd
+│   ├── guard_in_attack_range.gd
+│   ├── guard_in_melee_range.gd
+│   ├── guard_attack_cooldown_ready.gd
+│   ├── guard_global_cooldown_ready.gd
+│   └── guard_hp_below_threshold.gd   (带参数版本，见 §14)
+│
+└── Templates/                        stock 决策表
+    ├── StandardEnemyDecision.tres    idle/chase/hit/death 基础
+    ├── PatrolEnemyDecision.tres      + wander/patrol
+    └── StandardBossDecision.tres     + stun, phase_changed
+```
+
+### 12.1 AIEvents.gd
+
+```gdscript
+class_name AIEvents
+
+# 生命周期事件
+const EV_DAMAGED        := &"damaged"
+const EV_DIED           := &"died"
+const EV_PHASE_CHANGED  := &"phase_changed"
+
+# 状态完成事件
+const EV_ATTACK_FINISHED := &"attack_finished"
+const EV_HIT_RECOVERED   := &"hit_recovered"
+const EV_STUN_RECOVERED  := &"stun_recovered"
+const EV_REACTION_DONE   := &"reaction_finished"
+
+# 感知事件（可选，由外部系统 dispatch）
+const EV_TARGET_LOST     := &"target_lost"
+const EV_TARGET_SPOTTED  := &"target_spotted"
+```
+
+状态和决策表规则都用常量，防拼写错。
+
+### 12.2 StandardEnemyDecision.tres 规则表
+
+| # | from | event | to | guard | priority |
+|---|---|---|---|---|---|
+| 1 | idle | — | chase | `GuardTargetInDetectionRange` | 0 |
+| 2 | chase | — | idle | `GuardTargetLost` | 0 |
+| 3 | * | damaged | hit | — | 10 |
+| 4 | hit | hit_recovered | chase | `GuardTargetAlive` | 10 |
+| 5 | hit | hit_recovered | idle | — | 0 |
+| 6 | * | died | death | — | 100 |
+
+新敌人继承此表后，通过"扩展"（§14）添加攻击规则（例：`chase → my_attack, guard=GuardInMeleeRange`）。
+
+### 12.3 StandardBossDecision.tres 规则表
+
+在 StandardEnemyDecision 基础上 +：
+
+| # | from | event | to | guard | priority |
+|---|---|---|---|---|---|
+| 7 | * | phase_changed | chase | `GuardTargetAlive` | 50 |
+| 8 | * | damaged | stun | `GuardStunApplied` | 15 |
+| 9 | stun | stun_recovered | chase | `GuardTargetAlive` | 10 |
+
+---
+
+## 13. 新敌人创作工作流
+
+目标：< 10 分钟从零到可运行。
+
+### 13.1 普通敌人（无攻击）
+
+1. Godot 编辑器：右键 `Scenes/Characters/Enemies/` → **New Inherited Scene** → 选 `EnemyAIBase.tscn`
+2. 根节点重命名 `NewEnemy`
+3. 设置 `Sprite2D.texture` = 贴图
+4. 调整 `HealthComponent.max_health`
+5. 调整 `CollisionShape2D` / `HurtBoxComponent/CollisionShape2D` / `HitBoxComponent/CollisionShape2D` 尺寸
+6. 保存为 `Scenes/Characters/Enemies/NewEnemy/NewEnemy.tscn`
+
+此时敌人已经可以跑：待机 → 玩家进入 detection → 追击 → 受击 → 死亡。**零代码。**
+
+### 13.2 带特殊攻击的敌人
+
+在 13.1 基础上继续：
+
+7. 右键 `Scenes/Characters/Enemies/NewEnemy/` → New Script → 选脚本模板 **"AI State"** → 命名 `NewEnemyAttack.gd`
+8. 实现 `enter() / physics_update() / exit()`，在动画结束时 `emit_event(AIEvents.EV_ATTACK_FINISHED)`
+9. 把 `NewEnemyAttack` 作为 `StateMachine` 的子节点添加（名字 = `"attack"`）
+10. 右键 `Core/AI/Templates/StandardEnemyDecision.tres` → Duplicate → `NewEnemyDecision.tres`
+11. 打开 `NewEnemyDecision.tres`，添加一条 `TransitionRule`:
+    - `from = chase`, `to = attack`, `guard_script = GuardInMeleeRange`
+12. 可选：添加 `from = attack, event = attack_finished, to = chase`（若不用 stock 规则 5 的回退路径）
+13. 把 `AIController.decision_table` 改指向 `NewEnemyDecision.tres`
+
+运行验证。**加一个攻击约 5-10 分钟。**
+
+### 13.3 Boss
+
+流程同 13.2，但：
+- Step 1 选 `BossAIBase.tscn`
+- Step 10 duplicate `StandardBossDecision.tres`
+- 配置 `BossAttackManager.phase_configs`（多阶段攻击池，复用现有机制）
+- Boss 根脚本继承 `BossBase`，监听 `phase_changed` → `ai_controller.dispatch(AIEvents.EV_PHASE_CHANGED)`
+
+---
+
+## 14. DecisionTable 继承机制
+
+### 14.1 动机
+
+- DS2 决策表 90% 规则和 StandardBossDecision 一样（idle/chase/hit/stun/death/phase_changed）
+- 不希望复制粘贴，否则 stock 规则更新时所有 Boss 都要手动同步
+
+### 14.2 实现
+
+`DecisionTable.gd` 新增：
+
+```gdscript
+@export var base_table: DecisionTable = null   # 可选基表
+@export var rules: Array[TransitionRule] = []
+
+var _cached_rules: Array[TransitionRule] = []
+var _is_cached: bool = false
+
+## 返回合并后的完整规则（递归合并 base）
+func get_effective_rules() -> Array[TransitionRule]:
+    if _is_cached:
+        return _cached_rules
+    var merged: Array[TransitionRule] = []
+    if base_table:
+        merged.append_array(base_table.get_effective_rules())
+    merged.append_array(rules)
+    # 注：不做去重，让子表规则有机会"影子覆盖"同 from+event 的父规则
+    # AIController 查询时按 priority 排序后取第一条命中的
+    _cached_rules = merged
+    _is_cached = true
+    return _cached_rules
+```
+
+`AIController` 调用 `decision_table.get_effective_rules()` 而非 `rules` 直接读。
+
+### 14.3 子表如何覆盖父表规则
+
+子表加一条 `from=chase, event="", to=cleave, priority=20`；父表如果有 `from=chase, event="", to=attack, priority=10` —— 合并后两条都在，AIController 按 priority 降序评估，子表优先。**不主动删除父规则**（避免隐式破坏）。
+
+如需**完全屏蔽**父规则：子表加一条同 `from + event` 但 `to` 指向 noop、priority 更高的规则，或者 spec 后续引入 `@export var disabled_events: Array[StringName]` 显式禁用（本版本不做）。
+
+### 14.4 DS2DecisionTable.tres 示例
+
+```
+base_table: StandardBossDecision.tres
+
+rules (本表新增):
+├─ chase → cleave  (cond, GuardCanCleave, priority=10)
+├─ chase → slam    (cond, GuardCanSlam,   priority=20)
+├─ cleave → chase  (event=attack_finished, priority=0)
+├─ slam → chase    (event=attack_finished, priority=0)
+├─ * → counter     (event=damaged, guard=GuardPoiseBroken, priority=30)
+├─ * → defend      (event=damaged, guard=GuardEvasionRolledDefend, priority=20)
+├─ * → roll        (event=damaged, guard=GuardEvasionRolledRoll, priority=19)
+├─ counter → chase (event=reaction_finished, priority=0)
+├─ defend → chase  (event=reaction_finished, priority=0)
+└─ roll → chase    (event=reaction_finished, priority=0)
+```
+
+Stock 的 `hit / death / idle ↔ chase / phase_changed` 规则全部从父表继承，DS2 只写 16 条增量。
+
+---
+
+## 15. 脚本模板（script_templates/）
+
+Godot 的 `script_templates/` 目录允许用户在"新建脚本"对话框里选预定义骨架。新增 3 个：
+
+### 15.1 `script_templates/Node/ai_state.gd`
+
+```gdscript
+# meta-description: AI State (pure executor, emits events)
+extends State
+
+func enter() -> void:
+    pass
+
+func physics_update(_delta: float) -> void:
+    pass
+
+func exit() -> void:
+    pass
+```
+
+### 15.2 `script_templates/RefCounted/ai_guard.gd`
+
+```gdscript
+# meta-description: AI Guard (static check function for DecisionTable rules)
+extends RefCounted
+
+static func check(bb: Blackboard) -> bool:
+    return true
+```
+
+### 15.3 `script_templates/CharacterBody2D/enemy_ai_root.gd`
+
+```gdscript
+# meta-description: Enemy/Boss root script with AI wiring
+extends EnemyBase  # or BossBase
+
+@onready var ai_controller: AIController = $AIController
+@onready var health_component: HealthComponent = $HealthComponent
+
+func _ready() -> void:
+    super._ready()
+    if health_component:
+        health_component.damaged.connect(_on_damaged)
+        health_component.died.connect(_on_died)
+
+func _on_damaged(damage: Damage, attacker_pos: Vector2) -> void:
+    var bb := ai_controller.blackboard
+    if bb == null: return
+    bb.last_damage = damage
+    bb.last_attacker_position = attacker_pos
+    bb.recently_hit = true
+    ai_controller.dispatch(AIEvents.EV_DAMAGED)
+
+func _on_died() -> void:
+    ai_controller.dispatch(AIEvents.EV_DIED)
+```
+
+
