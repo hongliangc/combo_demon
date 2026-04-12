@@ -387,12 +387,14 @@ DemonSlime2._on_died (监听 HealthComponent.died)
 
 ## 5. DemonSlime2 试点实现
 
-### 5.1 目录结构（继承 BossAIBase 模板）
+### 5.1 目录结构（继承 AgentAIBase 模板）
 
 ```
 Scenes/Characters/Bosses/DemonSlime2/
 ├── DemonSlime2.gd              extends BossBase, 使用 enemy_ai_root 脚本模板
-├── DemonSlime2.tscn            ← inherited scene from BossAIBase.tscn
+├── DemonSlime2.tscn            ← inherited scene from AgentAIBase.tscn
+│                                  根节点 script 覆盖为 BossBase.gd → DemonSlime2.gd
+│                                  新增 BossAttackManager / StunState 等子节点
 ├── AI/
 │   ├── DS2DecisionTable.tres   base_table = StandardBossDecision.tres
 │   └── Guards/
@@ -413,7 +415,7 @@ Scenes/Characters/Bosses/DemonSlime2/
 ```
 
 **说明**：
-- **Idle / Chase / Hit / Stun / Death 全部从 BossAIBase 模板继承**，不在 DS2 目录里重写
+- **Idle / Chase / Hit / Death 从 AgentAIBase 模板继承**，StunState 作为 Boss 额外子节点添加，不在 DS2 目录里重写
 - DS2 特有状态（Cleave/Slam/Counter/Defend/Roll）作为 inherited scene 的新增子节点，加入 `StateMachine` 容器
 - `DS2DecisionTable.base_table = StandardBossDecision.tres`，只写 16 条增量规则（§14.4）
 - **明确放弃**：不在旧 `DemonSlime/` 上修改；不引用旧 DS 状态；如需复用攻击效果 Scene，直接 preload
@@ -652,8 +654,7 @@ func _on_phase_changed(_new_phase: int) -> void:
 11. `StandardBossDecision.tres`
 
 ### 9.5 场景模板 (Scenes/Characters/Templates/)
-12. `EnemyAIBase.tscn`（预装 AIController + StateMachine + 4 stock 状态）
-13. `BossAIBase.tscn`（预装 AIController + StateMachine + 5 stock 状态 + BossAttackManager）
+12. `AgentAIBase.tscn`（单一模板，预装 AIController + StateMachine + 4 stock 状态；Boss 通过继承后覆盖 script + 加子节点实现）
 
 ### 9.6 Godot 脚本模板 (script_templates/)
 14. `Node/ai_state.gd`
@@ -684,19 +685,23 @@ func _on_phase_changed(_new_phase: int) -> void:
 
 参考 LimboAI 的 `agent_base.tscn` 模式：新敌人通过继承共享模板，继承所有基础设施 + 预装 AI 管线，只需调整贴图/数值/添加特有攻击状态即可运行。
 
-### 11.1 两套新模板
+### 11.1 单一模板 `AgentAIBase.tscn`
 
-| 模板 | 用于 | 主要差异 |
-|---|---|---|
-| `Scenes/Characters/Templates/EnemyAIBase.tscn` | 普通敌人 | `Sprite2D` 视觉、小号 HealthBar、无 BossAttackManager |
-| `Scenes/Characters/Templates/BossAIBase.tscn` | Boss | `AnimatedSprite2D` 视觉、大号 HealthBar、带 BossAttackManager、多一个预装 StunState |
+新架构下 AI 层通过 AIController 完全统一，Boss 和 Enemy 差异仅在根脚本和可选组件，**不需要两套模板**：
 
-两套模板**不**共享一个更底层的 `AgentBase` —— 它们的 Sprite 类型、HealthBar 尺寸、collision 配置差异太大，多一层基类收益抵不上认知复杂度。
+| Boss 与 Enemy 的差异 | 怎么处理 |
+|---|---|
+| 根脚本（BossBase vs EnemyBase） | 继承场景里**覆盖根节点 script** |
+| BossAttackManager | 需要时**手动加子节点** |
+| Phase 系统 | BossBase 的信号，根脚本里 `dispatch("phase_changed")` |
+| Poise / Evasion | 根脚本 `_on_damaged` 里按需实现 |
+| StunState | 需要时加到 StateMachine（任何 enemy 也可以有 stun） |
+| AnimatedSprite2D | 模板默认 Sprite2D；需要 AnimatedSprite2D 时隐藏 Sprite2D 并新增 |
 
-### 11.2 EnemyAIBase.tscn 节点结构
+### 11.2 AgentAIBase.tscn 节点结构
 
 ```
-EnemyAIBase (CharacterBody2D, script=Core/Characters/EnemyBase.gd, groups=["enemy"])
+AgentAIBase (CharacterBody2D, script=Core/Characters/EnemyBase.gd, groups=["enemy"])
 ├── Sprite2D                          空 texture, 待子场景覆盖
 ├── AnimationPlayer
 ├── AnimationTree
@@ -712,7 +717,7 @@ EnemyAIBase (CharacterBody2D, script=Core/Characters/EnemyBase.gd, groups=["enem
 ├── HitBoxComponent (Area2D)
 │   └── CollisionShape2D
 ├── HealthComponent                   max_health=100 默认
-├── HealthBar (ProgressBar)           小尺寸预设
+├── HealthBar (ProgressBar)
 ├── DamageNumbersAnchor (Node2D)
 └── AIController (Node)
      @export decision_table = Core/AI/Templates/StandardEnemyDecision.tres  (默认)
@@ -724,16 +729,14 @@ EnemyAIBase (CharacterBody2D, script=Core/Characters/EnemyBase.gd, groups=["enem
           └── DeathState  (script=Core/AI/Stock/DeathState.gd)
 ```
 
-### 11.3 BossAIBase.tscn 增量（相对 Enemy）
+**Boss 场景在继承模板后额外操作**：
+1. 根节点 script 覆盖为 `BossBase.gd`
+2. 添加 `BossAttackManager` 子节点（如需攻击池）
+3. 添加 `StunState` 到 StateMachine（如需眩晕）
+4. `AIController.decision_table` 改指向 `StandardBossDecision.tres` 或自定义表
+5. HealthBar 尺寸/样式按需覆盖
 
-- 根节点 `script = Core/Characters/BossBase.gd`
-- `Sprite2D` → `AnimatedSprite2D`
-- 新增 `BossAttackManager (Node, script=Scenes/Characters/Bosses/Shared/BossAttackManager.gd)`
-- `HealthBar` 尺寸更大
-- `AIController.decision_table` 默认 = `Core/AI/Templates/StandardBossDecision.tres`
-- `StateMachine` 额外预装 `StunState`（Boss 专用，眩晕时间长、配合 stun_immunity）
-
-### 11.3b 模板里的 Resource 绑定约定
+### 11.3 模板里的 Resource 绑定约定
 
 Godot 的 `@export var decision_table: DecisionTable` 字段在模板 `.tscn` 里通过 `ExtResource` 绑定到具体 .tres。**注意**：继承模板的子场景如果想换一张决策表，必须在子场景里显式覆盖该字段，不能靠"清空"—— 清空会变成 null 而不是"回到默认"。这是 Godot inherited scene 的固有行为，spec 不做特殊处理，工作流文档里会提示。
 
@@ -832,7 +835,7 @@ const EV_TARGET_SPOTTED  := &"target_spotted"
 
 ### 13.1 普通敌人（无攻击）
 
-1. Godot 编辑器：右键 `Scenes/Characters/Enemies/` → **New Inherited Scene** → 选 `EnemyAIBase.tscn`
+1. Godot 编辑器：右键 `Scenes/Characters/Enemies/` → **New Inherited Scene** → 选 `AgentAIBase.tscn`
 2. 根节点重命名 `NewEnemy`
 3. 设置 `Sprite2D.texture` = 贴图
 4. 调整 `HealthComponent.max_health`
@@ -859,7 +862,8 @@ const EV_TARGET_SPOTTED  := &"target_spotted"
 ### 13.3 Boss
 
 流程同 13.2，但：
-- Step 1 选 `BossAIBase.tscn`
+- Step 1 选 `AgentAIBase.tscn`，根节点 script 覆盖为 `BossBase.gd`
+- 添加 `BossAttackManager` / `StunState` 等 Boss 特有子节点
 - Step 10 duplicate `StandardBossDecision.tres`
 - 配置 `BossAttackManager.phase_configs`（多阶段攻击池，复用现有机制）
 - Boss 根脚本继承 `BossBase`，监听 `phase_changed` → `ai_controller.dispatch(AIEvents.EV_PHASE_CHANGED)`
