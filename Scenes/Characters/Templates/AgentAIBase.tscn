@@ -1,0 +1,182 @@
+[gd_scene format=3 uid="uid://rllitgnkf211"]
+
+[ext_resource type="Script" uid="uid://ccdt7uouihhtb" path="res://Core/AI/AgentAIBase.gd" id="1_agent_base"]
+[ext_resource type="Script" uid="uid://3cpq40uop66w" path="res://Core/Components/HurtBoxComponent.gd" id="2_hurtbox"]
+[ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="3_health"]
+[ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="5_hitbox"]
+[ext_resource type="Script" uid="uid://cax8bfmlvt4q3" path="res://Core/AI/AIController.gd" id="6_ai_controller"]
+[ext_resource type="Script" uid="uid://bvvnhbufppo8" path="res://Core/AI/Stock/IdleState.gd" id="7_idle"]
+[ext_resource type="Script" uid="uid://beqjsx7b4cg0n" path="res://Core/AI/Stock/ChaseState.gd" id="8_chase"]
+[ext_resource type="Script" uid="uid://c00p727wgkv03" path="res://Core/AI/Stock/HitState.gd" id="9_hit"]
+[ext_resource type="Script" uid="uid://c8dyu2kanm807" path="res://Core/AI/Stock/DeathState.gd" id="10_death"]
+
+[sub_resource type="Animation" id="Animation_RESET"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("HealthBar:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("HurtBoxComponent/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_main"]
+_data = {
+&"RESET": SubResource("Animation_RESET")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(81, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
+size = Vector2(80, 78)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
+size = Vector2(79, 78)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill"]
+bg_color = Color(0.8, 0.1, 0.1, 1)
+
+[sub_resource type="GDScript" id="GDScript_healthbar"]
+script/source = "extends ProgressBar
+
+## 血条 - 兼容 HealthComponent 的 health_changed 信号
+
+func on_health_changed(current_health: float, max_health: float) -> void:
+	if max_health > 0:
+		value = current_health / max_health
+"
+
+[node name="AgentAIBase" type="CharacterBody2D" unique_id=319170295 groups=["enemy"]]
+collision_layer = 8
+collision_mask = 128
+script = ExtResource("1_agent_base")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=364152549]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=710612678]
+libraries/ = SubResource("AnimationLibrary_main")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=884594291]
+shape = SubResource("RectangleShape2D_body")
+
+[node name="HurtBoxComponent" type="Area2D" parent="." unique_id=1245267114]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("2_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBoxComponent" unique_id=975434091]
+shape = SubResource("RectangleShape2D_hurt")
+
+[node name="HitBoxComponent" type="Area2D" parent="." unique_id=1666699896]
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("5_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent" unique_id=1873200456]
+shape = SubResource("RectangleShape2D_hit")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=163196815]
+script = ExtResource("3_health")
+
+[node name="HealthBar" type="ProgressBar" parent="." unique_id=664927981]
+offset_left = -20.0
+offset_top = -30.0
+offset_right = 20.0
+offset_bottom = -24.0
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
+max_value = 1.0
+value = 0.5
+show_percentage = false
+script = SubResource("GDScript_healthbar")
+
+[node name="DamageNumbersAnchor" type="Node2D" parent="." unique_id=863163428]
+position = Vector2(0, -32)
+
+[node name="FloorCastL" type="RayCast2D" parent="." unique_id=1100000001]
+position = Vector2(-45, 35)
+target_position = Vector2(0, 15)
+
+[node name="FloorCastR" type="RayCast2D" parent="." unique_id=1100000002]
+position = Vector2(45, 35)
+target_position = Vector2(0, 15)
+
+[node name="WallCastL" type="RayCast2D" parent="." unique_id=1100000003]
+target_position = Vector2(-50, 0)
+
+[node name="WallCastR" type="RayCast2D" parent="." unique_id=1100000004]
+target_position = Vector2(50, 0)
+
+[node name="AIController" type="Node" parent="." unique_id=566218302]
+script = ExtResource("6_ai_controller")
+
+[node name="StateMachine" type="Node" parent="AIController" unique_id=193203180]
+
+[node name="Idle" type="Node" parent="AIController/StateMachine" unique_id=2065975853]
+script = ExtResource("7_idle")
+
+[node name="Chase" type="Node" parent="AIController/StateMachine" unique_id=942496324]
+script = ExtResource("8_chase")
+
+[node name="Hit" type="Node" parent="AIController/StateMachine" unique_id=158595046]
+script = ExtResource("9_hit")
+
+[node name="Death" type="Node" parent="AIController/StateMachine" unique_id=551432475]
+script = ExtResource("10_death")

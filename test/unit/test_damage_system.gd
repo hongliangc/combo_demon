@@ -1,4 +1,5 @@
 extends GutTest
+const H = preload("res://test/base/test_helper.gd")
 
 ## Damage Resource 单元测试
 ## 验证伤害创建、效果组合、范围随机化
@@ -36,7 +37,7 @@ func test_damage_randomize_in_range() -> void:
 	dmg.max_amount = 20.0
 	for i in range(10):
 		dmg.randomize_damage()
-		assert_between(dmg.amount, 10.0, 20.0, "Randomized damage should be in range")
+		assert_true(dmg.amount >= 10.0 and dmg.amount <= 20.0, "Randomized damage should be in range")
 
 func test_damage_effects_description_empty() -> void:
 	var dmg = Damage.new()
@@ -47,3 +48,15 @@ func test_damage_effects_description_with_effects() -> void:
 	dmg.effects.append(StunEffect.new())
 	var desc = dmg.get_effects_description()
 	assert_ne(desc, "无特效", "Should have effect description")
+
+# ---- 工厂方法测试 ----
+
+func test_create_stun_damage_has_stun_effect() -> void:
+	var dmg = H.create_stun_damage(20.0, 2.0)
+	assert_eq(dmg.amount, 20.0)
+	assert_true(dmg.has_effect("StunEffect"))
+
+func test_create_knockback_damage_has_knockback_effect() -> void:
+	var dmg = H.create_knockback_damage(15.0, 500.0)
+	assert_eq(dmg.amount, 15.0)
+	assert_true(dmg.has_effect("KnockBackEffect"))

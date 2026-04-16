@@ -1,0 +1,98 @@
+class_name AgentAIBase extends CharacterBody2D
+
+## AI 角色统一基类
+## 职责：gravity + move_and_slide + facing + AI 信号接线 + _register_rules
+
+@export var has_gravity: bool = false
+@export var gravity_force: float = 800.0
+## 美术原图默认朝向：true=朝右，false=朝左
+@export var sprite_faces_right: bool = false
+
+@onready var ai: AIController = $AIController
+@onready var health_comp: HealthComponent = $HealthComponent
+@onready var anim_player: AnimationPlayer = $AnimationPlayer
+var sprite: Node2D
+
+@onready var _floor_cast_l: RayCast2D = get_node_or_null(^"FloorCastL")
+@onready var _floor_cast_r: RayCast2D = get_node_or_null(^"FloorCastR")
+@onready var _wall_cast_l: RayCast2D = get_node_or_null(^"WallCastL")
+@onready var _wall_cast_r: RayCast2D = get_node_or_null(^"WallCastR")
+
+func _ready() -> void:
+	_auto_find_sprite()
+	_setup_blackboard()
+	_setup_transitions()
+	_setup_signals()
+
+func _physics_process(delta: float) -> void:
+	if has_gravity:
+		if not is_on_floor():
+			velocity.y += gravity_force * delta
+		elif velocity.y > 0:
+			velocity.y = 0
+	move_and_slide()
+	_update_facing()
+
+func _update_facing() -> void:
+	if sprite and "flip_h" in sprite and abs(velocity.x) > 0.1:
+		var moving_right := velocity.x > 0
+		sprite.flip_h = moving_right != sprite_faces_right
+
+func _auto_find_sprite() -> void:
+	sprite = get_node_or_null(^"AnimatedSprite2D")
+	if not sprite:
+		sprite = get_node_or_null(^"Sprite2D")
+
+# ---- 平台移动助手 ----
+## 判断 dir 方向(-1/+1)上是否可安全移动:前方有地面 + 无墙
+## 未配置 RayCast 时视为可移动(兼容非平台敌人)
+func can_move_dir(dir: int) -> bool:
+	if dir == 0:
+		return true
+	if dir > 0:
+		var has_floor := _floor_cast_r == null or _floor_cast_r.is_colliding()
+		var hit_wall := _wall_cast_r != null and _wall_cast_r.is_colliding()
+		return has_floor and not hit_wall
+	else:
+		var has_floor := _floor_cast_l == null or _floor_cast_l.is_colliding()
+		var hit_wall := _wall_cast_l != null and _wall_cast_l.is_colliding()
+		return has_floor and not hit_wall
+
+# ---- 子类重写 ----
+func _setup_blackboard() -> void:
+	var bb := ai.blackboard
+	bb.bind_var(&"health", health_comp, &"health")
+	bb.bind_var(&"max_health", health_comp, &"max_health")
+
+func _setup_transitions() -> void:
+	pass
+
+func _setup_signals() -> void:
+	if health_comp:
+		health_comp.damaged.connect(_on_agent_damaged)
+		health_comp.died.connect(_on_agent_died)
+
+func _on_agent_damaged(damage: Damage, attacker_pos: Vector2) -> void:
+	var bb := ai.blackboard
+	bb.set_var(&"last_damage", damage)
+	bb.set_var(&"last_attacker_pos", attacker_pos)
+	bb.set_var(&"recently_hit", true)
+	ai.dispatch(AIEvents.EV_DAMAGED)
+
+func _on_agent_died() -> void:
+	ai.dispatch(AIEvents.EV_DIED)
+
+# ---- 数据驱动转换表注册 ----
+## rules 格式: [[from, to, event, guard_method, priority], ...]
+## from="*" 表示 ANYSTATE; guard_method="" 表示无条件
+## 自动跳过 StateMachine 中不存在的状态
+func _register_rules(rules: Array) -> void:
+	for r in rules:
+		var from: AIState = null if r[0] == "*" else ai.get_state(StringName(r[0]))
+		var to: AIState = ai.get_state(StringName(r[1]))
+		if r[0] != "*" and from == null:
+			continue
+		if to == null:
+			continue
+		var guard := Callable(self, r[3]) if r[3] != "" else Callable()
+		ai.add_transition(from, to, StringName(r[2]), guard, r[4])

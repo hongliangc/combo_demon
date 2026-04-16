@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://d1sj82yqwu01u" path="res://Scenes/Characters/Player/Hahashin/Hahashin.tscn" id="5_hkjyj"]
 [ext_resource type="Texture2D" uid="uid://u4gr3v560huf" path="res://Assets/Art/Parallax/map/groundTilemap_64px.png" id="6_bwdy2"]
 [ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="8_hkjyj"]
-[ext_resource type="PackedScene" uid="uid://bics1mnpd7xx4" path="res://Scenes/Characters/Bosses/BladeKeeper/BladeKeeper.tscn" id="9_r0gje"]
+[ext_resource type="PackedScene" uid="uid://30x40w2knf12" path="res://Scenes/Characters/Bosses/DemonSlime2/DemonSlime2.tscn" id="10_ahiby"]
 [ext_resource type="Texture2D" uid="uid://doc4o6oilqo3j" path="res://Assets/Art/Parallax/map/decoration/fence1_32px.png" id="10_w0eu8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_npi6w"]
@@ -374,6 +374,7 @@ texture = ExtResource("10_w0eu8")
 
 [sub_resource type="TileSet" id="TileSet_hkjyj"]
 physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 11
 sources/0 = SubResource("TileSetAtlasSource_npi6w")
 sources/2 = SubResource("TileSetAtlasSource_ahiby")
 
@@ -452,9 +453,6 @@ position = Vector2(321, 176)
 zoom = Vector2(2, 2)
 script = ExtResource("8_hkjyj")
 
-[node name="BladeKeeper" parent="." unique_id=1437296221 instance=ExtResource("9_r0gje")]
-position = Vector2(376, 277)
-
 [node name="TileMap" type="Node2D" parent="." unique_id=134292072]
 
 [node name="Ground" type="TileMapLayer" parent="TileMap" unique_id=1143799605]
@@ -465,3 +463,6 @@ tile_set = SubResource("TileSet_hkjyj")
 [node name="Fence" type="TileMapLayer" parent="TileMap" unique_id=314779619]
 tile_map_data = PackedByteArray("AADx/xEAAwAAAAIAAADx/xIAAwAAAAMAAADy/xEAAwABAAIAAADy/xIAAwABAAMAAADz/xEAAwACAAIAAADz/xIAAwACAAMAAAD0/xEAAwADAAIAAAD0/xIAAwADAAMAAADx/w8AAwAAAAIAAADx/xAAAwAAAAMAAADy/w8AAwABAAIAAADy/xAAAwABAAMAAADz/w8AAwACAAIAAADz/xAAAwACAAMAAAD0/w8AAwADAAIAAAD0/xAAAwADAAMAAADx/w0AAwAAAAIAAADx/w4AAwAAAAMAAADy/w0AAwABAAIAAADy/w4AAwABAAMAAADz/w0AAwACAAIAAADz/w4AAwACAAMAAAD0/w0AAwADAAIAAAD0/w4AAwADAAMAAADx/wsAAwAAAAIAAADx/wwAAwAAAAMAAADy/wsAAwABAAIAAADy/wwAAwABAAMAAADz/wsAAwACAAIAAADz/wwAAwACAAMAAAD0/wsAAwADAAIAAAD0/wwAAwADAAMAAACUAAsAAwAAAAIAAACUAAwAAwAAAAMAAACUAA0AAwAAAAIAAACUAA4AAwAAAAMAAACUAA8AAwAAAAIAAACUABAAAwAAAAMAAACUABEAAwAAAAIAAACUABIAAwAAAAMAAACVAAsAAwABAAIAAACVAAwAAwABAAMAAACVAA0AAwABAAIAAACVAA4AAwABAAMAAACVAA8AAwABAAIAAACVABAAAwABAAMAAACVABEAAwABAAIAAACVABIAAwABAAMAAACWAAsAAwACAAIAAACWAAwAAwACAAMAAACWAA0AAwACAAIAAACWAA4AAwACAAMAAACWAA8AAwACAAIAAACWABAAAwACAAMAAACWABEAAwACAAIAAACWABIAAwACAAMAAACXAAsAAwADAAIAAACXAAwAAwADAAMAAACXAA0AAwADAAIAAACXAA4AAwADAAMAAACXAA8AAwADAAIAAACXABAAAwADAAMAAACXABEAAwADAAIAAACXABIAAwADAAMAAAA=")
 tile_set = SubResource("TileSet_353he")
+
+[node name="DemonSlime2" parent="." unique_id=168645748 instance=ExtResource("10_ahiby")]
+position = Vector2(251, 227)

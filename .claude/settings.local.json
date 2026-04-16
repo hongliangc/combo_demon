@@ -33,7 +33,9 @@
       "Agent",
       "Bash(\"D:/devtool/godot/Godot_v4.6-stable_win64.exe/Godot_v4.6-stable_win64_console.exe\" --headless --import)",
       "Bash(\"D:/devtool/godot/Godot_v4.6-stable_win64.exe/Godot_v4.6-stable_win64_console.exe\" --headless --script addons/gut/gut_cmdln.gd *)",
-      "mcp__filesystem__write_file"
+      "mcp__filesystem__write_file",
+      "WebFetch(domain:limboai.readthedocs.io)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "deny": [
       "Bash(git rm:*)",
