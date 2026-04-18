@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="ComboSkill" format=3 uid="uid://chokvp3rfo6wc"]
+
+[ext_resource type="Script" uid="uid://bp52vndrtujng" path="res://Core/AI/ComboSkill.gd" id="1"]
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="2"]
+
+[sub_resource type="Resource" id="sub_1"]
+script = ExtResource("2")
+id = &"combo_step1"
+params = {
+&"animation": &"cleave"
+}
+
+[sub_resource type="Resource" id="sub_2"]
+script = ExtResource("2")
+id = &"combo_step2"
+params = {
+&"animation": &"cleave"
+}
+
+[resource]
+script = ExtResource("1")
+sequence = Array[ExtResource("2")]([SubResource("sub_1"), SubResource("sub_2")])
+gap = 0.0
+id = &"combo_2hit"
+state_name = &"combo"
+cooldown = 5.0
+weight = 2
+max_range = 100.0
+tags = Array[StringName]([&"melee", &"combo"])
+interruptible = false
+params = {
+&"global_cooldown": 0.5
+}

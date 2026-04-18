@@ -40,5 +40,16 @@
       "enabled": true,
       "min_level": "INFO"
     }
+  },
+
+  "category_configs": {
+    "state_machine": {
+      "enabled": true,
+      "min_level": "DEBUG"
+    },
+    "ai_diag": {
+      "enabled": true,
+      "min_level": "DEBUG"
+    }
   }
 }

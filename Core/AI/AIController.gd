@@ -14,6 +14,9 @@ var states: Dictionary = {}       # StringName → State
 var current_state: AIState
 var ANYSTATE: AIState = null        # 哨兵值，null = 通配
 
+## 当前正在执行的技能（由 AttackDispatcher 设置，攻击结束时清除）
+var current_skill: Skill = null
+
 var _transitions: Array = []
 var _tick_accum: float = 0.0
 
@@ -46,6 +49,11 @@ func _ready() -> void:
 func _deferred_init() -> void:
 	_find_target()
 	_enter_initial_state()
+	var owner_label: String = String(owner_node.name) if owner_node else "<null>"
+	var target_label: String = String(target_node.name) if target_node else "<NOT FOUND>"
+	DebugConfig.info("[AI] init owner=%s states=%s target=%s initial=%s" % [
+		owner_label, states.keys(), target_label, initial_state_name
+	], "", "ai_diag")
 
 func _collect_states() -> void:
 	var container := get_node_or_null(^"StateMachine")
@@ -84,7 +92,7 @@ func _process(delta: float) -> void:
 		current_state.update(delta)
 
 # ---- Blackboard 更新（仅计算值 — 属性用 bind）----
-func _update_blackboard(delta: float) -> void:
+func _update_blackboard(_delta: float) -> void:
 	if is_instance_valid(target_node) and owner_node is Node2D:
 		var dist: float = (owner_node as Node2D).global_position.distance_to(
 			(target_node as Node2D).global_position)
@@ -95,17 +103,15 @@ func _update_blackboard(delta: float) -> void:
 	else:
 		blackboard.set_var(&"distance", INF)
 		blackboard.set_var(&"target_alive", false)
-	var atk_cd: float = blackboard.get_var(&"attack_cooldown", 0.0)
-	if atk_cd > 0:
-		blackboard.set_var(&"attack_cooldown", maxf(0.0, atk_cd - delta))
-	var gcd: float = blackboard.get_var(&"global_cooldown", 0.0)
-	if gcd > 0:
-		blackboard.set_var(&"global_cooldown", maxf(0.0, gcd - delta))
 
 # ---- 事件分派 ----
 func dispatch(event: StringName) -> void:
 	if current_state == null or event == &"":
 		return
+	# 不可打断技能执行中，只允许白名单事件
+	if current_skill and not current_skill.interruptible:
+		if event != AIEvents.EV_DIED and event != AIEvents.EV_ATTACK_FINISHED:
+			return
 	for t in _transitions:
 		if t.event != event:
 			continue
@@ -127,6 +133,12 @@ func _evaluate_conditional_transitions() -> void:
 			continue
 		if t.guard.is_valid() and not t.guard.call():
 			continue
+		var pending_skill: Skill = blackboard.get_var(&"pending_skill", null)
+		DebugConfig.info("[AI] cond %s → %s (dist=%.0f) skill_id=%s" % [
+			current_state.name, t.to_state.name,
+			blackboard.get_var(&"distance", -1.0),
+			pending_skill.id if pending_skill else "null"
+		], "", "ai_diag")
 		_change_state(t.to_state)
 		return
 
@@ -137,10 +149,16 @@ func _change_state(new_state: AIState) -> void:
 		current_state.exit()
 	current_state = new_state
 	current_state.enter()
-	DebugConfig.debug("[AI] → %s" % new_state.name, "", "state_machine")
+	DebugConfig.info("[AI] → %s" % new_state.name, "", "ai_diag")
 
 func get_current_state_name() -> StringName:
 	return StringName(current_state.name.to_lower()) if current_state else &""
 
 func get_state(state_name: StringName) -> AIState:
 	return states.get(state_name)
+
+## 路由状态专用：直接跳转到指定状态，绕过转换表
+func goto(state_name: StringName) -> void:
+	var target := get_state(state_name)
+	if target:
+		_change_state(target)

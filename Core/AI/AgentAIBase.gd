@@ -1,7 +1,7 @@
 class_name AgentAIBase extends CharacterBody2D
 
 ## AI 角色统一基类
-## 职责：gravity + move_and_slide + facing + AI 信号接线 + _register_rules
+## 职责：gravity + move_and_slide + facing + skill_set + AI 信号接线 + _register_rules
 
 @export var has_gravity: bool = false
 @export var gravity_force: float = 800.0
@@ -13,6 +13,14 @@ class_name AgentAIBase extends CharacterBody2D
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 var sprite: Node2D
 
+var skill_set: SkillSet
+
+# ---- 伤害统计 ----
+var _damage_log: Array[Array] = []   # [[timestamp, amount], ...]
+const DAMAGE_WINDOW: float = 3.0
+var _hit_clear_timer: float = 0.0
+const HIT_CLEAR_DELAY: float = 0.5
+
 @onready var _floor_cast_l: RayCast2D = get_node_or_null(^"FloorCastL")
 @onready var _floor_cast_r: RayCast2D = get_node_or_null(^"FloorCastR")
 @onready var _wall_cast_l: RayCast2D = get_node_or_null(^"WallCastL")
@@ -20,6 +28,7 @@ var sprite: Node2D
 
 func _ready() -> void:
 	_auto_find_sprite()
+	_setup_skill_set()
 	_setup_blackboard()
 	_setup_transitions()
 	_setup_signals()
@@ -31,6 +40,10 @@ func _physics_process(delta: float) -> void:
 		elif velocity.y > 0:
 			velocity.y = 0
 	move_and_slide()
+	if skill_set:
+		skill_set.tick(delta)
+	_tick_global_cooldown(delta)
+	_tick_hit_clear(delta)
 	_update_facing()
 
 func _update_facing() -> void:
@@ -59,10 +72,16 @@ func can_move_dir(dir: int) -> bool:
 		return has_floor and not hit_wall
 
 # ---- 子类重写 ----
+func _setup_skill_set() -> void:
+	skill_set = SkillSet.new()
+
 func _setup_blackboard() -> void:
 	var bb := ai.blackboard
 	bb.bind_var(&"health", health_comp, &"health")
 	bb.bind_var(&"max_health", health_comp, &"max_health")
+	bb.set_var(&"global_cooldown", 0.0)
+	bb.set_var(&"recently_hit", false)
+	bb.set_var(&"damage_recent", 0.0)
 
 func _setup_transitions() -> void:
 	pass
@@ -72,15 +91,42 @@ func _setup_signals() -> void:
 		health_comp.damaged.connect(_on_agent_damaged)
 		health_comp.died.connect(_on_agent_died)
 
+# ---- 事件处理 ----
 func _on_agent_damaged(damage: Damage, attacker_pos: Vector2) -> void:
 	var bb := ai.blackboard
 	bb.set_var(&"last_damage", damage)
 	bb.set_var(&"last_attacker_pos", attacker_pos)
 	bb.set_var(&"recently_hit", true)
+	_hit_clear_timer = HIT_CLEAR_DELAY
+	var now := Time.get_ticks_msec() / 1000.0
+	_damage_log.append([now, damage.amount])
+	_update_damage_recent()
 	ai.dispatch(AIEvents.EV_DAMAGED)
 
 func _on_agent_died() -> void:
 	ai.dispatch(AIEvents.EV_DIED)
+
+# ---- 伤害统计 ----
+func _update_damage_recent() -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	var cutoff := now - DAMAGE_WINDOW
+	while not _damage_log.is_empty() and _damage_log[0][0] < cutoff:
+		_damage_log.pop_front()
+	var total := 0.0
+	for entry in _damage_log:
+		total += entry[1]
+	ai.blackboard.set_var(&"damage_recent", total)
+
+func _tick_hit_clear(delta: float) -> void:
+	if _hit_clear_timer > 0:
+		_hit_clear_timer -= delta
+		if _hit_clear_timer <= 0:
+			ai.blackboard.set_var(&"recently_hit", false)
+
+func _tick_global_cooldown(delta: float) -> void:
+	var gcd: float = ai.blackboard.get_var(&"global_cooldown", 0.0)
+	if gcd > 0:
+		ai.blackboard.set_var(&"global_cooldown", maxf(gcd - delta, 0.0))
 
 # ---- 数据驱动转换表注册 ----
 ## rules 格式: [[from, to, event, guard_method, priority], ...]

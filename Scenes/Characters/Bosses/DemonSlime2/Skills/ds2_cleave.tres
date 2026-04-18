@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://d3jf8xlas0gsn"]
+
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cleave"
+state_name = &"genericattack"
+cooldown = 3.0
+weight = 5
+max_range = 100.0
+tags = Array[StringName]([&"melee"])
+params = {
+&"animation": &"cleave",
+&"global_cooldown": 0.3
+}

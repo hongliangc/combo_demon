@@ -9,6 +9,9 @@
 [ext_resource type="Script" uid="uid://beqjsx7b4cg0n" path="res://Core/AI/Stock/ChaseState.gd" id="8_chase"]
 [ext_resource type="Script" uid="uid://c00p727wgkv03" path="res://Core/AI/Stock/HitState.gd" id="9_hit"]
 [ext_resource type="Script" uid="uid://c8dyu2kanm807" path="res://Core/AI/Stock/DeathState.gd" id="10_death"]
+[ext_resource type="Script" path="res://Core/AI/Stock/AttackDispatcher.gd" id="11_dispatcher"]
+[ext_resource type="Script" path="res://Core/AI/Stock/GenericAttackState.gd" id="12_generic_attack"]
+[ext_resource type="Script" path="res://Core/AI/Stock/ComboState.gd" id="13_combo"]
 
 [sub_resource type="Animation" id="Animation_RESET"]
 length = 0.001
@@ -180,3 +183,12 @@ script = ExtResource("9_hit")
 
 [node name="Death" type="Node" parent="AIController/StateMachine" unique_id=551432475]
 script = ExtResource("10_death")
+
+[node name="Dispatcher" type="Node" parent="AIController/StateMachine"]
+script = ExtResource("11_dispatcher")
+
+[node name="GenericAttack" type="Node" parent="AIController/StateMachine"]
+script = ExtResource("12_generic_attack")
+
+[node name="Combo" type="Node" parent="AIController/StateMachine"]
+script = ExtResource("13_combo")

@@ -83,11 +83,11 @@ func test_anystate_from_any_current() -> void:
 # ============ Guard ============
 
 func test_guard_blocks_transition() -> void:
-	var blocked := true
-	_ai.add_transition(_idle, _chase, &"go", func(): return not blocked)
+	var blocked := [true]  # Array box so lambda captures by reference
+	_ai.add_transition(_idle, _chase, &"go", func(): return not blocked[0])
 	_ai.dispatch(&"go")
 	assert_eq(_ai.get_current_state_name(), &"idle", "guard blocked")
-	blocked = false
+	blocked[0] = false
 	_ai.dispatch(&"go")
 	assert_eq(_ai.get_current_state_name(), &"chase", "guard passed")
 
@@ -102,11 +102,11 @@ func test_priority_ordering() -> void:
 # ============ 条件式转换 ============
 
 func test_conditional_transition_on_tick() -> void:
-	var should_go := false
-	_ai.add_transition(_idle, _chase, &"", func(): return should_go)
+	var should_go := [false]  # Array box so lambda captures by reference
+	_ai.add_transition(_idle, _chase, &"", func(): return should_go[0])
 	_ai._evaluate_conditional_transitions()
 	assert_eq(_ai.get_current_state_name(), &"idle", "guard false")
-	should_go = true
+	should_go[0] = true
 	_ai._evaluate_conditional_transitions()
 	assert_eq(_ai.get_current_state_name(), &"chase", "guard true on tick")
 
@@ -123,3 +123,55 @@ func test_get_state() -> void:
 	assert_eq(_ai.get_state(&"idle"), _idle)
 	assert_eq(_ai.get_state(&"chase"), _chase)
 	assert_null(_ai.get_state(&"nonexistent"))
+
+# ============ goto ============
+
+func test_goto_changes_state() -> void:
+	_ai.goto(&"chase")
+	assert_eq(_ai.get_current_state_name(), &"chase")
+
+func test_goto_invalid_state_does_nothing() -> void:
+	_ai.goto(&"nonexistent")
+	assert_eq(_ai.get_current_state_name(), &"idle")
+
+# ============ current_skill interrupt ============
+
+func test_non_interruptible_skill_blocks_dispatch() -> void:
+	var skill := Skill.new()
+	skill.interruptible = false
+	_ai.current_skill = skill
+	_ai.add_transition(_ai.ANYSTATE, _hit, AIEvents.EV_DAMAGED)
+	_ai.dispatch(AIEvents.EV_DAMAGED)
+	assert_eq(_ai.get_current_state_name(), &"idle", "non-interruptible blocks EV_DAMAGED")
+
+func test_non_interruptible_allows_died() -> void:
+	var skill := Skill.new()
+	skill.interruptible = false
+	_ai.current_skill = skill
+	_ai.add_transition(_ai.ANYSTATE, _death, AIEvents.EV_DIED)
+	_ai.dispatch(AIEvents.EV_DIED)
+	assert_eq(_ai.get_current_state_name(), &"death", "EV_DIED always penetrates")
+
+func test_non_interruptible_allows_attack_finished() -> void:
+	_ai.add_transition(_idle, _chase, &"go")
+	_ai.dispatch(&"go")
+	var skill := Skill.new()
+	skill.interruptible = false
+	_ai.current_skill = skill
+	_ai.add_transition(_chase, _idle, AIEvents.EV_ATTACK_FINISHED)
+	_ai.dispatch(AIEvents.EV_ATTACK_FINISHED)
+	assert_eq(_ai.get_current_state_name(), &"idle", "EV_ATTACK_FINISHED always penetrates")
+
+func test_interruptible_skill_allows_dispatch() -> void:
+	var skill := Skill.new()
+	skill.interruptible = true
+	_ai.current_skill = skill
+	_ai.add_transition(_ai.ANYSTATE, _hit, AIEvents.EV_DAMAGED)
+	_ai.dispatch(AIEvents.EV_DAMAGED)
+	assert_eq(_ai.get_current_state_name(), &"hit", "interruptible allows EV_DAMAGED")
+
+func test_no_skill_allows_dispatch() -> void:
+	_ai.current_skill = null
+	_ai.add_transition(_ai.ANYSTATE, _hit, AIEvents.EV_DAMAGED)
+	_ai.dispatch(AIEvents.EV_DAMAGED)
+	assert_eq(_ai.get_current_state_name(), &"hit", "no skill = interruptible")
