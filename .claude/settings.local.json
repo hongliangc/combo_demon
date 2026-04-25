@@ -35,7 +35,14 @@
       "Bash(\"D:/devtool/godot/Godot_v4.6-stable_win64.exe/Godot_v4.6-stable_win64_console.exe\" --headless --script addons/gut/gut_cmdln.gd *)",
       "mcp__filesystem__write_file",
       "WebFetch(domain:limboai.readthedocs.io)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__plugin_claude-mem_mcp-search__search",
+      "WebFetch(domain:docs.claude-mem.ai)",
+      "mcp__mcp-search__search",
+      "Bash(tasklist)",
+      "Bash(cp \"E:/workspace/4.godot/combo_demon/docs/superpowers/specs/2026-04-16-skill-system-design.md\" \"E:/workspace/knowledge-base/.raw/agent-ai-skill-system-spec-2026-04-16.md\")",
+      "Bash(cp \"E:/workspace/4.godot/combo_demon/.claude/skills/feature-development/references/agent-ai-guide.md\" \"E:/workspace/knowledge-base/.raw/agent-ai-guide.md\")",
+      "Read(//e/workspace/knowledge-base/.raw/**)"
     ],
     "deny": [
       "Bash(git rm:*)",
@@ -46,6 +53,7 @@
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "godot"
+    "godot",
+    "mcp-search"
   ]
 }

@@ -19,3 +19,15 @@
 1. 继续改造，把当前的player和boss等charator 都改造成使用模板场景，简化代码， 抽出公共的功能模块，直接放到模板场景中或者使用组合模式放到模板场景中。方便后续新建boss或者player角色时直接继承模板场景就可以了
 2. 修改后可以需要进行验证
 3. 如果有更好的修改建议可以提出来让我抉择
+
+
+2026.04.20 编码优化
+阅读：docs\superpowers\specs\2026-04-12-ai-v3-agent-base-design.md，查看 _setup_transitions 。优化BladeKeeper 场景脚本实现_setup_transitions。并记录下，用于后续场景迁移或者新建使用AgentAI优化
+
+
+2026.04.21 状态机可以加上重入效果
+触发重入后，可以设置播放动画，animationPlayer.seek 设置为第一帧
+
+
+2026.04.25 
+1. DS2 被攻击不掉血修复

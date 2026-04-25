@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://bgnrbkgrl14ux"]
+
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://dqjprnns73oqg" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKTrapEntity.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"bk_place_trap"
+state_name = &"genericattack"
+cooldown = 6.0
+weight = 2
+min_phase = 2
+max_range = 300.0
+tags = Array[StringName]([&"offensive", &"trap"])
+params = {
+&"animation": &"trap_cast",
+&"spawn_offset": Vector2(0, 0),
+&"spawn_scene": ExtResource("2")
+}

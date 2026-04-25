@@ -25,6 +25,12 @@
         "get_uid",
         "update_project_uids"
       ]
-    }
+    },
+    "mcp-search": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\ivan\\.claude\\plugins\\marketplaces\\thedotmack\\plugin\\scripts\\mcp-server.cjs"
+      ]
+    }    
   }
 }

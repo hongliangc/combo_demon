@@ -60,10 +60,10 @@ texture = ExtResource("2_70vwq")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_n0ouu")
 
-[node name="HitBoxComponent" type="Area2D" parent="." groups=["player_bullet"]]
+[node name="HitBoxComponent" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 8
 script = ExtResource("3_hitbox")
-destroy_owner_on_hit = true
-ignore_collision_groups = Array[String](["player_bullet"])
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent"]
 shape = SubResource("CircleShape2D_70vwq")

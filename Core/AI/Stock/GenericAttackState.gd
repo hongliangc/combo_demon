@@ -57,3 +57,18 @@ func spawn_entity() -> void:
 	var entity := scene.instantiate()
 	owner_node.get_tree().root.add_child(entity)
 	entity.global_position = (owner_node as Node2D).global_position + skill.params.get(&"spawn_offset", Vector2.ZERO)
+
+## 动画 method call track 调用：调用 owner_node 上的方法
+## 用于 BuffEntity 框架到位前的过渡方案
+func call_skill_method() -> void:
+	var skill: Skill = ai.current_skill
+	if not skill:
+		return
+	var method_name: StringName = skill.params.get(&"method", &"")
+	if method_name == &"" or not owner_node.has_method(method_name):
+		return
+	var arg = skill.params.get(&"method_arg", null)
+	if arg == null:
+		owner_node.call(method_name)
+	else:
+		owner_node.call(method_name, arg)

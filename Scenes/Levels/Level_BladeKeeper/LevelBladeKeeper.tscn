@@ -8,8 +8,8 @@
 [ext_resource type="PackedScene" uid="uid://d1sj82yqwu01u" path="res://Scenes/Characters/Player/Hahashin/Hahashin.tscn" id="5_hkjyj"]
 [ext_resource type="Texture2D" uid="uid://u4gr3v560huf" path="res://Assets/Art/Parallax/map/groundTilemap_64px.png" id="6_bwdy2"]
 [ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="8_hkjyj"]
-[ext_resource type="PackedScene" uid="uid://30x40w2knf12" path="res://Scenes/Characters/Bosses/DemonSlime2/DemonSlime2.tscn" id="10_ahiby"]
 [ext_resource type="Texture2D" uid="uid://doc4o6oilqo3j" path="res://Assets/Art/Parallax/map/decoration/fence1_32px.png" id="10_w0eu8"]
+[ext_resource type="Script" uid="uid://mgosgl2yim7f" path="res://Scenes/Levels/Level_BladeKeeper/EnemySpawn.gd" id="12_353he"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_npi6w"]
 texture = ExtResource("6_bwdy2")
@@ -464,5 +464,6 @@ tile_set = SubResource("TileSet_hkjyj")
 tile_map_data = PackedByteArray("AADx/xEAAwAAAAIAAADx/xIAAwAAAAMAAADy/xEAAwABAAIAAADy/xIAAwABAAMAAADz/xEAAwACAAIAAADz/xIAAwACAAMAAAD0/xEAAwADAAIAAAD0/xIAAwADAAMAAADx/w8AAwAAAAIAAADx/xAAAwAAAAMAAADy/w8AAwABAAIAAADy/xAAAwABAAMAAADz/w8AAwACAAIAAADz/xAAAwACAAMAAAD0/w8AAwADAAIAAAD0/xAAAwADAAMAAADx/w0AAwAAAAIAAADx/w4AAwAAAAMAAADy/w0AAwABAAIAAADy/w4AAwABAAMAAADz/w0AAwACAAIAAADz/w4AAwACAAMAAAD0/w0AAwADAAIAAAD0/w4AAwADAAMAAADx/wsAAwAAAAIAAADx/wwAAwAAAAMAAADy/wsAAwABAAIAAADy/wwAAwABAAMAAADz/wsAAwACAAIAAADz/wwAAwACAAMAAAD0/wsAAwADAAIAAAD0/wwAAwADAAMAAACUAAsAAwAAAAIAAACUAAwAAwAAAAMAAACUAA0AAwAAAAIAAACUAA4AAwAAAAMAAACUAA8AAwAAAAIAAACUABAAAwAAAAMAAACUABEAAwAAAAIAAACUABIAAwAAAAMAAACVAAsAAwABAAIAAACVAAwAAwABAAMAAACVAA0AAwABAAIAAACVAA4AAwABAAMAAACVAA8AAwABAAIAAACVABAAAwABAAMAAACVABEAAwABAAIAAACVABIAAwABAAMAAACWAAsAAwACAAIAAACWAAwAAwACAAMAAACWAA0AAwACAAIAAACWAA4AAwACAAMAAACWAA8AAwACAAIAAACWABAAAwACAAMAAACWABEAAwACAAIAAACWABIAAwACAAMAAACXAAsAAwADAAIAAACXAAwAAwADAAMAAACXAA0AAwADAAIAAACXAA4AAwADAAMAAACXAA8AAwADAAIAAACXABAAAwADAAMAAACXABEAAwADAAIAAACXABIAAwADAAMAAAA=")
 tile_set = SubResource("TileSet_353he")
 
-[node name="DemonSlime2" parent="." unique_id=168645748 instance=ExtResource("10_ahiby")]
-position = Vector2(251, 227)
+[node name="BossSpawn" type="Node2D" parent="." unique_id=1338013884]
+position = Vector2(352, 261)
+script = ExtResource("12_353he")

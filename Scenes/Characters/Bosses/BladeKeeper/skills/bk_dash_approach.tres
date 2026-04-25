@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://4a6qktdpxruya"]
+
+[ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bk_dash_approach"
+state_name = &"approach"
+cooldown = 5.0
+weight = 4
+min_phase = 1
+max_phase = -1
+min_range = 200.0
+max_range = 600.0
+tags = Array[StringName]([&"offensive", &"gap_close"])
+precondition_method = &""
+interruptible = true
+params = {
+&"animation": &"roll",
+&"direction": &"toward_target",
+&"speed": 350.0,
+&"stop_distance": 180.0
+}

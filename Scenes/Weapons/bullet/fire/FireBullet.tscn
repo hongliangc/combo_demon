@@ -34,31 +34,31 @@ gravity = Vector3(0, 0, 0)
 scale_curve = SubResource("CurveTexture_22olb")
 color_ramp = SubResource("GradientTexture1D_180rq")
 
-[node name="FireBullet" type="CharacterBody2D"]
+[node name="FireBullet" type="CharacterBody2D" unique_id=1257254102]
 collision_layer = 4
 collision_mask = 217
 script = ExtResource("1_hr483")
 target_speed = 200.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1803333191]
 shape = SubResource("CircleShape2D_xdfer")
 
-[node name="HitBoxComponent" type="Area2D" parent="." groups=["player_bullet"]]
+[node name="HitBoxComponent" type="Area2D" parent="." unique_id=582026792]
+collision_layer = 4
+collision_mask = 8
 script = ExtResource("2_hitbox")
-destroy_owner_on_hit = true
-ignore_collision_groups = Array[String](["player_bullet"])
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent" unique_id=944877007]
 shape = SubResource("CircleShape2D_n6m7u")
 
-[node name="SpriteGroup" type="Node2D" parent="."]
+[node name="SpriteGroup" type="Node2D" parent="." unique_id=1067636311]
 
-[node name="GPUParticles2D" type="GPUParticles2D" parent="SpriteGroup"]
+[node name="GPUParticles2D" type="GPUParticles2D" parent="SpriteGroup" unique_id=1672840841]
 amount = 100
 preprocess = 0.1
 local_coords = true
 process_material = SubResource("ParticleProcessMaterial_vrlhg")
 
-[node name="Sprite2D" type="Sprite2D" parent="SpriteGroup"]
+[node name="Sprite2D" type="Sprite2D" parent="SpriteGroup" unique_id=127026229]
 rotation = 1.5708
 texture = ExtResource("2_f0lmi")

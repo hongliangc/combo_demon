@@ -6,6 +6,9 @@ extends AIState
 
 var _timer: Timer
 
+func _init() -> void:
+	reentrant = true
+
 func enter() -> void:
 	if owner_node is CharacterBody2D:
 		(owner_node as CharacterBody2D).velocity = Vector2.ZERO
@@ -18,6 +21,7 @@ func enter() -> void:
 	if "anim_player" in owner_node and owner_node.anim_player:
 		if owner_node.anim_player.has_animation(&"hit"):
 			owner_node.anim_player.play(&"hit")
+			owner_node.anim_player.seek(0.0, true)
 	_ensure_timer()
 	_timer.wait_time = default_duration
 	_timer.start()

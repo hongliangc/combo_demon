@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://5l5b1x71gsgj"]
+
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bk_atk_heavy"
+state_name = &"genericattack"
+weight = 6
+min_phase = 2
+max_range = 50.0
+tags = Array[StringName]([&"offensive", &"melee"])
+params = {
+&"animation": &"atk_2",
+&"direction": &"toward_target",
+&"speed": 80.0
+}

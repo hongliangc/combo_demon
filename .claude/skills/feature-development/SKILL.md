@@ -11,8 +11,9 @@ description: "General-purpose development skill for Combo Demon. Use when implem
 
 | 需求类型 | 关键词 | 读取 reference |
 |---------|-------|---------------|
-| 敌人 | enemy, 怪物, mob | `references/enemy-guide.md` |
-| Boss | boss, 首领 | `references/boss-guide.md` |
+| **AgentAIBase 角色（新 Boss/Enemy 默认）** | agent, skill-system, 新 boss, 新敌人 | `references/agent-ai-guide.md` |
+| 敌人（旧 EnemyBase 路径，仅维护） | enemy, 怪物, mob | `references/enemy-guide.md` |
+| Boss（旧 BossBase 路径，仅维护 Cyclops/DS1） | boss, 首领 | `references/boss-guide.md` |
 | 攻击效果 | effect, 击退, 眩晕, 伤害 | `references/effect-guide.md` |
 | 组件/系统 | component, 系统 | `references/component-guide.md` |
 | 陷阱 | trap, 机关, 障碍 | `references/trap-guide.md` |

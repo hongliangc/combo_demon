@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://9axjwnl4u8c9c"]
+
+[ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bk_defend_buff"
+state_name = &"genericattack"
+cooldown = 8.0
+weight = 0
+min_phase = 1
+max_phase = -1
+min_range = 0.0
+max_range = 1.0e10
+tags = Array[StringName]([&"reactive", &"defensive", &"buff"])
+precondition_method = &"_precond_under_pressure"
+interruptible = true
+params = {
+&"animation": &"defend",
+&"method": &"apply_defense_buff",
+&"method_arg": 3.0
+}

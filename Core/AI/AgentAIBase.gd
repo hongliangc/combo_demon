@@ -11,6 +11,7 @@ class_name AgentAIBase extends CharacterBody2D
 @onready var ai: AIController = $AIController
 @onready var health_comp: HealthComponent = $HealthComponent
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
+@onready var hitbox: Node2D = get_node_or_null(^"HitBoxComponent")
 var sprite: Node2D
 
 var skill_set: SkillSet
@@ -47,9 +48,13 @@ func _physics_process(delta: float) -> void:
 	_update_facing()
 
 func _update_facing() -> void:
-	if sprite and "flip_h" in sprite and abs(velocity.x) > 0.1:
+	if not sprite or not "flip_h" in sprite:
+		return
+	if abs(velocity.x) > 0.1:
 		var moving_right := velocity.x > 0
 		sprite.flip_h = moving_right != sprite_faces_right
+	if hitbox:
+		hitbox.scale.x = -1.0 if sprite.flip_h else 1.0
 
 func _auto_find_sprite() -> void:
 	sprite = get_node_or_null(^"AnimatedSprite2D")
@@ -87,6 +92,10 @@ func _setup_transitions() -> void:
 	pass
 
 func _setup_signals() -> void:
+	var hurtbox := get_node_or_null(^"HurtBoxComponent")
+	if hurtbox and health_comp and hurtbox.has_signal(&"damaged") \
+			and not hurtbox.damaged.is_connected(health_comp.take_damage):
+		hurtbox.damaged.connect(health_comp.take_damage)
 	if health_comp:
 		health_comp.damaged.connect(_on_agent_damaged)
 		health_comp.died.connect(_on_agent_died)

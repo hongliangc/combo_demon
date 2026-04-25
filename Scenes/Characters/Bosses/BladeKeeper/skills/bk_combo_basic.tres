@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="ComboSkill" format=3 uid="uid://drq1bgk8avw57"]
+
+[ext_resource type="Script" uid="uid://bp52vndrtujng" path="res://Core/AI/ComboSkill.gd" id="1"]
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="2"]
+
+[sub_resource type="Resource" id="sub_1"]
+script = ExtResource("2")
+id = &"bk_combo_basic_step1"
+params = {
+&"animation": &"atk_1"
+}
+
+[sub_resource type="Resource" id="sub_2"]
+script = ExtResource("2")
+id = &"bk_combo_basic_step2"
+params = {
+&"animation": &"atk_2"
+}
+
+[sub_resource type="Resource" id="sub_3"]
+script = ExtResource("2")
+id = &"bk_combo_basic_step3"
+params = {
+&"animation": &"atk_3"
+}
+
+[resource]
+script = ExtResource("1")
+sequence = Array[ExtResource("2")]([SubResource("sub_1"), SubResource("sub_2"), SubResource("sub_3")])
+id = &"bk_combo_basic"
+state_name = &"combo"
+cooldown = 2.0
+weight = 5
+min_phase = 1
+max_range = 50.0
+tags = Array[StringName]([&"offensive", &"melee", &"combo"])
+interruptible = false

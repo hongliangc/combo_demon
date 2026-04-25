@@ -9,16 +9,16 @@
 [ext_resource type="Script" uid="uid://beqjsx7b4cg0n" path="res://Core/AI/Stock/ChaseState.gd" id="8_chase"]
 [ext_resource type="Script" uid="uid://c00p727wgkv03" path="res://Core/AI/Stock/HitState.gd" id="9_hit"]
 [ext_resource type="Script" uid="uid://c8dyu2kanm807" path="res://Core/AI/Stock/DeathState.gd" id="10_death"]
-[ext_resource type="Script" path="res://Core/AI/Stock/AttackDispatcher.gd" id="11_dispatcher"]
-[ext_resource type="Script" path="res://Core/AI/Stock/GenericAttackState.gd" id="12_generic_attack"]
-[ext_resource type="Script" path="res://Core/AI/Stock/ComboState.gd" id="13_combo"]
+[ext_resource type="Script" uid="uid://ddwmjtmp1g8e2" path="res://Core/AI/Stock/AttackDispatcher.gd" id="11_dispatcher"]
+[ext_resource type="Script" uid="uid://bky6akb84sun2" path="res://Core/AI/Stock/GenericAttackState.gd" id="12_generic_attack"]
+[ext_resource type="Script" uid="uid://dok0elg2cedvk" path="res://Core/AI/Stock/ComboState.gd" id="13_combo"]
 
 [sub_resource type="Animation" id="Animation_RESET"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/path = NodePath("HealthBar:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -30,46 +30,10 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Sprite2D:position")
+tracks/1/path = NodePath("HurtBoxComponent/CollisionShape2D:disabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:rotation")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [0.0]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("HealthBar:modulate")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
-}
-tracks/4/type = "value"
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/path = NodePath("HurtBoxComponent/CollisionShape2D:disabled")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -80,15 +44,6 @@ tracks/4/keys = {
 _data = {
 &"RESET": SubResource("Animation_RESET")
 }
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
-size = Vector2(81, 80)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
-size = Vector2(80, 78)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
-size = Vector2(79, 78)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0, 0, 0, 1)
@@ -111,13 +66,10 @@ collision_layer = 8
 collision_mask = 128
 script = ExtResource("1_agent_base")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=364152549]
-
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=710612678]
 libraries/ = SubResource("AnimationLibrary_main")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=884594291]
-shape = SubResource("RectangleShape2D_body")
 
 [node name="HurtBoxComponent" type="Area2D" parent="." unique_id=1245267114]
 collision_layer = 8
@@ -125,7 +77,6 @@ collision_mask = 0
 script = ExtResource("2_hurtbox")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBoxComponent" unique_id=975434091]
-shape = SubResource("RectangleShape2D_hurt")
 
 [node name="HitBoxComponent" type="Area2D" parent="." unique_id=1666699896]
 collision_layer = 8
@@ -133,7 +84,6 @@ collision_mask = 2
 script = ExtResource("5_hitbox")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitBoxComponent" unique_id=1873200456]
-shape = SubResource("RectangleShape2D_hit")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=163196815]
 script = ExtResource("3_health")
@@ -184,11 +134,13 @@ script = ExtResource("9_hit")
 [node name="Death" type="Node" parent="AIController/StateMachine" unique_id=551432475]
 script = ExtResource("10_death")
 
-[node name="Dispatcher" type="Node" parent="AIController/StateMachine"]
+[node name="Dispatcher" type="Node" parent="AIController/StateMachine" unique_id=573801613]
 script = ExtResource("11_dispatcher")
 
-[node name="GenericAttack" type="Node" parent="AIController/StateMachine"]
+[node name="GenericAttack" type="Node" parent="AIController/StateMachine" unique_id=1943725742]
 script = ExtResource("12_generic_attack")
 
-[node name="Combo" type="Node" parent="AIController/StateMachine"]
+[node name="Combo" type="Node" parent="AIController/StateMachine" unique_id=1022768555]
 script = ExtResource("13_combo")
+
+[connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

@@ -9,6 +9,9 @@ class_name DemonSlime2 extends AgentAIBase
 @export var phase_2_hp_pct: float = 0.66
 @export var phase_3_hp_pct: float = 0.33
 
+## 技能资源（在 Inspector 中拖拽 .tres 配置）
+@export var skill_resources: Array[Skill] = []
+
 var current_phase: int = 0
 
 const PHASE_SPEED := { 0: 1.0, 1: 1.3, 2: 1.5 }
@@ -25,11 +28,7 @@ func _ready() -> void:
 # ---- 技能配置 ----
 func _setup_skill_set() -> void:
 	skill_set = SkillSet.new()
-	skill_set.setup([
-		preload("res://Scenes/Characters/Bosses/DemonSlime2/Skills/ds2_cleave.tres"),
-		preload("res://Scenes/Characters/Bosses/DemonSlime2/Skills/ds2_slam.tres"),
-		preload("res://Scenes/Characters/Bosses/DemonSlime2/Skills/ds2_combo_2hit.tres"),
-	])
+	skill_set.setup(skill_resources)
 
 # ---- Blackboard ----
 func _setup_blackboard() -> void:

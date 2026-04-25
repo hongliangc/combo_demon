@@ -145,6 +145,8 @@ func _evaluate_conditional_transitions() -> void:
 func _change_state(new_state: AIState) -> void:
 	if new_state == null:
 		return
+	if new_state == current_state and not new_state.reentrant:
+		return
 	if current_state:
 		current_state.exit()
 	current_state = new_state
