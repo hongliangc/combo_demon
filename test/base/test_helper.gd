@@ -46,3 +46,35 @@ static func create_behavior_config(overrides: Dictionary = {}) -> BehaviorConfig
 	config.has_gravity = overrides.get("has_gravity", false)
 	config.is_boss = overrides.get("is_boss", false)
 	return config
+
+
+# ============ v2 BuffEntity helpers ============
+
+static func create_damage_ctx(target: Node, amount: float, source: Node = null, tags: int = 0) -> DamageContext:
+	var ctx := DamageContext.new()
+	ctx.target = target
+	ctx.source = source
+	ctx.amount = amount
+	ctx.raw_amount = amount
+	ctx.tags = tags
+	if source is Node2D:
+		ctx.source_pos = (source as Node2D).global_position
+	return ctx
+
+static func create_buff_entity(id: StringName, duration: float = 0.0, effects: Array[BuffEffect] = []) -> BuffEntity:
+	var b := BuffEntity.new()
+	b.id = id
+	b.duration = duration
+	b.effects = effects
+	return b
+
+static func build_actor_with_pipeline() -> CharacterBody2D:
+	var a := CharacterBody2D.new()
+	a.name = "Actor"
+	var p := DamagePipeline.new(); p.name = "DamagePipeline"; a.add_child(p)
+	var bc := BuffController.new(); bc.name = "BuffController"; a.add_child(bc)
+	var sc := StatusController.new(); sc.name = "StatusController"; a.add_child(sc)
+	var hc := HealthComponent.new(); hc.name = "HealthComponent"
+	hc.max_health = 100.0; hc.health = 100.0
+	a.add_child(hc)
+	return a

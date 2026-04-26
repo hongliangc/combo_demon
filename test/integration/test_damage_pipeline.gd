@@ -6,12 +6,14 @@ const H = preload("res://test/base/test_helper.gd")
 
 var _owner: CharacterBody2D
 var _health_comp: HealthComponent
+var _pipe: DamagePipeline
 var _sm: BaseStateMachine
 var _states: Dictionary
 
 func before_each() -> void:
 	# 构建最小完整链路:
 	# CharacterBody2D (with damaged signal)
+	#   ├─ DamagePipeline
 	#   ├─ HealthComponent
 	#   └─ BaseStateMachine
 	#       ├─ idle (BEHAVIOR)
@@ -20,6 +22,11 @@ func before_each() -> void:
 	_owner = CharacterBody2D.new()
 	_owner.name = "TestEnemy"
 	_owner.set_meta("alive", true)
+
+	# DamagePipeline (Phase 3 — HealthComponent now subscribes pipeline.apply)
+	_pipe = DamagePipeline.new()
+	_pipe.name = "DamagePipeline"
+	_owner.add_child(_pipe)
 
 	# HealthComponent
 	_health_comp = HealthComponent.new()
@@ -54,21 +61,29 @@ func before_each() -> void:
 func after_each() -> void:
 	_owner = null
 	_health_comp = null
+	_pipe = null
 	_sm = null
 	_states = {}
+
+# Phase 3: HC.take_damage() removed. Damage now flows through DamagePipeline.
+func _deal(amount: float) -> void:
+	var ctx := DamageContext.new()
+	ctx.target = _owner
+	ctx.amount = amount
+	ctx.raw_amount = amount
+	_pipe.process(ctx)
 
 # ============ 伤害 → 扣血 ============
 
 func test_damage_reduces_health() -> void:
-	var dmg = H.create_damage(30.0)
-	_health_comp.take_damage(dmg, Vector2.ZERO)
+	_deal(30.0)
 	assert_eq(_health_comp.health, 70.0)
 
 # ============ 伤害 → 信号链 ============
 
 func test_damage_emits_health_changed_and_damaged() -> void:
 	watch_signals(_health_comp)
-	_health_comp.take_damage(H.create_damage(10.0), Vector2.ZERO)
+	_deal(10.0)
 	assert_signal_emitted(_health_comp, "health_changed")
 	assert_signal_emitted(_health_comp, "damaged")
 
@@ -76,7 +91,7 @@ func test_damage_emits_health_changed_and_damaged() -> void:
 
 func test_lethal_damage_emits_died() -> void:
 	watch_signals(_health_comp)
-	_health_comp.take_damage(H.create_damage(100.0), Vector2.ZERO)
+	_deal(100.0)
 	assert_signal_emitted(_health_comp, "died")
 	assert_false(_health_comp.is_alive)
 
@@ -117,7 +132,7 @@ func test_damage_cached_in_state_machine() -> void:
 # ============ 多次伤害序列 ============
 
 func test_multiple_damages_track_health_correctly() -> void:
-	_health_comp.take_damage(H.create_damage(20.0), Vector2.ZERO)
-	_health_comp.take_damage(H.create_damage(30.0), Vector2.ZERO)
-	_health_comp.take_damage(H.create_damage(10.0), Vector2.ZERO)
+	_deal(20.0)
+	_deal(30.0)
+	_deal(10.0)
 	assert_eq(_health_comp.health, 40.0)
