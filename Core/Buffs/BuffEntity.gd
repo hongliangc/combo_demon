@@ -24,7 +24,7 @@ var legal_action_locks: int = 0
 
 ## Run all effects whose effect_on bitmask matches the given trigger.
 func execute_on(trigger: int, ctx: BuffEffectContext) -> void:
-    for e in effects:
-        if e and (e.effect_on & trigger) != 0:
-            ctx.trigger = trigger
-            e.execute(ctx)
+	for e in effects:
+		if e and (e.effect_on & trigger) != 0:
+			ctx.trigger = trigger
+			e.execute(ctx)
