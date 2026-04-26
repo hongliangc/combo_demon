@@ -4,6 +4,20 @@ class_name HealthComponent
 
 ## Thin HP container. Subscribes DamagePipeline.apply only — no buff awareness.
 ## Death is signaled to AAB; reset_health is exposed for spawning/respawn.
+##
+## SIGNATURE CHANGE (Phase 3 of buff-entity-framework):
+##   Old: damaged(damage: Damage, attacker_position: Vector2)
+##   New: damaged(amount: float, source_pos: Vector2)
+##
+## Existing slots still using the OLD signature (rewired in Phase 5, Task 22):
+##   - Core/AI/AgentAIBase.gd::_on_agent_damaged       → moves to pipeline.react
+##   - Core/Characters/BaseCharacter.gd::_on_health_component_damaged
+##                                                    → forwards old Damage object
+##   These slots will receive (float, Vector2) at runtime under the new signal,
+##   which would crash on `damage.amount` access. Until Phase 5 lands, do NOT
+##   instantiate BK / BaseCharacter scenes against this rewritten HC; the
+##   buff-framework integration tests cover the new path with a bare
+##   CharacterBody2D fixture (see test/base/test_helper.gd build_actor_with_pipeline).
 
 signal health_changed(current: float, maximum: float)
 signal damaged(amount: float, source_pos: Vector2)

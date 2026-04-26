@@ -97,10 +97,16 @@ func _setup_signals() -> void:
 			and not hurtbox.damaged.is_connected(health_comp.take_damage):
 		hurtbox.damaged.connect(health_comp.take_damage)
 	if health_comp:
+		# TODO Phase 5 (Task 22): rewire to new HC.damaged(amount, source_pos)
+		# signature; switch consumer to pipeline.react and drop _on_agent_damaged
+		# in favour of _on_pipeline_react(ctx: DamageContext).
 		health_comp.damaged.connect(_on_agent_damaged)
 		health_comp.died.connect(_on_agent_died)
 
 # ---- 事件处理 ----
+# TODO Phase 5: receives new HC.damaged(amount: float, source_pos: Vector2);
+# slot still typed for legacy (Damage, Vector2) and will crash until Task 22
+# replaces this with _on_pipeline_react(ctx: DamageContext).
 func _on_agent_damaged(damage: Damage, attacker_pos: Vector2) -> void:
 	var bb := ai.blackboard
 	bb.set_var(&"last_damage", damage)

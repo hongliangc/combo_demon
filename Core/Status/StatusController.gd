@@ -25,43 +25,36 @@ func _ready() -> void:
 	if pipeline:
 		pipeline.pre_apply.connect(_on_pre_apply)
 	if bc:
-		bc.buffs_changed.connect(_recompute_buff_locks)
+		bc.buffs_changed.connect(_recompute_legal_actions)
 
 func _process(delta: float) -> void:
 	if _action_timers.is_empty():
 		return
-	var prev := legal_actions
 	var to_clear: Array = []
 	for bit in _action_timers.keys():
-		_action_timers[bit] -= delta
-		if _action_timers[bit] <= 0.0:
+		var t: float = _action_timers[bit] - delta
+		if t <= 0.0:
 			to_clear.append(bit)
+		else:
+			_action_timers[bit] = t
 	for k in to_clear:
 		_action_timers.erase(k)
 	_recompute_legal_actions()
-	if legal_actions != prev:
-		legal_actions_changed.emit(prev, legal_actions)
 
 # ============ Public API ============
 func apply_lock(action_mask: int, duration: float) -> void:
-	var prev := legal_actions
 	for bit in _ACTION_BITS:
 		if action_mask & bit:
 			var cur: float = _action_timers.get(bit, 0.0)
 			if duration > cur:
 				_action_timers[bit] = duration
 	_recompute_legal_actions()
-	if legal_actions != prev:
-		legal_actions_changed.emit(prev, legal_actions)
 
 func release_lock(action_mask: int) -> void:
-	var prev := legal_actions
 	for bit in _ACTION_BITS:
 		if action_mask & bit:
 			_action_timers.erase(bit)
 	_recompute_legal_actions()
-	if legal_actions != prev:
-		legal_actions_changed.emit(prev, legal_actions)
 
 func has_legal_action(action: int) -> bool:
 	return (legal_actions & action) == action
@@ -81,15 +74,12 @@ func _on_pre_apply(ctx: DamageContext) -> void:
 
 # ============ Recompute ============
 func _recompute_legal_actions() -> void:
+	var prev := legal_actions
 	var locked := 0
 	for bit in _action_timers.keys():
 		locked |= bit
 	if bc:
 		locked |= bc.get_legal_action_locks()
 	legal_actions = LegalAction.ALL & ~locked
-
-func _recompute_buff_locks() -> void:
-	var prev := legal_actions
-	_recompute_legal_actions()
 	if legal_actions != prev:
 		legal_actions_changed.emit(prev, legal_actions)

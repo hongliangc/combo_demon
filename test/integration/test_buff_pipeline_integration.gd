@@ -95,3 +95,4 @@ func test_attached_buffs_propagate_on_post_apply() -> void:
 	_pipe.process(ctx)
 	assert_eq(_bc.active.size(), 1)
 	assert_eq(_bc.active[0].entity.id, &"mark")
+	assert_eq(_hc.health, 90.0, "damage actually landed alongside buff attach")

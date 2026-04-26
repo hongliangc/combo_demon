@@ -47,6 +47,9 @@ func _setup_health_signals() -> void:
 
 	# 监听 HealthComponent 信号
 	if health_component:
+		# TODO Phase 5 (Task 22): rewire to new HC.damaged(amount, source_pos)
+		# signature; the slot below still types the legacy (Damage, Vector2)
+		# tuple and will crash under the new signal until rewired.
 		health_component.damaged.connect(_on_health_component_damaged)
 		health_component.died.connect(_on_died)
 
