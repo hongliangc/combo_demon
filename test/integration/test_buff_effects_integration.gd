@@ -104,3 +104,28 @@ func test_knockup_sets_vertical_and_horizontal_velocity_on_apply() -> void:
 
 	assert_eq(_actor.velocity.y, -500.0, "vertical force applied (upward)")
 	assert_almost_eq(_actor.velocity.x, 200.0, 1.0, "horizontal force pushed right")
+
+# ============ DamageEffectBuff (thorns / ON_DAMAGED reflection) ============
+
+func test_thorns_reflects_damage_to_attacker() -> void:
+	# Two actors: attacker hits defender; defender has thorns buff that reflects damage back.
+	var attacker := H.build_actor_with_pipeline()
+	add_child_autofree(attacker)
+	var defender := _actor  # already built + added in before_each
+
+	# Build thorns BuffEntity: DamageEffectBuff with target_kind=1 (reflect to source) on ON_DAMAGED.
+	var thorns_eff := DamageEffectBuff.new()
+	thorns_eff.amount = 7.0
+	thorns_eff.target_kind = 1
+	thorns_eff.effect_on = BuffEffect.EffectOn.ON_DAMAGED
+	var thorns := H.create_buff_entity(&"thorns", 10.0, [thorns_eff])
+	_bc.apply(thorns, null, Vector2.ZERO)
+
+	# Attacker hits defender for 10 damage through pipeline.
+	var dc := H.create_damage_ctx(defender, 10.0, attacker)
+	_pipe.process(dc)
+
+	# Defender takes 10 damage; attacker takes 7 damage from thorns reflection.
+	assert_eq(_hc.health, 90.0, "defender took 10 damage from attacker")
+	assert_eq(attacker.get_node(^"HealthComponent").health, 93.0,
+			"attacker took 7 reflected damage from thorns")
