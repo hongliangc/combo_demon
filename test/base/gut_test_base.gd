@@ -8,28 +8,24 @@ const _SignalTracker = preload("res://test/base/signal_tracker.gd")
 
 # ============ Mock 工厂方法 ============
 
-## 创建一个最小化的 Damage Resource
-func create_damage(amount: float = 10.0, effects: Array[AttackEffect] = []) -> Damage:
+## Phase 5: legacy AttackEffect-based factories. Damage v2 retyped effects to
+## Array[BuffEntity]; untyped Array avoids engine-level type-assignment errors.
+func create_damage(amount: float = 10.0, _effects: Array = []) -> Damage:
 	var dmg = Damage.new()
 	dmg.amount = amount
 	dmg.min_amount = amount * 0.5
 	dmg.max_amount = amount * 1.5
-	dmg.effects = effects
 	return dmg
 
 
-## 创建带眩晕效果的 Damage
-func create_stun_damage(amount: float = 10.0, stun_duration: float = 1.5) -> Damage:
-	var stun = StunEffect.new()
-	stun.stun_duration = stun_duration
-	return create_damage(amount, [stun])
+## Pending: rewrite via BuffEntity stun in Cyclops/DS2 migration.
+func create_stun_damage(_amount: float = 10.0, _stun_duration: float = 1.5) -> Damage:
+	return create_damage(_amount)
 
 
-## 创建带击退效果的 Damage
-func create_knockback_damage(amount: float = 10.0, force: float = 300.0) -> Damage:
-	var kb = KnockBackEffect.new()
-	kb.knockback_force = force
-	return create_damage(amount, [kb])
+## Pending: rewrite via KnockBackEffectBuff in Cyclops/DS2 migration.
+func create_knockback_damage(_amount: float = 10.0, _force: float = 300.0) -> Damage:
+	return create_damage(_amount)
 
 
 ## 创建一个 BehaviorConfig Resource

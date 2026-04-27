@@ -39,27 +39,15 @@ func _ready() -> void:
 
 ## 设置生命系统信号连接
 func _setup_health_signals() -> void:
-	# 连接 HurtBoxComponent → HealthComponent
-	var hurtbox = get_node_or_null("HurtBoxComponent")
-	if hurtbox and health_component:
-		if hurtbox.has_signal("damaged"):
-			hurtbox.damaged.connect(health_component.take_damage)
-
-	# 监听 HealthComponent 信号
+	# Phase 5 (Task 22b): legacy HurtBox→HC.take_damage and HC.damaged→state machine
+	# wiring removed. Damage now flows via DamagePipeline; AAB-derived agents
+	# subscribe pipeline.react. BaseCharacter only forwards death.
 	if health_component:
-		# TODO Phase 5 (Task 22): rewire to new HC.damaged(amount, source_pos)
-		# signature; the slot below still types the legacy (Damage, Vector2)
-		# tuple and will crash under the new signal until rewired.
-		health_component.damaged.connect(_on_health_component_damaged)
 		health_component.died.connect(_on_died)
 
 		# 同步导出参数到 HealthComponent
 		health_component.max_health = max_health
 		health_component.health = health
-
-## HealthComponent 受伤回调 - 转发 damaged 信号给状态机
-func _on_health_component_damaged(damage_data: Damage, attacker_position: Vector2) -> void:
-	damaged.emit(damage_data, attacker_position)
 
 ## 死亡处理入口
 func _on_died() -> void:

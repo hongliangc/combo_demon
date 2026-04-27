@@ -107,27 +107,21 @@ func test_on_damaged_routes_to_hit_state() -> void:
 	assert_eq(_sm.current_state.name, "hit")
 
 func test_on_damaged_with_stun_routes_to_hit() -> void:
-	# StunEffect 不再路由到单独的 stun 状态，统一进入 hit
-	var idle: BaseState = _states["idle"]
-	idle.state_machine = _sm
-	idle.on_damaged(H.create_stun_damage(10.0, 2.0), Vector2.ZERO)
-	assert_eq(_sm.current_state.name, "hit")
+	# Phase 5: legacy on_damaged(Damage, Vector2) slot is dead — AAB now subscribes
+	# pipeline.react. H.create_stun_damage builds Array[AttackEffect] Damage which
+	# Damage v2 (Array[BuffEntity]) rejects. Buff-driven hit reactions covered by
+	# test_buff_pipeline_integration.gd / test_buff_effects_integration.gd.
+	pending("Phase 5: legacy state-machine on_damaged slot dead; rewrite via pipeline.react in Cyclops/DS2 migration")
 
 func test_on_damaged_with_knockback_routes_to_hit() -> void:
-	# KnockBackEffect 不再路由到单独的 knockback 状态，统一进入 hit
-	var idle: BaseState = _states["idle"]
-	idle.state_machine = _sm
-	idle.on_damaged(H.create_knockback_damage(10.0, 300.0), Vector2.ZERO)
-	assert_eq(_sm.current_state.name, "hit")
+	pending("Phase 5: legacy state-machine on_damaged slot dead; rewrite via pipeline.react in Cyclops/DS2 migration")
 
 # ============ 伤害缓存 ============
 
 func test_damage_cached_in_state_machine() -> void:
-	var dmg = H.create_stun_damage(15.0, 2.0)
-	var pos = Vector2(50, 100)
-	_sm._on_owner_damaged(dmg, pos)
-	assert_eq(_sm.last_damage, dmg)
-	assert_eq(_sm.last_attacker_position, pos)
+	# Phase 5: BaseStateMachine._on_owner_damaged is dead code (BaseCharacter no
+	# longer emits damaged). Damage caching now belongs to AAB._on_pipeline_react.
+	pending("Phase 5: BaseStateMachine damaged-cache path dead; AAB pipeline.react covers in Cyclops/DS2 migration")
 
 # ============ 多次伤害序列 ============
 

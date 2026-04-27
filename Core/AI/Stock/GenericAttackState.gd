@@ -72,3 +72,18 @@ func call_skill_method() -> void:
 		owner_node.call(method_name)
 	else:
 		owner_node.call(method_name, arg)
+
+## Animation method-call hook: read skill.params.self_buff and apply via BuffController.
+## Used by BK defense_cast / heal_self skills (data-driven, no per-boss override).
+func apply_skill_self_buff() -> void:
+	if ai == null or ai.current_skill == null:
+		return
+	var skill = ai.current_skill
+	if not (&"params" in skill):
+		return
+	var buff: BuffEntity = skill.params.get(&"self_buff", null)
+	if buff == null:
+		return
+	var bc: BuffController = owner_node.get_node_or_null(^"BuffController")
+	if bc:
+		bc.apply(buff, owner_node, owner_node.global_position if owner_node is Node2D else Vector2.ZERO)

@@ -12,6 +12,9 @@ class_name AgentAIBase extends CharacterBody2D
 @onready var health_comp: HealthComponent = $HealthComponent
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 @onready var hitbox: Node2D = get_node_or_null(^"HitBoxComponent")
+@onready var pipeline: DamagePipeline = get_node_or_null(^"DamagePipeline")
+@onready var status: StatusController = get_node_or_null(^"StatusController")
+@onready var buff_controller: BuffController = get_node_or_null(^"BuffController")
 var sprite: Node2D
 
 var skill_set: SkillSet
@@ -92,33 +95,42 @@ func _setup_transitions() -> void:
 	pass
 
 func _setup_signals() -> void:
-	var hurtbox := get_node_or_null(^"HurtBoxComponent")
-	if hurtbox and health_comp and hurtbox.has_signal(&"damaged") \
-			and not hurtbox.damaged.is_connected(health_comp.take_damage):
-		hurtbox.damaged.connect(health_comp.take_damage)
+	if pipeline:
+		pipeline.react.connect(_on_pipeline_react)
+	if status:
+		status.legal_actions_changed.connect(_on_legal_actions_changed)
 	if health_comp:
-		# TODO Phase 5 (Task 22): rewire to new HC.damaged(amount, source_pos)
-		# signature; switch consumer to pipeline.react and drop _on_agent_damaged
-		# in favour of _on_pipeline_react(ctx: DamageContext).
-		health_comp.damaged.connect(_on_agent_damaged)
 		health_comp.died.connect(_on_agent_died)
 
 # ---- 事件处理 ----
-# TODO Phase 5: receives new HC.damaged(amount: float, source_pos: Vector2);
-# slot still typed for legacy (Damage, Vector2) and will crash until Task 22
-# replaces this with _on_pipeline_react(ctx: DamageContext).
-func _on_agent_damaged(damage: Damage, attacker_pos: Vector2) -> void:
+func _on_pipeline_react(ctx: DamageContext) -> void:
+	if ctx.blocked or ctx.is_heal:
+		return
+	if ctx.target != self:
+		return
+	if ctx.tags & DamageTags.DOT:
+		return  # DoT 不进 HitState
 	var bb := ai.blackboard
-	bb.set_var(&"last_damage", damage)
-	bb.set_var(&"last_attacker_pos", attacker_pos)
+	bb.set_var(&"last_damage_amount", ctx.dealt)
+	bb.set_var(&"last_attacker_pos", ctx.source_pos)
 	bb.set_var(&"recently_hit", true)
 	_hit_clear_timer = HIT_CLEAR_DELAY
 	var now := Time.get_ticks_msec() / 1000.0
-	_damage_log.append([now, damage.amount])
+	_damage_log.append([now, ctx.dealt])
 	_update_damage_recent()
 	ai.dispatch(AIEvents.EV_DAMAGED)
 
+func _on_legal_actions_changed(prev: int, new: int) -> void:
+	var lost := prev & ~new
+	var gained := new & ~prev
+	if (lost & LegalAction.ATTACK) and ai.current_skill:
+		ai.dispatch(AIEvents.EV_INTERRUPTED)
+	if (gained & LegalAction.ATTACK) and prev != LegalAction.ALL:
+		ai.dispatch(AIEvents.EV_RECOVERED)
+
 func _on_agent_died() -> void:
+	if buff_controller:
+		buff_controller.clear_all()
 	ai.dispatch(AIEvents.EV_DIED)
 
 # ---- 伤害统计 ----

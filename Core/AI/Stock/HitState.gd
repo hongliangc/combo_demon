@@ -1,6 +1,7 @@
 extends AIState
 
-## Stock Hit — 受击反应：应用 effects，播 hit 动画，timer → dispatch hit_recovered
+## Stock Hit — 受击反应：查询 BuffController.get_top_hit_buff() 选动画 + 锁时长
+## 不再 apply effects（已由 DamagePipeline.post_apply 阶段处理）
 
 @export var default_duration: float = 0.3
 
@@ -12,18 +13,26 @@ func _init() -> void:
 func enter() -> void:
 	if owner_node is CharacterBody2D:
 		(owner_node as CharacterBody2D).velocity = Vector2.ZERO
-	var damage: Damage = bb.get_var(&"last_damage")
-	var attacker_pos: Vector2 = bb.get_var(&"last_attacker_pos", Vector2.ZERO) as Vector2
-	if damage and not damage.effects.is_empty():
-		for effect in damage.effects:
-			if effect:
-				effect.apply_effect(owner_node as CharacterBody2D, attacker_pos)
+
+	var anim_key: StringName = &"hit"
+	var duration: float = default_duration
+
+	var bc: BuffController = owner_node.get_node_or_null(^"BuffController")
+	if bc:
+		var top: BuffEntity = bc.get_top_hit_buff()
+		if top:
+			if top.hit_reaction != &"":
+				anim_key = top.hit_reaction
+			if top.hit_lock_duration > 0.0:
+				duration = top.hit_lock_duration
+
 	if "anim_player" in owner_node and owner_node.anim_player:
-		if owner_node.anim_player.has_animation(&"hit"):
-			owner_node.anim_player.play(&"hit")
+		if owner_node.anim_player.has_animation(anim_key):
+			owner_node.anim_player.play(anim_key)
 			owner_node.anim_player.seek(0.0, true)
+
 	_ensure_timer()
-	_timer.wait_time = default_duration
+	_timer.wait_time = duration
 	_timer.start()
 
 func physics_update(delta: float) -> void:

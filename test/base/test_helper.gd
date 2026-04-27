@@ -6,25 +6,28 @@ extends RefCounted
 
 # ============ Mock 工厂方法 ============
 
-static func create_damage(amount: float = 10.0, effects: Array[AttackEffect] = []) -> Damage:
+## Phase 5: legacy AttackEffect-based factories. Damage v2 retyped effects to
+## Array[BuffEntity]; the typed Array[AttackEffect] signature is incompatible
+## and only kept for source-compat with pending legacy tests. Untyped Array
+## avoids engine-level assignment errors when these helpers are loaded.
+static func create_damage(amount: float = 10.0, effects: Array = []) -> Damage:
 	var dmg = Damage.new()
 	dmg.amount = amount
 	dmg.min_amount = amount * 0.5
 	dmg.max_amount = amount * 1.5
-	dmg.effects = effects
+	# effects intentionally not assigned — Damage v2 wants Array[BuffEntity];
+	# legacy callers passed Array[AttackEffect] which is dead code post-Phase 5.
 	return dmg
 
 
-static func create_stun_damage(amount: float = 10.0, stun_duration: float = 1.5) -> Damage:
-	var stun = StunEffect.new()
-	stun.stun_duration = stun_duration
-	return create_damage(amount, [stun])
+static func create_stun_damage(_amount: float = 10.0, _stun_duration: float = 1.5) -> Damage:
+	# Pending: rewrite via BuffEntity stun in Cyclops/DS2 migration.
+	return create_damage(_amount)
 
 
-static func create_knockback_damage(amount: float = 10.0, force: float = 300.0) -> Damage:
-	var kb = KnockBackEffect.new()
-	kb.knockback_force = force
-	return create_damage(amount, [kb])
+static func create_knockback_damage(_amount: float = 10.0, _force: float = 300.0) -> Damage:
+	# Pending: rewrite via KnockBackEffectBuff in Cyclops/DS2 migration.
+	return create_damage(_amount)
 
 
 static func create_behavior_config(overrides: Dictionary = {}) -> BehaviorConfig:
