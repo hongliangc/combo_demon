@@ -113,13 +113,15 @@ func _precond_under_pressure() -> bool:
 
 # ---- Animation method-call: BuffController 路由 ----
 ## Animation method-call: 自施防御 buff。
-## `_duration` 保留是为了兼容旧动画轨道里的 method-call 实参；时长以 buff 资源为准。
+## `_duration` 形参用来吃掉 bk_defend_buff.tres `params.method_arg = 3.0`，
+## 经 GenericAttackState.call_skill_method 传入；实际时长以 defense_buff 资源为准。
 func apply_defense_buff(_duration: float = 0.0) -> void:
 	if buff_controller and defense_buff:
 		buff_controller.apply(defense_buff, self, global_position)
 
 ## Animation method-call: 自施回血 buff。
-## `_amount` 保留是为了兼容旧动画轨道里的 method-call 实参；治疗量以 buff 资源为准。
+## `_amount` 形参用来吃掉 bk_heal_self.tres `params.method_arg = 20.0`，
+## 经 GenericAttackState.call_skill_method 传入；实际治疗量以 heal_buff 资源为准。
 func heal_self(_amount: float = 0.0) -> void:
 	if buff_controller and heal_buff:
 		buff_controller.apply(heal_buff, self, global_position)
