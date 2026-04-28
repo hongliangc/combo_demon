@@ -15,9 +15,7 @@ func execute(ctx: BuffEffectContext) -> void:
 	var t: Node = _resolve_target(ctx)
 	if not (t is CharacterBody2D):
 		return
-	var src_pos: Vector2 = ctx.instance.source_pos
-	if ctx.damage_ctx:
-		src_pos = ctx.damage_ctx.source_pos
+	var src_pos: Vector2 = _resolve_source_pos(ctx)
 	var dir := ((t as Node2D).global_position - src_pos).normalized()
 	if dir == Vector2.ZERO:
 		dir = Vector2.RIGHT
@@ -29,3 +27,12 @@ func _resolve_target(ctx: BuffEffectContext) -> Node:
 			return ctx.damage_ctx.source if ctx.damage_ctx else null
 		_:
 			return ctx.owner
+
+func _resolve_source_pos(ctx: BuffEffectContext) -> Vector2:
+	match ctx.trigger:
+		EffectOn.ON_DAMAGED, EffectOn.ON_HEAL:
+			# Attacker pushed away from owner (the one who got hit).
+			return (ctx.owner as Node2D).global_position if ctx.owner is Node2D else ctx.instance.source_pos
+		_:
+			# APPLY/TICK/etc. — owner pushed away from buff source position.
+			return ctx.instance.source_pos

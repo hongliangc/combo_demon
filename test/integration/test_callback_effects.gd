@@ -30,10 +30,7 @@ func test_on_damaged_pushes_attacker() -> void:
 	ctx.target = _victim
 	ctx.source = _attacker
 	ctx.amount = 10.0
-	# KnockBackEffectBuff reads ctx.damage_ctx.source_pos as the push origin.
-	# For ON_DAMAGED reactive knockback the origin must be the victim (where the hit
-	# landed) so the attacker — placed at x=0 with victim at x=100 — gets pushed left.
-	ctx.source_pos = _victim.global_position
+	ctx.source_pos = _attacker.global_position
 	pipe.process(ctx)
 
 	assert_almost_eq(_attacker.velocity.x, -300.0, 0.5, "pushed left away from victim at x=100")
