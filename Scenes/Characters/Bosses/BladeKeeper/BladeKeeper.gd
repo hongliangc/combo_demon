@@ -112,12 +112,14 @@ func _precond_under_pressure() -> bool:
 	return ai.blackboard.get_var(&"damage_recent", 0.0) > pressure_threshold
 
 # ---- Animation method-call: BuffController 路由 ----
-## Animation method-call: 自施防御 buff
+## Animation method-call: 自施防御 buff。
+## `_duration` 保留是为了兼容旧动画轨道里的 method-call 实参；时长以 buff 资源为准。
 func apply_defense_buff(_duration: float = 0.0) -> void:
 	if buff_controller and defense_buff:
 		buff_controller.apply(defense_buff, self, global_position)
 
-## Animation method-call: 自施回血 buff
+## Animation method-call: 自施回血 buff。
+## `_amount` 保留是为了兼容旧动画轨道里的 method-call 实参；治疗量以 buff 资源为准。
 func heal_self(_amount: float = 0.0) -> void:
 	if buff_controller and heal_buff:
 		buff_controller.apply(heal_buff, self, global_position)
