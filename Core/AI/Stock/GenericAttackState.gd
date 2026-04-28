@@ -76,10 +76,10 @@ func call_skill_method() -> void:
 ## Animation method-call hook: read skill.params.self_buff and apply via BuffController.
 ## Used by BK defense_cast / heal_self skills (data-driven, no per-boss override).
 func apply_skill_self_buff() -> void:
-	if ai == null or ai.current_skill == null:
+	if owner_node == null or ai == null or ai.current_skill == null:
 		return
 	var skill = ai.current_skill
-	if not (&"params" in skill):
+	if not (&"params" in skill) or not (skill.params is Dictionary):
 		return
 	var buff: BuffEntity = skill.params.get(&"self_buff", null)
 	if buff == null:

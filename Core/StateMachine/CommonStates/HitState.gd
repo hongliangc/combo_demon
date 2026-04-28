@@ -26,12 +26,9 @@ func enter() -> void:
 
 	var bc: BuffController = owner_node.get_node_or_null(^"BuffController") if owner_node else null
 	if bc:
-		var top: BuffEntity = bc.get_top_hit_buff()
-		if top:
-			if top.hit_reaction != &"":
-				anim_key = top.hit_reaction
-			if top.hit_lock_duration > 0.0:
-				duration = top.hit_lock_duration
+		var resolved := bc.resolve_hit_anim(anim_key, duration)
+		anim_key = resolved[&"anim"]
+		duration = resolved[&"duration"]
 
 	enter_control_state(String(anim_key))
 	start_timer(duration)

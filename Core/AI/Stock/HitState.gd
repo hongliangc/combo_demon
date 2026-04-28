@@ -19,12 +19,9 @@ func enter() -> void:
 
 	var bc: BuffController = owner_node.get_node_or_null(^"BuffController")
 	if bc:
-		var top: BuffEntity = bc.get_top_hit_buff()
-		if top:
-			if top.hit_reaction != &"":
-				anim_key = top.hit_reaction
-			if top.hit_lock_duration > 0.0:
-				duration = top.hit_lock_duration
+		var resolved := bc.resolve_hit_anim(anim_key, duration)
+		anim_key = resolved[&"anim"]
+		duration = resolved[&"duration"]
 
 	if "anim_player" in owner_node and owner_node.anim_player:
 		if owner_node.anim_player.has_animation(anim_key):

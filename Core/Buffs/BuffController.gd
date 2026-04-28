@@ -155,6 +155,15 @@ func get_top_hit_buff() -> BuffEntity:
 			top = inst
 	return top.entity if top else null
 
+## Resolve hit animation + lock duration, falling back to defaults if no buff overrides.
+## Returns {&"anim": StringName, &"duration": float}.
+func resolve_hit_anim(default_anim: StringName, default_duration: float) -> Dictionary:
+	var top: BuffEntity = get_top_hit_buff()
+	if top == null:
+		return {&"anim": default_anim, &"duration": default_duration}
+	var dur: float = top.hit_lock_duration if top.hit_lock_duration > 0.0 else default_duration
+	return {&"anim": top.hit_reaction, &"duration": dur}
+
 # ============ Internals ============
 func _exec_effect(eff: BuffEffect, inst: BuffInstance, delta: float,
 				  trigger: int, dc: DamageContext = null) -> void:
