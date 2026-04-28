@@ -2,10 +2,11 @@
 class_name KnockBackEffectBuff extends BuffEffect
 
 ## Sets horizontal velocity on a CharacterBody2D away from a source position.
-## target_kind: 0=owner (we got pushed), 1=source (attacker pushed away — reactive).
+## Target is derived from ctx.trigger (see plan amendment A1):
+##   APPLY     → ctx.owner pushed away from buff source_pos.
+##   ON_DAMAGED → ctx.damage_ctx.source (attacker) pushed away from owner.
 
 @export var force: float = 400.0
-@export var target_kind: int = 0
 
 func _init() -> void:
 	effect_on = EffectOn.APPLY
@@ -23,6 +24,8 @@ func execute(ctx: BuffEffectContext) -> void:
 	(t as CharacterBody2D).velocity = Vector2(dir.x * force, (t as CharacterBody2D).velocity.y)
 
 func _resolve_target(ctx: BuffEffectContext) -> Node:
-	if target_kind == 1 and ctx.damage_ctx and ctx.damage_ctx.source:
-		return ctx.damage_ctx.source
-	return ctx.owner
+	match ctx.trigger:
+		EffectOn.ON_DAMAGED, EffectOn.ON_HEAL:
+			return ctx.damage_ctx.source if ctx.damage_ctx else null
+		_:
+			return ctx.owner

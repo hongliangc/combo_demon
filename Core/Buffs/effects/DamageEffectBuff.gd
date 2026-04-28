@@ -3,11 +3,13 @@ class_name DamageEffectBuff extends BuffEffect
 
 ## Routes a damage hit through the target's DamagePipeline.
 ## Used for DoT (TICK) and reactive damage (ON_DAMAGED, e.g. thorns).
+## Target is derived from ctx.trigger (see plan amendment A1):
+##   ON_DAMAGED / ON_HEAL → ctx.damage_ctx.source (the attacker / healer)
+##   any other trigger    → ctx.owner
 
 @export var amount: float = 5.0
 @export var tick_interval: float = 0.5
 @export var damage_tags: int = 0          # caller may add DOT explicitly
-@export var target_kind: int = 0          # 0=self, 1=source (反伤)
 
 func _init() -> void:
 	effect_on = EffectOn.TICK
@@ -34,6 +36,8 @@ func execute(ctx: BuffEffectContext) -> void:
 	pipe.process(dc)
 
 func _resolve_target(ctx: BuffEffectContext) -> Node:
-	if target_kind == 1 and ctx.damage_ctx and ctx.damage_ctx.source:
-		return ctx.damage_ctx.source
-	return ctx.owner
+	match ctx.trigger:
+		EffectOn.ON_DAMAGED, EffectOn.ON_HEAL:
+			return ctx.damage_ctx.source if ctx.damage_ctx else null
+		_:
+			return ctx.owner

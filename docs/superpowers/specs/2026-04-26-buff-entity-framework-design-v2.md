@@ -203,18 +203,31 @@ class_name DamageEffectBuff extends BuffEffect
 @export var amount: float = 5.0
 @export var tick_interval: float = 0.5
 @export var damage_tags: int = 0      # DamageTags.DOT / Magical / ...
-@export var target_kind: int = 0      # 0=self, 1=source（反伤）
+# 目标由 ctx.trigger 决定（见 Plan Amendment A1）：
+#   ON_DAMAGED / ON_HEAL → ctx.damage_ctx.source（攻击者 / 治疗者）
+#   其他（APPLY / TICK / ...）  → ctx.owner
 
 func execute(ctx: BuffEffectContext) -> void:
+    var t: Node = _resolve_target(ctx)
+    if t == null: return
     var dc := DamageContext.new()
-    dc.target = ctx.owner if target_kind == 0 else (ctx.damage_ctx.source if ctx.damage_ctx else ctx.owner)
+    dc.target = t
     dc.source = ctx.instance.source_actor
     dc.raw_amount = amount
     dc.amount = amount
-    dc.tags = damage_tags | DamageTags.DOT  # DoT 自动带 DOT 标签
+    dc.tags = damage_tags
+    if ctx.trigger == EffectOn.TICK:
+        dc.tags |= DamageTags.DOT
     dc.source_pos = ctx.instance.source_pos
-    var pipe: DamagePipeline = dc.target.get_node(^"DamagePipeline")
+    var pipe: DamagePipeline = t.get_node(^"DamagePipeline")
     if pipe: pipe.process(dc)
+
+func _resolve_target(ctx: BuffEffectContext) -> Node:
+    match ctx.trigger:
+        EffectOn.ON_DAMAGED, EffectOn.ON_HEAL:
+            return ctx.damage_ctx.source if ctx.damage_ctx else null
+        _:
+            return ctx.owner
 ```
 
 ```gdscript
@@ -237,14 +250,23 @@ func execute(ctx: BuffEffectContext) -> void:
 # Core/Buffs/effects/KnockBackEffect.gd
 class_name KnockBackEffectBuff extends BuffEffect
 @export var force: float = 400.0
-@export var target_kind: int = 0   # 0=self（被击退）, 1=source（反推 player）
+# 目标由 ctx.trigger 决定（Plan Amendment A1）：
+#   APPLY → ctx.owner（默认击退自身）
+#   ON_DAMAGED → ctx.damage_ctx.source（反推攻击者）
 
 func execute(ctx: BuffEffectContext) -> void:
-    var t: Node = ctx.owner if target_kind == 0 else (ctx.damage_ctx.source if ctx.damage_ctx else null)
+    var t: Node = _resolve_target(ctx)
     if not t is CharacterBody2D: return
     var src_pos: Vector2 = ctx.damage_ctx.source_pos if ctx.damage_ctx else ctx.instance.source_pos
     var dir := (t.global_position - src_pos).normalized()
     (t as CharacterBody2D).velocity = dir * force
+
+func _resolve_target(ctx: BuffEffectContext) -> Node:
+    match ctx.trigger:
+        EffectOn.ON_DAMAGED, EffectOn.ON_HEAL:
+            return ctx.damage_ctx.source if ctx.damage_ctx else null
+        _:
+            return ctx.owner
 ```
 
 ### 3.5 StatIds / DamageTags / LegalAction 常量
@@ -827,7 +849,7 @@ func enter() -> void:
 
 ```
 ReactivePushBuff.effects = [
-    KnockBackEffectBuff(force=400, target_kind=1, effect_on=ON_DAMAGED)
+    KnockBackEffectBuff(force=400, effect_on=ON_DAMAGED)
 ]
 BC.on_post_apply(ctx) 时遍历 active：
   effect.effect_on & ON_DAMAGED → execute(ctx)

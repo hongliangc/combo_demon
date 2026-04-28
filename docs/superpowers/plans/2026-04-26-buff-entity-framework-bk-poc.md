@@ -14,6 +14,28 @@
 
 ---
 
+## Plan Amendments
+
+### A1 — 2026-04-28: drop `target_kind`, derive target from `ctx.trigger` (Phase 4 CR Important #1)
+
+**Driver:** Phase 4 code-review flagged that `DamageEffectBuff` / `KnockBackEffectBuff` defaulted `effect_on` to TICK / APPLY but exposed `target_kind` independently. A designer setting `target_kind = 1` (target the attacker) without also OR-ing `ON_DAMAGED` into `effect_on` would silently fall back to `ctx.owner` and self-damage / self-knockback.
+
+**Resolution:** `target_kind` is redundant. The trigger fully determines the meaningful target:
+
+| `ctx.trigger`                    | Target                          |
+|----------------------------------|---------------------------------|
+| `ON_DAMAGED` / `ON_HEAL`         | `ctx.damage_ctx.source`         |
+| any other (APPLY / TICK / etc.) | `ctx.owner`                     |
+
+**Changes:**
+- `DamageEffectBuff` / `KnockBackEffectBuff`: drop `@export var target_kind`. `_resolve_target` switches on `ctx.trigger`.
+- Designers who need an unusual mapping (e.g., self-damage on hit) author a new subclass; the data model stays clean.
+- Phase 4 thorns integration test no longer sets `target_kind`.
+- BK reactive-push .tres in Task 27 drops the `target_kind = 1` line.
+- Source spec [v2 §3.4 / §8.6](../specs/2026-04-26-buff-entity-framework-design-v2.md) updated in lockstep.
+
+---
+
 ## File Structure
 
 ### Created — Core/Damage/
@@ -1478,11 +1500,11 @@ class_name DamageEffectBuff extends BuffEffect
 
 ## Routes a damage hit through the target's DamagePipeline.
 ## Used for DoT (TICK) and reactive damage (ON_DAMAGED, e.g. thorns).
+## Target is derived from ctx.trigger (see Plan Amendment A1).
 
 @export var amount: float = 5.0
 @export var tick_interval: float = 0.5
 @export var damage_tags: int = 0          # caller may add DOT explicitly
-@export var target_kind: int = 0          # 0=self, 1=source (反伤)
 
 func _init() -> void:
     effect_on = EffectOn.TICK
@@ -1509,9 +1531,12 @@ func execute(ctx: BuffEffectContext) -> void:
     pipe.process(dc)
 
 func _resolve_target(ctx: BuffEffectContext) -> Node:
-    if target_kind == 1 and ctx.damage_ctx and ctx.damage_ctx.source:
-        return ctx.damage_ctx.source
-    return ctx.owner
+    # ON_DAMAGED / ON_HEAL → target the attacker / healer; otherwise target the buff owner.
+    match ctx.trigger:
+        EffectOn.ON_DAMAGED, EffectOn.ON_HEAL:
+            return ctx.damage_ctx.source if ctx.damage_ctx else null
+        _:
+            return ctx.owner
 ```
 
 - [ ] **Step 2: Commit**
@@ -1578,10 +1603,11 @@ git commit -m "feat(buff): add HealEffectBuff for HoT"
 class_name KnockBackEffectBuff extends BuffEffect
 
 ## Sets horizontal velocity on a CharacterBody2D away from a source position.
-## target_kind: 0=owner (we got pushed), 1=source (attacker pushed away — reactive).
+## Target is derived from ctx.trigger (see Plan Amendment A1):
+##   APPLY → owner pushed away from buff source_pos.
+##   ON_DAMAGED → attacker pushed away from owner (reactive push).
 
 @export var force: float = 400.0
-@export var target_kind: int = 0
 
 func _init() -> void:
     effect_on = EffectOn.APPLY
@@ -1599,9 +1625,11 @@ func execute(ctx: BuffEffectContext) -> void:
     (t as CharacterBody2D).velocity = Vector2(dir.x * force, (t as CharacterBody2D).velocity.y)
 
 func _resolve_target(ctx: BuffEffectContext) -> Node:
-    if target_kind == 1 and ctx.damage_ctx and ctx.damage_ctx.source:
-        return ctx.damage_ctx.source
-    return ctx.owner
+    match ctx.trigger:
+        EffectOn.ON_DAMAGED, EffectOn.ON_HEAL:
+            return ctx.damage_ctx.source if ctx.damage_ctx else null
+        _:
+            return ctx.owner
 ```
 
 - [ ] **Step 2: Write KnockUpEffectBuff**
@@ -2136,7 +2164,6 @@ effects = [SubResource("Heal_pulse")]
 script = ExtResource("2_kb")
 effect_on = 16
 force = 350.0
-target_kind = 1
 
 [resource]
 script = ExtResource("1_buff")
@@ -2161,7 +2188,6 @@ effect_on = 2
 amount = 5.0
 tick_interval = 0.5
 damage_tags = 6
-target_kind = 0
 
 [resource]
 script = ExtResource("1_buff")

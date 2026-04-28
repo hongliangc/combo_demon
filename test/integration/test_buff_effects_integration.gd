@@ -81,7 +81,6 @@ func test_knockback_sets_horizontal_velocity_on_apply() -> void:
 
 	var e := KnockBackEffectBuff.new()
 	e.force = 300.0
-	e.target_kind = 0
 	var buff := H.create_buff_entity(&"knockback", 0.0, [e])
 
 	# Source at (0,0) → actor at (100,0): direction = right.
@@ -113,10 +112,9 @@ func test_thorns_reflects_damage_to_attacker() -> void:
 	add_child_autofree(attacker)
 	var defender := _actor  # already built + added in before_each
 
-	# Build thorns BuffEntity: DamageEffectBuff with target_kind=1 (reflect to source) on ON_DAMAGED.
+	# Build thorns BuffEntity: DamageEffectBuff fires on ON_DAMAGED; trigger derives target = attacker.
 	var thorns_eff := DamageEffectBuff.new()
 	thorns_eff.amount = 7.0
-	thorns_eff.target_kind = 1
 	thorns_eff.effect_on = BuffEffect.EffectOn.ON_DAMAGED
 	var thorns := H.create_buff_entity(&"thorns", 10.0, [thorns_eff])
 	_bc.apply(thorns, null, Vector2.ZERO)
