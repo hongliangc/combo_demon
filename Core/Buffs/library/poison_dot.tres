@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BuffEntity" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
+[ext_resource type="Script" path="res://Core/Buffs/effects/DamageEffectBuff.gd" id="2_dmg"]
+
+[sub_resource type="Resource" id="DoT_poison"]
+script = ExtResource("2_dmg")
+effect_on = 2
+amount = 5.0
+tick_interval = 0.5
+damage_tags = 6
+
+[resource]
+script = ExtResource("1_buff")
+id = &"poison_dot"
+duration = 8.0
+stacking = 0
+max_stacks = 1
+tags = 16
+effects = [SubResource("DoT_poison")]

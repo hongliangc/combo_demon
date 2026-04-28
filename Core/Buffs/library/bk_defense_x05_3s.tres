@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="BuffEntity" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
+[ext_resource type="Script" path="res://Core/Buffs/effects/StatModEffect.gd" id="2_stat"]
+
+[sub_resource type="Resource" id="StatMod_def"]
+script = ExtResource("2_stat")
+effect_on = 5
+stat_id = &"incoming_damage"
+multiplier = 0.5
+
+[resource]
+script = ExtResource("1_buff")
+id = &"bk_defense_x05_3s"
+duration = 3.0
+stacking = 0
+max_stacks = 1
+tags = 0
+legal_action_locks = 0
+hit_reaction = &""
+hit_priority = 0
+hit_lock_duration = 0.0
+effects = [SubResource("StatMod_def")]

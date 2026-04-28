@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuffEntity" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
+[ext_resource type="Script" path="res://Core/Buffs/effects/HealEffectBuff.gd" id="2_heal"]
+
+[sub_resource type="Resource" id="Heal_pulse"]
+script = ExtResource("2_heal")
+effect_on = 2
+amount = 8.0
+tick_interval = 1.0
+
+[resource]
+script = ExtResource("1_buff")
+id = &"bk_heal_pulse"
+duration = 3.0
+stacking = 0
+max_stacks = 1
+effects = [SubResource("Heal_pulse")]

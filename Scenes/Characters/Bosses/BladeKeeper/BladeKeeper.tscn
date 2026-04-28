@@ -142,6 +142,9 @@
 [ext_resource type="Resource" uid="uid://5l5b1x71gsgj" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_atk_heavy.tres" id="skill_heavy"]
 [ext_resource type="Resource" uid="uid://b87j0dgmk7h7q" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_throw_sword.tres" id="skill_throw"]
 [ext_resource type="Resource" uid="uid://bgnrbkgrl14ux" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_place_trap.tres" id="skill_trap"]
+[ext_resource type="Script" uid="uid://dlr87hqkwckdm" path="res://Core/Damage/DamagePipeline.gd" id="bk_pipeline"]
+[ext_resource type="Script" uid="uid://dy0ra50yvnnyr" path="res://Core/Buffs/BuffController.gd" id="bk_buffctl"]
+[ext_resource type="Script" uid="uid://d3umvhka6l2uv" path="res://Core/Status/StatusController.gd" id="bk_status"]
 
 [sub_resource type="Animation" id="Animation_52y2t"]
 length = 0.001
@@ -1397,3 +1400,12 @@ script = ExtResource("3_approach")
 position = Vector2(0, -42)
 sprite_frames = SubResource("SpriteFrames_nw0us")
 animation = &"idle"
+
+[node name="DamagePipeline" type="Node" parent="."]
+script = ExtResource("bk_pipeline")
+
+[node name="BuffController" type="Node" parent="."]
+script = ExtResource("bk_buffctl")
+
+[node name="StatusController" type="Node" parent="."]
+script = ExtResource("bk_status")

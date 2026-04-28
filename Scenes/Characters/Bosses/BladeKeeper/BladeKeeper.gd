@@ -18,8 +18,12 @@ const PHASE_SPEED := {
 ## 技能资源（在 Inspector 中拖拽 .tres 配置）
 @export var skill_resources: Array[Skill] = []
 
+## Buff 资源（library/）
+@export var defense_buff: BuffEntity = preload("res://Core/Buffs/library/bk_defense_x05_3s.tres")
+@export var heal_buff: BuffEntity = preload("res://Core/Buffs/library/bk_heal_pulse.tres")
+@export var reactive_push_buff: BuffEntity = preload("res://Core/Buffs/library/bk_reactive_push.tres")
+
 var current_phase: int = Phase.PHASE_1
-var _defense_multiplier: float = 1.0
 
 var move_speed: float:
 	get: return base_move_speed * PHASE_SPEED.get(current_phase, 1.0)
@@ -28,6 +32,9 @@ func _ready() -> void:
 	super._ready()
 	if health_comp:
 		health_comp.health_changed.connect(_on_health_changed)
+	# 永久反推 buff（PoC 阶段直接挂）
+	if buff_controller and reactive_push_buff:
+		buff_controller.apply(reactive_push_buff, self, global_position)
 
 # ---- AgentAIBase 钩子 ----
 func _setup_skill_set() -> void:
@@ -104,20 +111,16 @@ func _guard_can_interrupt() -> bool:
 func _precond_under_pressure() -> bool:
 	return ai.blackboard.get_var(&"damage_recent", 0.0) > pressure_threshold
 
-# ---- Method-call 占位（BuffEntity 框架到位前的过渡方案）----
-## 注意：_defense_multiplier 仅记录状态。实际减伤需在 take_damage 路径上拦截 ——
-## 落地方案二选一：
-##   (1) 在 BK 上加 HurtBoxComponent 拦截器，take_damage 前乘以 _defense_multiplier；
-##   (2) 暂不实现实际减伤，等 BuffEntity 框架到位时统一接 stat_modifiers。
-## 本次迁移选 (2)：apply_defense_buff 只记录状态 + 等待 BuffEntity，不破坏现有伤害管线。
-func apply_defense_buff(duration: float) -> void:
-	_defense_multiplier = 0.5
-	var t := get_tree().create_timer(duration)
-	t.timeout.connect(func(): _defense_multiplier = 1.0)
+# ---- Animation method-call: BuffController 路由 ----
+## Animation method-call: 自施防御 buff
+func apply_defense_buff(_duration: float = 0.0) -> void:
+	if buff_controller and defense_buff:
+		buff_controller.apply(defense_buff, self, global_position)
 
-func heal_self(amount: float) -> void:
-	if health_comp:
-		health_comp.heal(amount)
+## Animation method-call: 自施回血 buff
+func heal_self(_amount: float = 0.0) -> void:
+	if buff_controller and heal_buff:
+		buff_controller.apply(heal_buff, self, global_position)
 
 # ---- Phase 推进（HP 比例驱动）----
 func _on_health_changed(current: float, _maximum: float) -> void:

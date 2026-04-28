@@ -15,6 +15,9 @@
 [ext_resource type="Script" uid="uid://kkmnjkou0eie" path="res://Core/StateMachine/PlayerStates/PlayerHitState.gd" id="15_sm_hit"]
 [ext_resource type="Script" uid="uid://vyfwglbh5x83" path="res://Core/StateMachine/PlayerStates/PlayerSpecialAttackState.gd" id="16_sm_special"]
 [ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerFallDeathState.gd" id="17_sm_falldeath"]
+[ext_resource type="Script" uid="uid://dlr87hqkwckdm" path="res://Core/Damage/DamagePipeline.gd" id="18_pipeline"]
+[ext_resource type="Script" uid="uid://dy0ra50yvnnyr" path="res://Core/Buffs/BuffController.gd" id="19_buffctl"]
+[ext_resource type="Script" uid="uid://d3umvhka6l2uv" path="res://Core/Status/StatusController.gd" id="20_status"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_floor"]
 
@@ -78,6 +81,15 @@ disabled = true
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1971167533]
 script = ExtResource("3_health")
+
+[node name="DamagePipeline" type="Node" parent="."]
+script = ExtResource("18_pipeline")
+
+[node name="BuffController" type="Node" parent="."]
+script = ExtResource("19_buffctl")
+
+[node name="StatusController" type="Node" parent="."]
+script = ExtResource("20_status")
 
 [node name="HealthBar" type="ProgressBar" parent="." unique_id=107527890]
 anchors_preset = 5
