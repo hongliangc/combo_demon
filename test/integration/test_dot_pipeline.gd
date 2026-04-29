@@ -10,6 +10,7 @@ var _actor: CharacterBody2D
 var _hc: HealthComponent
 var _bc: BuffController
 var _react_called: bool
+var _seen_tag: int = 0
 
 func before_each() -> void:
 	_actor = H.build_actor_with_pipeline()
@@ -18,6 +19,7 @@ func before_each() -> void:
 	_bc = _actor.get_node(^"BuffController")
 	var pipe: DamagePipeline = _actor.get_node(^"DamagePipeline")
 	_react_called = false
+	_seen_tag = 0
 	pipe.react.connect(func(ctx):
 		if not (ctx.tags & DamageTags.DOT):
 			_react_called = true)
@@ -39,12 +41,10 @@ func test_dot_drains_hp_each_tick() -> void:
 
 func test_dot_carries_dot_tag_into_pipeline() -> void:
 	var pipe: DamagePipeline = _actor.get_node(^"DamagePipeline")
-	# Lambdas in GDScript capture by value — use a one-element array to mutate from the callback.
-	var seen_tag: Array[int] = [0]
-	pipe.apply.connect(func(ctx): seen_tag[0] = ctx.tags)
+	pipe.apply.connect(func(ctx): _seen_tag = ctx.tags)
 	_bc.apply(_make_poison(), null, _actor.global_position)
 	_bc._physics_process(0.5)
-	assert_true((seen_tag[0] & DamageTags.DOT) != 0)
+	assert_true((_seen_tag & DamageTags.DOT) != 0, "DOT bit set on TICK damage")
 
 func test_dot_skips_react_for_hit_state() -> void:
 	_bc.apply(_make_poison(), null, _actor.global_position)

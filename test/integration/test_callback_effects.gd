@@ -21,16 +21,11 @@ func before_each() -> void:
 func test_on_damaged_pushes_attacker() -> void:
 	var kb := KnockBackEffectBuff.new()
 	kb.force = 300.0
-	# NOTE: target_kind dropped per plan amendment A1; trigger=ON_DAMAGED → target=ctx.damage_ctx.source (attacker)
 	kb.effect_on = BuffEffect.EffectOn.ON_DAMAGED
 	_victim_bc.apply(H.create_buff_entity(&"thorns", 0.0, [kb]), null, _victim.global_position)
 
 	var pipe: DamagePipeline = _victim.get_node(^"DamagePipeline")
-	var ctx := DamageContext.new()
-	ctx.target = _victim
-	ctx.source = _attacker
-	ctx.amount = 10.0
-	ctx.source_pos = _attacker.global_position
+	var ctx := H.create_damage_ctx(_victim, 10.0, _attacker)
 	pipe.process(ctx)
 
 	assert_almost_eq(_attacker.velocity.x, -300.0, 0.5, "pushed left away from victim at x=100")
