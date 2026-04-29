@@ -3,8 +3,8 @@ class_name KnockBackEffectBuff extends BuffEffect
 
 ## Sets horizontal velocity on a CharacterBody2D away from a source position.
 ## Target is derived from ctx.trigger (see plan amendment A1):
-##   APPLY     → ctx.owner pushed away from buff source_pos.
-##   ON_DAMAGED → ctx.damage_ctx.source (attacker) pushed away from owner.
+##   APPLY                    → ctx.owner pushed away from buff source_pos.
+##   ON_DAMAGED / ON_HEAL     → ctx.damage_ctx.source pushed away from owner.
 
 @export var force: float = 400.0
 
