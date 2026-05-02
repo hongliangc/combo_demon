@@ -1,17 +1,16 @@
-[gd_resource type="Resource" script_class="BuffEntity" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="BuffEntity" format=3 uid="uid://br70emkmvrm0w"]
 
-[ext_resource type="Script" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
-[ext_resource type="Script" path="res://Core/Buffs/effects/KnockBackEffectBuff.gd" id="2_kb"]
+[ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
+[ext_resource type="Script" uid="uid://b1nwuwgh80wpm" path="res://Core/Buffs/BuffEffect.gd" id="1_oqcql"]
+[ext_resource type="Script" uid="uid://1rkyibv0m1h5" path="res://Core/Buffs/effects/KnockBackEffectBuff.gd" id="2_kb"]
 
 [sub_resource type="Resource" id="KB_push"]
 script = ExtResource("2_kb")
-effect_on = 16
 force = 350.0
+effect_on = 16
 
 [resource]
 script = ExtResource("1_buff")
 id = &"bk_reactive_push"
-duration = 0.0
-stacking = 0
 max_stacks = 1
-effects = [SubResource("KB_push")]
+effects = Array[ExtResource("1_oqcql")]([SubResource("KB_push")])

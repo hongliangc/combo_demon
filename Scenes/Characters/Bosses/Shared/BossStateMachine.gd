@@ -14,30 +14,43 @@ func _setup_signals() -> void:
 		if not owner_node.is_connected("phase_changed", _on_phase_changed):
 			owner_node.phase_changed.connect(_on_phase_changed)
 
-func _on_owner_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
+## Boss overlay on pipeline.react — runs stun-immunity/poise/evasion guards
+## that may force_transition to counter/defend/roll BEFORE the base class
+## hands the hit to current_state.on_damaged(). Guards only fire on real hits
+## (mirrors the base class's early-exit filters to avoid spending poise on
+## blocked / DOT / heal / zero-damage events).
+func _on_pipeline_react(ctx: DamageContext) -> void:
 	if is_transitioning_phase:
 		return
 
-	var boss := owner_node as BossBase
-	if boss:
-		if boss.stun_immunity > 0:
-			return
-
-		# Poise 检查（优先于闪避）
-		if boss.poise_enabled and boss.take_poise_hit():
-			force_transition("counter")
-			return
-
-		# 闪避检查：概率触发 defend 或 roll
-		if boss.evasion_enabled:
-			var chance: float = boss.evasion_chance_per_phase.get(boss.current_phase, 0.0)
-			if chance > 0 and randf() < chance:
-				var evasion_state: String = ["defend", "roll"].pick_random()
-				force_transition(evasion_state)
+	var is_real_hit: bool = (
+		not ctx.blocked
+		and not ctx.is_heal
+		and ctx.target == owner_node
+		and (ctx.tags & DamageTags.DOT) == 0
+		and ctx.dealt > 0.0
+	)
+	if is_real_hit:
+		var boss := owner_node as BossBase
+		if boss:
+			if boss.stun_immunity > 0:
 				return
 
+			# Poise 检查（优先于闪避）
+			if boss.poise_enabled and boss.take_poise_hit():
+				force_transition("counter")
+				return
+
+			# 闪避检查：概率触发 defend 或 roll
+			if boss.evasion_enabled:
+				var chance: float = boss.evasion_chance_per_phase.get(boss.current_phase, 0.0)
+				if chance > 0 and randf() < chance:
+					var evasion_state: String = ["defend", "roll"].pick_random()
+					force_transition(evasion_state)
+					return
+
 	# 通过决策链 → 缓存伤害 + 传递给当前状态
-	super._on_owner_damaged(damage, attacker_position)
+	super._on_pipeline_react(ctx)
 
 func _on_phase_changed(new_phase: int) -> void:
 	is_transitioning_phase = true

@@ -7,4 +7,3 @@ script = ExtResource("1_damage")
 max_amount = 55.0
 min_amount = 35.0
 amount = 45.0
-effects = Array[Resource]([])

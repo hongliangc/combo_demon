@@ -12,6 +12,9 @@
 [ext_resource type="Script" uid="uid://ddwmjtmp1g8e2" path="res://Core/AI/Stock/AttackDispatcher.gd" id="11_dispatcher"]
 [ext_resource type="Script" uid="uid://bky6akb84sun2" path="res://Core/AI/Stock/GenericAttackState.gd" id="12_generic_attack"]
 [ext_resource type="Script" uid="uid://dok0elg2cedvk" path="res://Core/AI/Stock/ComboState.gd" id="13_combo"]
+[ext_resource type="Script" uid="uid://dlr87hqkwckdm" path="res://Core/Damage/DamagePipeline.gd" id="14_pipeline"]
+[ext_resource type="Script" uid="uid://dy0ra50yvnnyr" path="res://Core/Buffs/BuffController.gd" id="15_buffctl"]
+[ext_resource type="Script" uid="uid://d3umvhka6l2uv" path="res://Core/Status/StatusController.gd" id="16_status"]
 
 [sub_resource type="Animation" id="Animation_RESET"]
 length = 0.001
@@ -142,5 +145,14 @@ script = ExtResource("12_generic_attack")
 
 [node name="Combo" type="Node" parent="AIController/StateMachine" unique_id=1022768555]
 script = ExtResource("13_combo")
+
+[node name="DamagePipeline" type="Node" parent="." unique_id=1611640453]
+script = ExtResource("14_pipeline")
+
+[node name="BuffController" type="Node" parent="." unique_id=123392243]
+script = ExtResource("15_buffctl")
+
+[node name="StatusController" type="Node" parent="." unique_id=1354908370]
+script = ExtResource("16_status")
 
 [connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

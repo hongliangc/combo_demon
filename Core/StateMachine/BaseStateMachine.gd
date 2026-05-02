@@ -122,11 +122,14 @@ func _setup_animation_tree() -> void:
 
 
 ## 设置信号连接（子类可重写）
+## 订阅 owner 的 DamagePipeline.react，桥接到 current_state.on_damaged()。
+## BuffEntity 迁移后 owner.damaged(Damage, Vector2) 已不再发，统一走 pipeline.react。
 func _setup_signals() -> void:
-	# 连接 damaged 信号（如果 owner 有的话）
-	if owner_node and owner_node.has_signal("damaged"):
-		if not owner_node.is_connected("damaged", _on_owner_damaged):
-			owner_node.damaged.connect(_on_owner_damaged)
+	if owner_node == null:
+		return
+	var pipe: DamagePipeline = owner_node.get_node_or_null(^"DamagePipeline")
+	if pipe and not pipe.react.is_connected(_on_pipeline_react):
+		pipe.react.connect(_on_pipeline_react)
 
 
 ## 状态转换处理（带优先级检查）
@@ -165,12 +168,25 @@ func _execute_transition(from_state: BaseState, new_state: BaseState) -> void:
 	DebugConfig.debug("[%s] %s -> %s" % [owner_name, from_name, new_state.name], "", "state_machine")
 
 
-## 当 owner 受到伤害时
-func _on_owner_damaged(damage: Damage, attacker_position: Vector2 = Vector2.ZERO) -> void:
+## DamagePipeline.react 桥接 → current_state.on_damaged()
+## 过滤：blocked / is_heal / DOT / target 错配 → 早退；
+## 仅在 ctx.dealt > 0 时合成 Damage 触发受击（避开 0 伤的 i-frames / 抗性场景）。
+func _on_pipeline_react(ctx: DamageContext) -> void:
+	if ctx.blocked or ctx.is_heal:
+		return
+	if ctx.target != owner_node:
+		return
+	if ctx.tags & DamageTags.DOT:
+		return
+	if ctx.dealt <= 0.0:
+		return
+	var damage := Damage.new()
+	damage.amount = ctx.dealt
+	damage.tags = ctx.tags
 	last_damage = damage
-	last_attacker_position = attacker_position
+	last_attacker_position = ctx.source_pos
 	if current_state and current_state.has_method("on_damaged"):
-		current_state.on_damaged(damage, attacker_position)
+		current_state.on_damaged(damage, ctx.source_pos)
 
 
 ## 强制切换到指定状态（忽略优先级检查，用于控制状态）
@@ -217,9 +233,11 @@ func recover_from_stun() -> void:
 
 ## 清理信号连接，防止状态机销毁后信号泄漏
 func _exit_tree() -> void:
-	if is_instance_valid(owner_node) and owner_node.has_signal("damaged"):
-		if owner_node.is_connected("damaged", _on_owner_damaged):
-			owner_node.damaged.disconnect(_on_owner_damaged)
+	if not is_instance_valid(owner_node):
+		return
+	var pipe: DamagePipeline = owner_node.get_node_or_null(^"DamagePipeline")
+	if pipe and pipe.react.is_connected(_on_pipeline_react):
+		pipe.react.disconnect(_on_pipeline_react)
 
 
 # ============ 工具方法 ============

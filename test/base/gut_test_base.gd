@@ -81,9 +81,11 @@ func assert_signal_emitted_within(obj: Object, signal_name: String, timeout: flo
 # 直接使用父类方法即可，无需重写
 
 ## 等待指定物理帧数
-func wait_physics_frames(count: int = 1) -> void:
+## 签名匹配 GutTest.wait_physics_frames(int, String = '') -> Variant
+func wait_physics_frames(count: int = 1, _msg: String = '') -> Variant:
 	for i in count:
 		await get_tree().physics_frame
+	return null
 
 
 # ============ 自定义断言 ============

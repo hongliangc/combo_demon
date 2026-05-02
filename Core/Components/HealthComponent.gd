@@ -3,21 +3,18 @@ extends Node
 class_name HealthComponent
 
 ## Thin HP container. Subscribes DamagePipeline.apply only — no buff awareness.
-## Death is signaled to AAB; reset_health is exposed for spawning/respawn.
+## Death is signaled via `died`; AAB consumes that to enter Death state, where
+## DeathState awaits the death animation then queue_free's the owner.
 ##
-## SIGNATURE CHANGE (Phase 3 of buff-entity-framework):
-##   Old: damaged(damage: Damage, attacker_position: Vector2)
-##   New: damaged(amount: float, source_pos: Vector2)
-##
-## Existing slots still using the OLD signature (rewired in Phase 5, Task 22):
-##   - Core/AI/AgentAIBase.gd::_on_agent_damaged       → moves to pipeline.react
-##   - Core/Characters/BaseCharacter.gd::_on_health_component_damaged
-##                                                    → forwards old Damage object
-##   These slots will receive (float, Vector2) at runtime under the new signal,
-##   which would crash on `damage.amount` access. Until Phase 5 lands, do NOT
-##   instantiate BK / BaseCharacter scenes against this rewritten HC; the
-##   buff-framework integration tests cover the new path with a bare
-##   CharacterBody2D fixture (see test/base/test_helper.gd build_actor_with_pipeline).
+## ctx.blocked semantics in _commit (gated by react-side listeners like AAB):
+##   - target mismatch          → no-op, do not touch ctx (other HC will handle)
+##   - target dead before apply → ctx.blocked = true, skip apply
+##                                (posthumous DoT/AOE → AAB ignores, no Hit re-entry)
+##   - lethal blow              → ctx.blocked = true after `is_alive=false`,
+##                                so react fires after `died.emit` but AAB skips
+##                                the Hit transition (Death wins cleanly).
+## BuffController hooks into post_apply (not react), so ctx.blocked does not
+## affect ON_DAMAGED triggers / attached_buffs application.
 
 signal health_changed(current: float, maximum: float)
 signal damaged(amount: float, source_pos: Vector2)
@@ -47,7 +44,12 @@ func _emit_initial_health() -> void:
 
 # ============ Pipeline subscriber ============
 func _commit(ctx: DamageContext) -> void:
-	if ctx.target != owner_body or not is_alive:
+	if ctx.target != owner_body:
+		return
+	if not is_alive:
+		# Posthumous hits: signal downstream react listeners (AAB) to ignore via ctx.blocked.
+		# Keeps post_apply buff hooks unaffected (they don't gate on blocked).
+		ctx.blocked = true
 		return
 	var prev := health
 	if ctx.is_heal:
@@ -62,6 +64,7 @@ func _commit(ctx: DamageContext) -> void:
 	health_changed.emit(health, max_health)
 	if health <= 0.0 and is_alive:
 		is_alive = false
+		ctx.blocked = true
 		died.emit()
 
 # ============ External entry points ============

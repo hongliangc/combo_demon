@@ -28,11 +28,14 @@
 [ext_resource type="Texture2D" uid="uid://3arqwp0hj6lt" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_down/03_jump_down_3.png" id="13_nhah7"]
 [ext_resource type="Texture2D" uid="uid://cnv83cxxqlps3" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_up/03_jump_up_1.png" id="14_da7nw"]
 [ext_resource type="Texture2D" uid="uid://62if5r1mx2yk" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_6.png" id="14_hvdqb"]
+[ext_resource type="Resource" uid="uid://dkwyd3tx4paju" path="res://Core/Buffs/library/bk_defense_x05_3s.tres" id="15_6ucxi"]
 [ext_resource type="Texture2D" uid="uid://4ij6p8xsm7dv" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_up/03_jump_up_2.png" id="15_fps0p"]
 [ext_resource type="Texture2D" uid="uid://7fq7c6bhanex" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_7.png" id="15_xudoa"]
+[ext_resource type="Resource" uid="uid://brkgkilkidl3m" path="res://Core/Buffs/library/bk_heal_pulse.tres" id="16_jjn64"]
 [ext_resource type="Texture2D" uid="uid://b07ue6kh3k0vx" path="res://Assets/Art/BLADE_KEEPER/PNG animations/03_jump_up/03_jump_up_3.png" id="16_jkvjd"]
 [ext_resource type="Texture2D" uid="uid://btsq60edhkc5q" path="res://Assets/Art/BLADE_KEEPER/PNG animations/08_2_atk/08_2_atk_8.png" id="16_r7lhx"]
 [ext_resource type="Texture2D" uid="uid://c6eaik4ftm2uq" path="res://Assets/Art/BLADE_KEEPER/PNG animations/02_run/02_run_1.png" id="17_4j748"]
+[ext_resource type="Resource" uid="uid://br70emkmvrm0w" path="res://Core/Buffs/library/bk_reactive_push.tres" id="17_532rr"]
 [ext_resource type="Texture2D" uid="uid://dn4xmwp0ei731" path="res://Assets/Art/BLADE_KEEPER/PNG animations/09_3_atk/09_3_atk_1.png" id="17_cdaud"]
 [ext_resource type="Texture2D" uid="uid://d1dbap4sy67il" path="res://Assets/Art/BLADE_KEEPER/PNG animations/02_run/02_run_2.png" id="18_4un6p"]
 [ext_resource type="Texture2D" uid="uid://bg0lsog23bcgb" path="res://Assets/Art/BLADE_KEEPER/PNG animations/09_3_atk/09_3_atk_2.png" id="18_52y2t"]
@@ -142,9 +145,6 @@
 [ext_resource type="Resource" uid="uid://5l5b1x71gsgj" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_atk_heavy.tres" id="skill_heavy"]
 [ext_resource type="Resource" uid="uid://b87j0dgmk7h7q" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_throw_sword.tres" id="skill_throw"]
 [ext_resource type="Resource" uid="uid://bgnrbkgrl14ux" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_place_trap.tres" id="skill_trap"]
-[ext_resource type="Script" uid="uid://dlr87hqkwckdm" path="res://Core/Damage/DamagePipeline.gd" id="bk_pipeline"]
-[ext_resource type="Script" uid="uid://dy0ra50yvnnyr" path="res://Core/Buffs/BuffController.gd" id="bk_buffctl"]
-[ext_resource type="Script" uid="uid://d3umvhka6l2uv" path="res://Core/Status/StatusController.gd" id="bk_status"]
 
 [sub_resource type="Animation" id="Animation_52y2t"]
 length = 0.001
@@ -1353,6 +1353,9 @@ base_move_speed = 180.0
 detection_radius = 600.0
 pressure_threshold = 35.0
 skill_resources = Array[ExtResource("3_dtgvd")]([ExtResource("skill_basic"), ExtResource("skill_heavy"), ExtResource("skill_dash"), ExtResource("skill_throw"), ExtResource("skill_trap"), ExtResource("skill_dodge"), ExtResource("skill_defend"), ExtResource("skill_heal"), ExtResource("skill_combo_basic"), ExtResource("skill_combo_p2"), ExtResource("skill_combo_p3")])
+defense_buff = ExtResource("15_6ucxi")
+heal_buff = ExtResource("16_jjn64")
+reactive_push_buff = ExtResource("17_532rr")
 has_gravity = true
 sprite_faces_right = true
 
@@ -1373,7 +1376,8 @@ shape = SubResource("RectangleShape2D_4qryw")
 disabled = true
 
 [node name="HealthComponent" parent="." index="4" unique_id=163196815]
-max_health = 200.0
+max_health = 1000.0
+health = 1000.0
 
 [node name="HealthBar" parent="." index="5" unique_id=664927981]
 value = 0.3
@@ -1401,11 +1405,3 @@ position = Vector2(0, -42)
 sprite_frames = SubResource("SpriteFrames_nw0us")
 animation = &"idle"
 
-[node name="DamagePipeline" type="Node" parent="."]
-script = ExtResource("bk_pipeline")
-
-[node name="BuffController" type="Node" parent="."]
-script = ExtResource("bk_buffctl")
-
-[node name="StatusController" type="Node" parent="."]
-script = ExtResource("bk_status")

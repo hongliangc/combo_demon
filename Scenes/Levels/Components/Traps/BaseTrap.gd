@@ -13,8 +13,8 @@ class_name BaseTrap
 @export_group("伤害配置")
 ## 伤害值
 @export var damage_amount: float = 10.0
-## 攻击特效列表（击退、击飞、眩晕等）
-@export var effects: Array[AttackEffect] = []
+## 命中时附加的 Buff 列表（击退、眩晕等通过 BuffEntity 表达）
+@export var effects: Array[BuffEntity] = []
 
 @export_group("时序配置")
 ## 场景启动后延迟激活（秒）

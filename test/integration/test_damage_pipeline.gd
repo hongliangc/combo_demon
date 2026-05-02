@@ -130,3 +130,25 @@ func test_multiple_damages_track_health_correctly() -> void:
 	_deal(30.0)
 	_deal(10.0)
 	assert_eq(_health_comp.health, 40.0)
+
+# ============ 致死/死后伤害：HC 标 blocked，react 下游可早退 ============
+
+func test_lethal_blow_marks_ctx_blocked() -> void:
+	var ctx := DamageContext.new()
+	ctx.target = _owner
+	ctx.amount = 100.0
+	ctx.raw_amount = 100.0
+	_pipe.process(ctx)
+	assert_false(_health_comp.is_alive)
+	assert_true(ctx.blocked, "lethal blow should mark ctx.blocked so react skips Hit transition")
+
+func test_posthumous_damage_marks_ctx_blocked() -> void:
+	_deal(100.0)
+	assert_false(_health_comp.is_alive)
+	var ctx := DamageContext.new()
+	ctx.target = _owner
+	ctx.amount = 10.0
+	ctx.raw_amount = 10.0
+	_pipe.process(ctx)
+	assert_true(ctx.blocked, "HC should mark ctx.blocked when target is dead")
+	assert_eq(_health_comp.health, 0.0)
