@@ -394,6 +394,20 @@ func abort_attack() -> void:
 			AnimationNodeOneShot.ONE_SHOT_REQUEST_ABORT)
 
 
+## 检查 control_sm 是否包含指定状态（HitState fallback 判断用）
+func has_control_state(state_name: String) -> bool:
+	var tree = get_anim_tree()
+	if not tree or not tree.tree_root:
+		return false
+	var bt := tree.tree_root as AnimationNodeBlendTree
+	if not bt or not bt.has_node("control_sm"):
+		return false
+	var sm := bt.get_node("control_sm") as AnimationNodeStateMachine
+	if not sm:
+		return false
+	return sm.has_node(state_name)
+
+
 ## 进入控制状态（hit / stun / death）
 ## 通过 control_blend 节点将动画从 locomotion 切换到 control_sm
 func enter_control_state(state_name: String) -> void:

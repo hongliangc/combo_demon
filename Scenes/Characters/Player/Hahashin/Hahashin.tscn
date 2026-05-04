@@ -1352,15 +1352,15 @@ position = Vector2(0, -50)
 [node name="HitBoxComponent" parent="." index="6" unique_id=424478430]
 collision_layer = 2
 
-[node name="HealthBar" parent="." index="8" unique_id=107527890]
+[node name="HealthBar" parent="." index="11" unique_id=107527890]
 offset_left = -20.0
 offset_top = -28.0
 offset_right = 20.0
 offset_bottom = -23.0
 
-[node name="MovementComponent" parent="." index="9" unique_id=1866148992]
+[node name="MovementComponent" parent="." index="12" unique_id=1866148992]
 max_speed = 200.0
 max_jump_count = 2
 
-[node name="CombatComponent" parent="." index="10" unique_id=1903333573]
+[node name="CombatComponent" parent="." index="13" unique_id=1903333573]
 damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr"), ExtResource("4_special")])

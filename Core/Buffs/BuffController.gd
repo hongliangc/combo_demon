@@ -48,6 +48,7 @@ func apply(buff: BuffEntity, source_actor: Node, source_pos: Vector2) -> void:
 
 	var ctx := _make_ctx(inst, BuffEffect.EffectOn.APPLY)
 	buff.execute_on(BuffEffect.EffectOn.APPLY, ctx)
+	DebugConfig.debug("[BC] %s applied buff=%s preserve_vel=%s" % [owner_node.name, buff.id, str(buff.preserves_velocity)], "", "combat")
 	buffs_changed.emit()
 
 # ============ Tick (per physics frame) ============
@@ -154,6 +155,14 @@ func get_top_hit_buff() -> BuffEntity:
 		if top == null or inst.entity.hit_priority > top.entity.hit_priority:
 			top = inst
 	return top.entity if top else null
+
+## 任意活动 buff 标记 preserves_velocity → HitState 应跳过清零 / 阻尼 velocity
+func should_preserve_velocity() -> bool:
+	for inst in active:
+		if inst.entity and inst.entity.preserves_velocity:
+			return true
+	return false
+
 
 ## Resolve hit animation + lock duration, falling back to defaults if no buff overrides.
 ## Returns {&"anim": StringName, &"duration": float}.

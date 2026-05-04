@@ -19,3 +19,4 @@ func execute(ctx: BuffEffectContext) -> void:
 	if dir_x == 0.0:
 		dir_x = 1.0
 	(t as CharacterBody2D).velocity = Vector2(dir_x * horizontal_force, vertical_force)
+	DebugConfig.debug("[KnockUp] %s vel=(%.0f,%.0f)" % [(t as Node).name, dir_x * horizontal_force, vertical_force], "", "combat")

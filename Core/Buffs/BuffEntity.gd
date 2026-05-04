@@ -20,6 +20,9 @@ var legal_action_locks: int = 0
 @export var hit_priority: int = 0
 @export var hit_lock_duration: float = 0.0
 
+## 若 true，HitState 不会清零 / lerp owner velocity（用于击飞 / 击退保留物理冲量）
+@export var preserves_velocity: bool = false
+
 @export var effects: Array[BuffEffect] = []
 
 ## Run all effects whose effect_on bitmask matches the given trigger.

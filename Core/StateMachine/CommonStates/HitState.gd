@@ -1,6 +1,8 @@
 extends BaseState
 class_name HitState
 
+const HitFlashHelperRef := preload("res://Core/Effects/HitFlashHelper.gd")
+
 ## 统一受击反应状态 (legacy BaseStateMachine 用)
 ## Phase 5: 改为查询 BuffController.get_top_hit_buff() 选动画 + 锁时长
 ## effects 已由 DamagePipeline.post_apply 阶段处理，本状态不再 apply effects
@@ -19,23 +21,39 @@ func _init():
 
 
 func enter() -> void:
-	stop_movement()
+	var bc: BuffController = owner_node.get_node_or_null(^"BuffController") if owner_node else null
+	var preserve_vel := bc != null and bc.should_preserve_velocity()
+	if not preserve_vel:
+		stop_movement()
 
 	var anim_key: StringName = &"hit"
 	var duration: float = hit_duration
 
-	var bc: BuffController = owner_node.get_node_or_null(^"BuffController") if owner_node else null
 	if bc:
 		var resolved := bc.resolve_hit_anim(anim_key, duration)
 		anim_key = resolved[&"anim"]
 		duration = resolved[&"duration"]
 
-	enter_control_state(String(anim_key))
+	_play_anim_or_fallback(String(anim_key))
 	start_timer(duration)
 	DebugConfig.debug("受击: %s anim=%s %.2fs" % [owner_node.name, anim_key, duration], "", "state_machine")
 
 
+## 动画解析顺序: buff 指定 → 通用 "hit" → 白闪
+func _play_anim_or_fallback(anim_name: String) -> void:
+	if has_control_state(anim_name):
+		enter_control_state(anim_name)
+		return
+	if anim_name != "hit" and has_control_state("hit"):
+		enter_control_state("hit")
+		return
+	HitFlashHelperRef.flash(owner_node)
+
+
 func physics_process_state(_delta: float) -> void:
+	var bc: BuffController = owner_node.get_node_or_null(^"BuffController") if owner_node else null
+	if bc and bc.should_preserve_velocity():
+		return
 	stop_movement()
 
 

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BuffEntity" format=3 uid="uid://dw6yj3xm8kyna"]
+
+[ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
+[ext_resource type="Script" uid="uid://b1nwuwgh80wpm" path="res://Core/Buffs/BuffEffect.gd" id="1_eff"]
+[ext_resource type="Script" uid="uid://bpu5eon0a0vdg" path="res://Core/Buffs/effects/KnockUpEffectBuff.gd" id="2_ku"]
+
+[sub_resource type="Resource" id="KU_launch"]
+script = ExtResource("2_ku")
+vertical_force = -200.0
+horizontal_force = 0.0
+
+[resource]
+script = ExtResource("1_buff")
+id = &"knockup"
+duration = 0.45
+max_stacks = 1
+legal_action_locks = 15
+hit_reaction = &"knockup_hit"
+hit_priority = 20
+preserves_velocity = true
+effects = Array[ExtResource("1_eff")]([SubResource("KU_launch")])

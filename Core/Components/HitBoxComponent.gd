@@ -39,6 +39,7 @@ func _on_hitbox_area_entered_(target: Area2D) -> void:
 	ctx.amount = damage.amount
 	ctx.tags = damage.tags
 	ctx.attached_buffs = damage.effects.duplicate()
+	DebugConfig.debug("[HitBox] %s→%s buffs=%d amt=%.1f" % [attacker.name, victim.name, ctx.attached_buffs.size(), ctx.amount], "", "combat")
 	ctx.source_pos = get_attacker_position()
 
 	var atk_bc: BuffController = attacker.get_node_or_null(^"BuffController")

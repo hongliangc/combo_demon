@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BuffEntity" format=3]
+
+[ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
+
+[resource]
+script = ExtResource("1_buff")
+id = &"force_stun"
+duration = 1.0
+stacking = 2
+max_stacks = 1
+legal_action_locks = 15
+hit_reaction = &"stun"
+hit_priority = 30
