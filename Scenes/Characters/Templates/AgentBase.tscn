@@ -4,14 +4,8 @@
 [ext_resource type="Script" uid="uid://3cpq40uop66w" path="res://Core/Components/HurtBoxComponent.gd" id="2_hurtbox"]
 [ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="3_health"]
 [ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="5_hitbox"]
-[ext_resource type="Script" uid="uid://cax8bfmlvt4q3" path="res://Core/AI/AIController.gd" id="6_ai_controller"]
-[ext_resource type="Script" uid="uid://bvvnhbufppo8" path="res://Core/AI/Stock/IdleState.gd" id="7_idle"]
-[ext_resource type="Script" uid="uid://beqjsx7b4cg0n" path="res://Core/AI/Stock/ChaseState.gd" id="8_chase"]
-[ext_resource type="Script" uid="uid://c00p727wgkv03" path="res://Core/AI/Stock/HitState.gd" id="9_hit"]
-[ext_resource type="Script" uid="uid://c8dyu2kanm807" path="res://Core/AI/Stock/DeathState.gd" id="10_death"]
-[ext_resource type="Script" uid="uid://ddwmjtmp1g8e2" path="res://Core/AI/Stock/AttackDispatcher.gd" id="11_dispatcher"]
-[ext_resource type="Script" uid="uid://bky6akb84sun2" path="res://Core/AI/Stock/GenericAttackState.gd" id="12_generic_attack"]
-[ext_resource type="Script" uid="uid://dok0elg2cedvk" path="res://Core/AI/Stock/ComboState.gd" id="13_combo"]
+[ext_resource type="Script" uid="uid://dk8kk0atsvses" path="res://Core/AI/StateController.gd" id="6_state_controller"]
+[ext_resource type="Script" path="res://Core/AI/controllers/AIController.gd" id="7_ai_controller_new"]
 [ext_resource type="Script" uid="uid://dlr87hqkwckdm" path="res://Core/Damage/DamagePipeline.gd" id="14_pipeline"]
 [ext_resource type="Script" uid="uid://dy0ra50yvnnyr" path="res://Core/Buffs/BuffController.gd" id="15_buffctl"]
 [ext_resource type="Script" uid="uid://d3umvhka6l2uv" path="res://Core/Status/StatusController.gd" id="16_status"]
@@ -120,31 +114,11 @@ target_position = Vector2(-50, 0)
 [node name="WallCastR" type="RayCast2D" parent="." unique_id=1100000004]
 target_position = Vector2(50, 0)
 
-[node name="AIController" type="Node" parent="." unique_id=566218302]
-script = ExtResource("6_ai_controller")
+[node name="StateController" type="Node" parent="." unique_id=193203180]
+script = ExtResource("6_state_controller")
 
-[node name="StateMachine" type="Node" parent="AIController" unique_id=193203180]
-
-[node name="Idle" type="Node" parent="AIController/StateMachine" unique_id=2065975853]
-script = ExtResource("7_idle")
-
-[node name="Chase" type="Node" parent="AIController/StateMachine" unique_id=942496324]
-script = ExtResource("8_chase")
-
-[node name="Hit" type="Node" parent="AIController/StateMachine" unique_id=158595046]
-script = ExtResource("9_hit")
-
-[node name="Death" type="Node" parent="AIController/StateMachine" unique_id=551432475]
-script = ExtResource("10_death")
-
-[node name="Dispatcher" type="Node" parent="AIController/StateMachine" unique_id=573801613]
-script = ExtResource("11_dispatcher")
-
-[node name="GenericAttack" type="Node" parent="AIController/StateMachine" unique_id=1943725742]
-script = ExtResource("12_generic_attack")
-
-[node name="Combo" type="Node" parent="AIController/StateMachine" unique_id=1022768555]
-script = ExtResource("13_combo")
+[node name="Controller" type="Node" parent="." unique_id=566218302]
+script = ExtResource("7_ai_controller_new")
 
 [node name="DamagePipeline" type="Node" parent="." unique_id=1611640453]
 script = ExtResource("14_pipeline")

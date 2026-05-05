@@ -15,9 +15,6 @@ const PHASE_SPEED := {
 @export var detection_radius: float = 600.0
 @export var pressure_threshold: float = 35.0
 
-## 技能资源（在 Inspector 中拖拽 .tres 配置）
-@export var skill_resources: Array[Skill] = []
-
 ## Buff 资源（library/）
 @export var defense_buff: BuffEntity = preload("res://Core/Buffs/library/bk_defense_x05_3s.tres")
 @export var heal_buff: BuffEntity = preload("res://Core/Buffs/library/bk_heal_pulse.tres")
@@ -37,16 +34,13 @@ func _ready() -> void:
 		buff_controller.apply(reactive_push_buff, self, global_position)
 
 # ---- AgentBase 钩子 ----
-func _setup_skill_set() -> void:
-	skill_set = SkillSet.new()
-	skill_set.setup(skill_resources)
-
 func _setup_blackboard() -> void:
 	super._setup_blackboard()
-	var bb := ai.blackboard
-	bb.bind_var(&"current_phase", self, &"current_phase")
-	bb.set_var(&"detection_radius", detection_radius)
-	bb.set_var(&"chase_speed", move_speed)
+	var bb := _get_blackboard()
+	if bb:
+		bb.bind_var(&"current_phase", self, &"current_phase")
+		bb.set_var(&"detection_radius", detection_radius)
+		bb.set_var(&"chase_speed", move_speed)
 
 func _setup_transitions() -> void:
 	_register_rules([
@@ -74,42 +68,50 @@ func _setup_transitions() -> void:
 
 # ---- Guard methods ----
 func _guard_detected() -> bool:
-	var bb := ai.blackboard
-	return bb.get_var(&"target_alive", false) and bb.get_var(&"distance", INF) < detection_radius
+	var bb := _get_blackboard()
+	return bb != null and bb.get_var(&"target_alive", false) and bb.get_var(&"distance", INF) < detection_radius
 
 func _guard_target_lost() -> bool:
-	var bb := ai.blackboard
-	return not bb.get_var(&"target_alive", false) or bb.get_var(&"distance", INF) > detection_radius * 1.2
+	var bb := _get_blackboard()
+	return bb == null or not bb.get_var(&"target_alive", false) or bb.get_var(&"distance", INF) > detection_radius * 1.2
 
 func _guard_target_alive() -> bool:
-	return ai.blackboard.get_var(&"target_alive", false)
+	var bb := _get_blackboard()
+	return bb != null and bb.get_var(&"target_alive", false)
 
 func _guard_can_attack() -> bool:
-	if not ai.blackboard.get_var(&"target_alive", false):
+	var bb := _get_blackboard()
+	if bb == null:
 		return false
-	if ai.blackboard.get_var(&"global_cooldown", 0.0) > 0:
+	if not bb.get_var(&"target_alive", false):
 		return false
-	var skill: Skill = skill_set.pick(self, ai.blackboard)
+	if bb.get_var(&"global_cooldown", 0.0) > 0:
+		return false
+	var skill: Skill = skill_set.pick(self, bb)
 	if skill == null:
 		return false
-	ai.blackboard.set_var(&"pending_skill", skill)
+	bb.set_var(&"pending_skill", skill)
 	return true
 
 func _guard_under_pressure() -> bool:
-	if ai.blackboard.get_var(&"damage_recent", 0.0) <= pressure_threshold:
+	var bb := _get_blackboard()
+	if bb == null:
 		return false
-	var skill: Skill = skill_set.pick_tagged(&"reactive", self, ai.blackboard)
+	if bb.get_var(&"damage_recent", 0.0) <= pressure_threshold:
+		return false
+	var skill: Skill = skill_set.pick_tagged(&"reactive", self, bb)
 	if skill == null:
 		return false
-	ai.blackboard.set_var(&"pending_skill", skill)
+	bb.set_var(&"pending_skill", skill)
 	return true
 
 func _guard_can_interrupt() -> bool:
-	return ai.current_skill == null or ai.current_skill.interruptible
+	return state_controller.current_skill == null or state_controller.current_skill.interruptible
 
 # ---- Skill precondition ----
 func _precond_under_pressure() -> bool:
-	return ai.blackboard.get_var(&"damage_recent", 0.0) > pressure_threshold
+	var bb := _get_blackboard()
+	return bb != null and bb.get_var(&"damage_recent", 0.0) > pressure_threshold
 
 # ---- Animation method-call: BuffController 路由 ----
 ## Animation method-call: 自施防御 buff。
@@ -138,5 +140,7 @@ func _on_health_changed(current: float, _maximum: float) -> void:
 		new_phase = Phase.PHASE_2
 	if new_phase != current_phase:
 		current_phase = new_phase
-		ai.blackboard.set_var(&"chase_speed", move_speed)
-		ai.dispatch(AIEvents.EV_PHASE_CHANGED)
+		var bb := _get_blackboard()
+		if bb:
+			bb.set_var(&"chase_speed", move_speed)
+		controller.dispatch(AIEvents.EV_PHASE_CHANGED)
