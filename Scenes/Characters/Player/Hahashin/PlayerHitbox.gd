@@ -7,10 +7,10 @@ class_name PlayerHitbox
 
 @onready var player: PlayerBase = get_owner()
 
-## 重写：从 CombatComponent 获取当前伤害类型
+## Phase 0 stub — base class no longer exposes `damage`. Hahashin migration in
+## Phase 1 replaces this whole file with skill-driven configure_from_skill.
 func update_attack() -> void:
-	if player and player.combat_component:
-		damage = player.combat_component.current_damage
+	pass
 
 ## 重写：返回玩家位置作为攻击者位置
 func get_attacker_position() -> Vector2:
