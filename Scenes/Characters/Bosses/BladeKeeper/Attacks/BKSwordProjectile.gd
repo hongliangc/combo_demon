@@ -5,7 +5,6 @@ class_name BKSwordProjectile
 
 @export var speed := 400.0
 @export var lifetime := 4.0
-@export var damage_config: Damage
 
 var _direction := Vector2.RIGHT
 var _lifetime_timer: SceneTreeTimer

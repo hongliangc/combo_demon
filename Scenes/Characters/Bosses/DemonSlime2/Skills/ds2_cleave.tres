@@ -10,6 +10,8 @@ cooldown = 3.0
 weight = 5
 max_range = 100.0
 tags = Array[StringName]([&"melee"])
+damage_amount = 10.0
+damage_tags = 1
 params = {
 &"animation": &"cleave",
 &"global_cooldown": 0.3

@@ -9,6 +9,8 @@ func enter() -> void:
 	if not skill:
 		_finish()
 		return
+	if skill and agent and agent.hitbox is HitBoxComponent:
+		(agent.hitbox as HitBoxComponent).configure_from_skill(skill)
 	if owner_node is CharacterBody2D:
 		(owner_node as CharacterBody2D).velocity = Vector2.ZERO
 	var anim_name = skill.params.get(&"animation", &"")
@@ -42,6 +44,9 @@ func spawn_projectile() -> void:
 	var proj := scene.instantiate()
 	owner_node.get_tree().root.add_child(proj)
 	proj.global_position = (owner_node as Node2D).global_position + skill.params.get(&"spawn_offset", Vector2.ZERO)
+	var proj_hitbox: HitBoxComponent = proj.get_node_or_null(^"HitBoxComponent")
+	if proj_hitbox:
+		proj_hitbox.configure_from_skill(skill)
 	var target_pos: Vector2 = bb.get_var(&"target_position", (owner_node as Node2D).global_position)
 	if proj.has_method(&"set_direction"):
 		proj.set_direction((target_pos - proj.global_position).normalized())
@@ -57,6 +62,9 @@ func spawn_entity() -> void:
 	var entity := scene.instantiate()
 	owner_node.get_tree().root.add_child(entity)
 	entity.global_position = (owner_node as Node2D).global_position + skill.params.get(&"spawn_offset", Vector2.ZERO)
+	var entity_hitbox: HitBoxComponent = entity.get_node_or_null(^"HitBoxComponent")
+	if entity_hitbox:
+		entity_hitbox.configure_from_skill(skill)
 
 ## 动画 method call track 调用：调用 owner_node 上的方法
 ## 用于 BuffEntity 框架到位前的过渡方案

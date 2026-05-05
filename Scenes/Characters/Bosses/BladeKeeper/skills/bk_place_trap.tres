@@ -12,6 +12,8 @@ weight = 2
 min_phase = 2
 max_range = 300.0
 tags = Array[StringName]([&"offensive", &"trap"])
+damage_amount = 0.0
+damage_tags = 0
 params = {
 &"animation": &"trap_cast",
 &"spawn_offset": Vector2(0, 0),

@@ -11,6 +11,8 @@ weight = 3
 min_phase = 1
 max_range = 180.0
 tags = Array[StringName]([&"melee", &"heavy"])
+damage_amount = 15.0
+damage_tags = 1
 params = {
 &"animation": &"cleave",
 &"global_cooldown": 0.5

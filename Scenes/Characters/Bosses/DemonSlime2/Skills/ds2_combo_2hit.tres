@@ -6,6 +6,8 @@
 [sub_resource type="Resource" id="sub_1"]
 script = ExtResource("2")
 id = &"combo_step1"
+damage_amount = 10.0
+damage_tags = 1
 params = {
 &"animation": &"cleave"
 }
@@ -13,6 +15,8 @@ params = {
 [sub_resource type="Resource" id="sub_2"]
 script = ExtResource("2")
 id = &"combo_step2"
+damage_amount = 10.0
+damage_tags = 1
 params = {
 &"animation": &"cleave"
 }

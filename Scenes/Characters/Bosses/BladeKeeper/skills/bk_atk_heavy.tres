@@ -10,6 +10,8 @@ weight = 6
 min_phase = 2
 max_range = 50.0
 tags = Array[StringName]([&"offensive", &"melee"])
+damage_amount = 15.0
+damage_tags = 1
 params = {
 &"animation": &"atk_2",
 &"direction": &"toward_target",
