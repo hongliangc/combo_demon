@@ -38,7 +38,7 @@ func start_cooldown(skill_id: StringName) -> void:
 	if s:
 		_cooldowns[s.id] = s.cooldown
 
-## 每帧扣减冷却（由 AgentAIBase._physics_process 调用）
+## 每帧扣减冷却（由 AgentBase._physics_process 调用）
 func tick(delta: float) -> void:
 	for id in _cooldowns:
 		if _cooldowns[id] > 0:

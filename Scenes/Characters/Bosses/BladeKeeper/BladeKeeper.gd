@@ -1,6 +1,6 @@
-class_name BladeKeeper extends AgentAIBase
+class_name BladeKeeper extends AgentBase
 
-## BladeKeeper Boss — 快速技巧型剑士（AgentAIBase + SkillSet 架构）
+## BladeKeeper Boss — 快速技巧型剑士（AgentBase + SkillSet 架构）
 
 # ---- Phase ----
 enum Phase { PHASE_1 = 1, PHASE_2 = 2, PHASE_3 = 3 }
@@ -36,7 +36,7 @@ func _ready() -> void:
 	if buff_controller and reactive_push_buff:
 		buff_controller.apply(reactive_push_buff, self, global_position)
 
-# ---- AgentAIBase 钩子 ----
+# ---- AgentBase 钩子 ----
 func _setup_skill_set() -> void:
 	skill_set = SkillSet.new()
 	skill_set.setup(skill_resources)

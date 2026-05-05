@@ -1,4 +1,4 @@
-class_name DemonSlime2 extends AgentAIBase
+class_name DemonSlime2 extends AgentBase
 
 ## DemonSlime2 — Skill System 试点 Boss
 

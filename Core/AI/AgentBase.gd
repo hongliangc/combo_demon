@@ -1,4 +1,4 @@
-class_name AgentAIBase extends CharacterBody2D
+class_name AgentBase extends CharacterBody2D
 
 ## AI 角色统一基类
 ## 职责：gravity + move_and_slide + facing + skill_set + AI 信号接线 + _register_rules

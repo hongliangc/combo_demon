@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://rllitgnkf211"]
 
-[ext_resource type="Script" uid="uid://ccdt7uouihhtb" path="res://Core/AI/AgentAIBase.gd" id="1_agent_base"]
+[ext_resource type="Script" uid="uid://ccdt7uouihhtb" path="res://Core/AI/AgentBase.gd" id="1_agent_base"]
 [ext_resource type="Script" uid="uid://3cpq40uop66w" path="res://Core/Components/HurtBoxComponent.gd" id="2_hurtbox"]
 [ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="3_health"]
 [ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="5_hitbox"]
@@ -64,7 +64,7 @@ func on_health_changed(current_health: float, max_health: float) -> void:
 		value = current_health / max_health
 "
 
-[node name="AgentAIBase" type="CharacterBody2D" unique_id=319170295 groups=["enemy"]]
+[node name="AgentBase" type="CharacterBody2D" unique_id=319170295 groups=["enemy"]]
 collision_layer = 8
 collision_mask = 128
 script = ExtResource("1_agent_base")
