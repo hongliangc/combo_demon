@@ -1,5 +1,5 @@
-# Core/Buffs/effects/HealEffectBuff.gd
-class_name HealEffectBuff extends BuffEffect
+# Core/Buffs/effects/HealBuffEffect.gd
+class_name HealBuffEffect extends BuffEffect
 
 ## HoT — periodic heal routed through pipeline as is_heal=true.
 

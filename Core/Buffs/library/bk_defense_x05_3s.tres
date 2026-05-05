@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
 [ext_resource type="Script" uid="uid://b1nwuwgh80wpm" path="res://Core/Buffs/BuffEffect.gd" id="1_g0bht"]
-[ext_resource type="Script" uid="uid://s4fs81cd66ik" path="res://Core/Buffs/effects/StatModEffect.gd" id="2_stat"]
+[ext_resource type="Script" uid="uid://s4fs81cd66ik" path="res://Core/Buffs/effects/StatModBuffEffect.gd" id="2_stat"]
 
 [sub_resource type="Resource" id="StatMod_def"]
 script = ExtResource("2_stat")

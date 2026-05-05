@@ -27,7 +27,7 @@ func test_heal_does_not_emit_damaged() -> void:
 	assert_signal_not_emitted(_hc, "damaged")
 
 func test_hot_ticks() -> void:
-	var e := HealEffectBuff.new()
+	var e := HealBuffEffect.new()
 	e.amount = 8.0
 	e.tick_interval = 1.0
 	e.effect_on = BuffEffect.EffectOn.TICK
@@ -38,7 +38,7 @@ func test_hot_ticks() -> void:
 	assert_eq(_hc.health, 66.0)
 
 func test_heal_received_modifier_applies() -> void:
-	var hr := StatModEffect.new()
+	var hr := StatModBuffEffect.new()
 	hr.stat_id = StatIds.HEAL_RECEIVED
 	hr.multiplier = 0.5
 	_bc.apply(H.create_buff_entity(&"hr_debuff", 10.0, [hr]), null, _actor.global_position)

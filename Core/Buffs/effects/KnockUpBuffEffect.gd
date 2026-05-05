@@ -1,5 +1,5 @@
-# Core/Buffs/effects/KnockUpEffectBuff.gd
-class_name KnockUpEffectBuff extends BuffEffect
+# Core/Buffs/effects/KnockUpBuffEffect.gd
+class_name KnockUpBuffEffect extends BuffEffect
 
 ## Sets vertical velocity (upward) and a horizontal push on a CharacterBody2D.
 @export var vertical_force: float = -500.0

@@ -1,5 +1,5 @@
-# Core/Buffs/effects/DamageEffectBuff.gd
-class_name DamageEffectBuff extends BuffEffect
+# Core/Buffs/effects/DamageBuffEffect.gd
+class_name DamageBuffEffect extends BuffEffect
 
 ## Routes a damage hit through the target's DamagePipeline.
 ## Used for DoT (TICK) and reactive damage (ON_DAMAGED, e.g. thorns).

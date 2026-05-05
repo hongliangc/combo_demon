@@ -1,5 +1,5 @@
-# Core/Buffs/effects/StatModEffect.gd
-class_name StatModEffect extends BuffEffect
+# Core/Buffs/effects/StatModBuffEffect.gd
+class_name StatModBuffEffect extends BuffEffect
 
 ## Adjusts a multiplicative stat modifier on the owner's BuffController.
 ## Default effect_on = APPLY|EXPIRE — net-zero pairing.

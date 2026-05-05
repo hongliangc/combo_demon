@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="BuffEntity" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
-[ext_resource type="Script" path="res://Core/Buffs/effects/DamageEffectBuff.gd" id="2_dmg"]
+[ext_resource type="Script" path="res://Core/Buffs/effects/DamageBuffEffect.gd" id="2_dmg"]
 
 [sub_resource type="Resource" id="DoT_poison"]
 script = ExtResource("2_dmg")

@@ -19,10 +19,10 @@ func before_each() -> void:
 	_hc = _actor.get_node(^"HealthComponent")
 	add_child_autofree(_actor)
 
-# ============ StatModEffect ============
+# ============ StatModBuffEffect ============
 
 func test_stat_mod_effect_drives_modifier_via_buff() -> void:
-	var e := StatModEffect.new()
+	var e := StatModBuffEffect.new()
 	e.stat_id = StatIds.INCOMING_DAMAGE
 	e.multiplier = 0.5
 	var buff := H.create_buff_entity(&"defense", 1.0, [e])
@@ -39,14 +39,14 @@ func test_stat_mod_effect_drives_modifier_via_buff() -> void:
 	_pipe.process(H.create_damage_ctx(_actor, 50.0))
 	assert_eq(_hc.health, 25.0, "modifier removed on EXPIRE — full damage lands")
 
-# ============ DamageEffectBuff (DoT) ============
+# ============ DamageBuffEffect (DoT) ============
 
 func test_dot_damages_owner_per_tick() -> void:
 	var sentinel := Node.new()
 	sentinel.name = "DotSource"
 	add_child_autofree(sentinel)
 
-	var e := DamageEffectBuff.new()
+	var e := DamageBuffEffect.new()
 	e.amount = 10.0
 	e.tick_interval = 0.5
 	var buff := H.create_buff_entity(&"poison", 5.0, [e])
@@ -56,14 +56,14 @@ func test_dot_damages_owner_per_tick() -> void:
 	_bc._physics_process(0.5)
 	assert_eq(_hc.health, 90.0, "one DoT tick deals 10 damage")
 
-# ============ HealEffectBuff (HoT) ============
+# ============ HealBuffEffect (HoT) ============
 
 func test_hot_heals_owner_per_tick() -> void:
 	# Bring hp to 40.
 	_pipe.process(H.create_damage_ctx(_actor, 60.0))
 	assert_eq(_hc.health, 40.0, "precondition: hp at 40")
 
-	var e := HealEffectBuff.new()
+	var e := HealBuffEffect.new()
 	e.amount = 15.0
 	e.tick_interval = 0.5
 	var buff := H.create_buff_entity(&"regen", 5.0, [e])
@@ -74,12 +74,12 @@ func test_hot_heals_owner_per_tick() -> void:
 	assert_eq(_hc.health, 55.0, "HoT tick heals 15 (40 + 15)")
 	assert_signal_not_emitted(_hc, "damaged")
 
-# ============ KnockBackEffectBuff ============
+# ============ KnockBackBuffEffect ============
 
 func test_knockback_sets_horizontal_velocity_on_apply() -> void:
 	_actor.global_position = Vector2(100, 0)
 
-	var e := KnockBackEffectBuff.new()
+	var e := KnockBackBuffEffect.new()
 	e.force = 300.0
 	var buff := H.create_buff_entity(&"knockback", 0.0, [e])
 
@@ -89,12 +89,12 @@ func test_knockback_sets_horizontal_velocity_on_apply() -> void:
 	assert_almost_eq(_actor.velocity.x, 300.0, 1.0, "horizontal velocity pushed right by force")
 	assert_eq(_actor.velocity.y, 0.0, "KnockBack does not touch vertical velocity")
 
-# ============ KnockUpEffectBuff ============
+# ============ KnockUpBuffEffect ============
 
 func test_knockup_sets_vertical_and_horizontal_velocity_on_apply() -> void:
 	_actor.global_position = Vector2(100, 0)
 
-	var e := KnockUpEffectBuff.new()
+	var e := KnockUpBuffEffect.new()
 	e.vertical_force = -500.0
 	e.horizontal_force = 200.0
 	var buff := H.create_buff_entity(&"knockup", 0.0, [e])
@@ -104,7 +104,7 @@ func test_knockup_sets_vertical_and_horizontal_velocity_on_apply() -> void:
 	assert_eq(_actor.velocity.y, -500.0, "vertical force applied (upward)")
 	assert_almost_eq(_actor.velocity.x, 200.0, 1.0, "horizontal force pushed right")
 
-# ============ DamageEffectBuff (thorns / ON_DAMAGED reflection) ============
+# ============ DamageBuffEffect (thorns / ON_DAMAGED reflection) ============
 
 func test_thorns_reflects_damage_to_attacker() -> void:
 	# Two actors: attacker hits defender; defender has thorns buff that reflects damage back.
@@ -112,8 +112,8 @@ func test_thorns_reflects_damage_to_attacker() -> void:
 	add_child_autofree(attacker)
 	var defender := _actor  # already built + added in before_each
 
-	# Build thorns BuffEntity: DamageEffectBuff fires on ON_DAMAGED; trigger derives target = attacker.
-	var thorns_eff := DamageEffectBuff.new()
+	# Build thorns BuffEntity: DamageBuffEffect fires on ON_DAMAGED; trigger derives target = attacker.
+	var thorns_eff := DamageBuffEffect.new()
 	thorns_eff.amount = 7.0
 	thorns_eff.effect_on = BuffEffect.EffectOn.ON_DAMAGED
 	var thorns := H.create_buff_entity(&"thorns", 10.0, [thorns_eff])

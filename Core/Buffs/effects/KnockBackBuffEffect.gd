@@ -1,5 +1,5 @@
-# Core/Buffs/effects/KnockBackEffectBuff.gd
-class_name KnockBackEffectBuff extends BuffEffect
+# Core/Buffs/effects/KnockBackBuffEffect.gd
+class_name KnockBackBuffEffect extends BuffEffect
 
 ## Sets horizontal velocity on a CharacterBody2D away from a source position.
 ## Target is derived from ctx.trigger (see plan amendment A1):
