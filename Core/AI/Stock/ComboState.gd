@@ -37,6 +37,8 @@ func _play_step() -> void:
 		_finish()
 		return
 	var sub_skill: Skill = _combo.sequence[_step]
+	if agent and agent.hitbox is HitBoxComponent:
+		(agent.hitbox as HitBoxComponent).configure_from_skill(sub_skill)
 	var anim_name = sub_skill.params.get(&"animation", &"")
 	if anim_name and "anim_player" in owner_node and owner_node.anim_player:
 		owner_node.anim_player.play(anim_name)
