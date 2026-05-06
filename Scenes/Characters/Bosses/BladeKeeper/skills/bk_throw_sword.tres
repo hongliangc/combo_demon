@@ -1,7 +1,9 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://f4mflfdu5fdyi"]
+[gd_resource type="Resource" script_class="Skill" load_steps=5 format=3 uid="uid://f4mflfdu5fdyi"]
 
 [ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://cecnqhyi5nu00" path="res://Scenes/Characters/Bosses/BladeKeeper/Attacks/BKSwordProjectile.tscn" id="2"]
+[ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="3_buff"]
+[ext_resource type="Resource" path="res://Core/Buffs/library/stun_short.tres" id="4_stun"]
 
 [resource]
 script = ExtResource("1")
@@ -16,6 +18,7 @@ max_range = 800.0
 tags = Array[StringName]([&"offensive", &"projectile"])
 damage_amount = 8.0
 damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 precondition_method = &""
 interruptible = true
 params = {
