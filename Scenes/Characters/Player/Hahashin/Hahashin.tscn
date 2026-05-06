@@ -12,14 +12,13 @@
 [ext_resource type="Script" uid="uid://wgmi45hwmslf" path="res://Core/Components/MovementComponent.gd" id="hh_movement"]
 [ext_resource type="Script" uid="uid://djmeifitglu7e" path="res://Core/Components/CombatComponent.gd" id="hh_combat"]
 [ext_resource type="Script" uid="uid://cdsgggqiqgpu5" path="res://Core/Components/SkillManager.gd" id="hh_skill_mgr"]
-[ext_resource type="Script" uid="uid://ctargslpswrke" path="res://Core/StateMachine/BaseStateMachine.gd" id="hh_sm_base"]
-[ext_resource type="Script" uid="uid://djpartimmyfeg" path="res://Core/StateMachine/PlayerStates/PlayerGroundState.gd" id="hh_sm_ground"]
-[ext_resource type="Script" uid="uid://18pd8ugnl0d1" path="res://Core/StateMachine/PlayerStates/PlayerAirState.gd" id="hh_sm_air"]
-[ext_resource type="Script" uid="uid://c6kgv2j2fpq7m" path="res://Core/StateMachine/PlayerStates/PlayerCombatState.gd" id="hh_sm_combat"]
-[ext_resource type="Script" uid="uid://blfkf8nub1o60" path="res://Core/StateMachine/PlayerStates/PlayerRollState.gd" id="hh_sm_roll"]
-[ext_resource type="Script" uid="uid://kkmnjkou0eie" path="res://Core/StateMachine/PlayerStates/PlayerHitState.gd" id="hh_sm_hit"]
-[ext_resource type="Script" uid="uid://vyfwglbh5x83" path="res://Core/StateMachine/PlayerStates/PlayerSpecialAttackState.gd" id="hh_sm_special"]
-[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerFallDeathState.gd" id="hh_sm_falldeath"]
+[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinGroundState.gd" id="hh_state_ground"]
+[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinAirState.gd" id="hh_state_air"]
+[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinCombatState.gd" id="hh_state_combat"]
+[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinRollState.gd" id="hh_state_roll"]
+[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinHitState.gd" id="hh_state_hit"]
+[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinSpecialAttackState.gd" id="hh_state_special"]
+[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinFallDeathState.gd" id="hh_state_falldeath"]
 [ext_resource type="Script" uid="uid://cc36djs3pjrxs" path="res://Core/AI/controllers/InputController.gd" id="hh_input_ctrl"]
 [ext_resource type="Texture2D" uid="uid://ci2uaxeklamvi" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_1.png" id="1_c3kl5"]
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
@@ -1315,6 +1314,7 @@ collision_mask = 129
 floor_constant_speed = true
 floor_snap_length = 16.0
 script = ExtResource("1_mom7b")
+has_gravity = true
 max_health = 10000
 health = 10000
 skill_resources = Array[ExtResource("skill_type")]([ExtResource("skill_atk_1"), ExtResource("skill_atk_2"), ExtResource("skill_atk_3"), ExtResource("skill_atk_3_kup"), ExtResource("skill_atk_air"), ExtResource("skill_atk_sp"), ExtResource("skill_roll")])
@@ -1368,40 +1368,29 @@ script = ExtResource("hh_skill_mgr")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=299757769]
 
-[node name="PlayerStateMachine" type="Node" parent="." unique_id=802477010 node_paths=PackedStringArray("init_state")]
-script = ExtResource("hh_sm_base")
-init_state = NodePath("Ground")
+[node name="StateController" parent="." parent_id_path=PackedInt32Array(193203180)]
+initial_state_name = &"ground"
 
-[node name="Ground" type="Node" parent="PlayerStateMachine" unique_id=1970280776]
-script = ExtResource("hh_sm_ground")
+[node name="Ground" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+script = ExtResource("hh_state_ground")
 
-[node name="Air" type="Node" parent="PlayerStateMachine" unique_id=205575343]
-script = ExtResource("hh_sm_air")
+[node name="Air" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+script = ExtResource("hh_state_air")
 
-[node name="Combat" type="Node" parent="PlayerStateMachine" unique_id=1556612127]
-script = ExtResource("hh_sm_combat")
-priority = 1
-can_be_interrupted = false
+[node name="Combat" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+script = ExtResource("hh_state_combat")
 
-[node name="Roll" type="Node" parent="PlayerStateMachine" unique_id=1542119215]
-script = ExtResource("hh_sm_roll")
-priority = 1
-can_be_interrupted = false
+[node name="Roll" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+script = ExtResource("hh_state_roll")
 
-[node name="Hit" type="Node" parent="PlayerStateMachine" unique_id=730543560]
-script = ExtResource("hh_sm_hit")
-priority = 2
-can_be_interrupted = false
+[node name="Hit" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+script = ExtResource("hh_state_hit")
 
-[node name="SpecialAttack" type="Node" parent="PlayerStateMachine" unique_id=1124944062]
-script = ExtResource("hh_sm_special")
-priority = 1
-can_be_interrupted = false
+[node name="SpecialAttack" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+script = ExtResource("hh_state_special")
 
-[node name="FallDeath" type="Node" parent="PlayerStateMachine" unique_id=802477011]
-script = ExtResource("hh_sm_falldeath")
-priority = 2
-can_be_interrupted = false
+[node name="FallDeath" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+script = ExtResource("hh_state_falldeath")
 
 [node name="Controller" parent="." index="19" unique_id=566218302]
 script = ExtResource("hh_input_ctrl")
