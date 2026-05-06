@@ -1,6 +1,26 @@
 [gd_scene format=3 uid="uid://d1sj82yqwu01u"]
 
-[ext_resource type="PackedScene" uid="uid://dhm2ajbsbff8e" path="res://Scenes/Characters/Templates/PlayerBase.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentBase.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="skill_type"]
+[ext_resource type="Resource" uid="uid://eq5rc0sel7syg" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_1.tres" id="skill_atk_1"]
+[ext_resource type="Resource" uid="uid://l2y2mz1koeipo" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_2.tres" id="skill_atk_2"]
+[ext_resource type="Resource" uid="uid://75398h61dcs6m" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_3.tres" id="skill_atk_3"]
+[ext_resource type="Resource" uid="uid://1l35s9g3rl77t" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_3_kup.tres" id="skill_atk_3_kup"]
+[ext_resource type="Resource" uid="uid://11j38rkz4tjcb" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_air.tres" id="skill_atk_air"]
+[ext_resource type="Resource" uid="uid://afqyeeo8urcgk" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_sp.tres" id="skill_atk_sp"]
+[ext_resource type="Resource" uid="uid://380ozrj5q3pyg" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_roll.tres" id="skill_roll"]
+[ext_resource type="Script" uid="uid://wgmi45hwmslf" path="res://Core/Components/MovementComponent.gd" id="hh_movement"]
+[ext_resource type="Script" uid="uid://djmeifitglu7e" path="res://Core/Components/CombatComponent.gd" id="hh_combat"]
+[ext_resource type="Script" uid="uid://cdsgggqiqgpu5" path="res://Core/Components/SkillManager.gd" id="hh_skill_mgr"]
+[ext_resource type="Script" uid="uid://ctargslpswrke" path="res://Core/StateMachine/BaseStateMachine.gd" id="hh_sm_base"]
+[ext_resource type="Script" uid="uid://djpartimmyfeg" path="res://Core/StateMachine/PlayerStates/PlayerGroundState.gd" id="hh_sm_ground"]
+[ext_resource type="Script" uid="uid://18pd8ugnl0d1" path="res://Core/StateMachine/PlayerStates/PlayerAirState.gd" id="hh_sm_air"]
+[ext_resource type="Script" uid="uid://c6kgv2j2fpq7m" path="res://Core/StateMachine/PlayerStates/PlayerCombatState.gd" id="hh_sm_combat"]
+[ext_resource type="Script" uid="uid://blfkf8nub1o60" path="res://Core/StateMachine/PlayerStates/PlayerRollState.gd" id="hh_sm_roll"]
+[ext_resource type="Script" uid="uid://kkmnjkou0eie" path="res://Core/StateMachine/PlayerStates/PlayerHitState.gd" id="hh_sm_hit"]
+[ext_resource type="Script" uid="uid://vyfwglbh5x83" path="res://Core/StateMachine/PlayerStates/PlayerSpecialAttackState.gd" id="hh_sm_special"]
+[ext_resource type="Script" path="res://Core/StateMachine/PlayerStates/PlayerFallDeathState.gd" id="hh_sm_falldeath"]
+[ext_resource type="Script" uid="uid://cc36djs3pjrxs" path="res://Core/AI/controllers/InputController.gd" id="hh_input_ctrl"]
 [ext_resource type="Texture2D" uid="uid://ci2uaxeklamvi" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_1.png" id="1_c3kl5"]
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
 [ext_resource type="Script" uid="uid://b1ex62f8uy81b" path="res://Scenes/Characters/Player/Hahashin/hahashin.gd" id="1_mom7b"]
@@ -625,20 +645,6 @@ tracks/4/keys = {
 "update": 0,
 "values": [Vector2(0, 0)]
 }
-tracks/5/type = "method"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath(".")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [],
-"method": &"switch_to_physical"
-}]
-}
 
 [sub_resource type="Animation" id="Animation_fqjf3"]
 length = 0.533334
@@ -833,18 +839,18 @@ tracks/5/use_blend = true
 tracks/6/type = "method"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath(".")
+tracks/6/path = NodePath("HitBoxComponent")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(1.4985, 1.998),
+"times": PackedFloat32Array(1.499, 1.998),
 "transitions": PackedFloat32Array(1, 1),
 "values": [{
-"args": [],
-"method": &"switch_to_knockup"
+"args": [&"atk_3_kup"],
+"method": &"configure_from_skill_id"
 }, {
-"args": [],
-"method": &"switch_to_physical"
+"args": [&"atk_3"],
+"method": &"configure_from_skill_id"
 }]
 }
 
@@ -974,23 +980,6 @@ tracks/4/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(53, 36), Vector2(60, 42), Vector2(69, 57), Vector2(69, 47), Vector2(80, 59), Vector2(61, 47), Vector2(59, 47), Vector2(108, 51), Vector2(79, 55), Vector2(127, 70), Vector2(58, 48)]
-}
-tracks/5/type = "method"
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/path = NodePath(".")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/keys = {
-"times": PackedFloat32Array(0, 2.9),
-"transitions": PackedFloat32Array(1, 1),
-"values": [{
-"args": [],
-"method": &"switch_to_special_attack"
-}, {
-"args": [],
-"method": &"switch_to_physical"
-}]
 }
 
 [sub_resource type="Animation" id="Animation_sohtc"]
@@ -1320,47 +1309,99 @@ node_connections = [&"output", 0, &"control_blend", &"loco_timescale", 0, &"loco
 size = Vector2(24, 35)
 
 [node name="Hahashin" unique_id=1329962730 instance=ExtResource("1_base")]
+groups = ["player"]
+collision_layer = 2
 collision_mask = 129
+floor_constant_speed = true
+floor_snap_length = 16.0
 script = ExtResource("1_mom7b")
 max_health = 10000
 health = 10000
+skill_resources = Array[ExtResource("skill_type")]([ExtResource("skill_atk_1"), ExtResource("skill_atk_2"), ExtResource("skill_atk_3"), ExtResource("skill_atk_3_kup"), ExtResource("skill_atk_air"), ExtResource("skill_atk_sp"), ExtResource("skill_roll")])
 
-[node name="FloorCollision" parent="." index="0" unique_id=925843210]
+[node name="CollisionShape2D" parent="." index="0" unique_id=884594291]
 shape = SubResource("RectangleShape2D_a57dt")
 
-[node name="AnimatedSprite2D" parent="." index="1" unique_id=1572817713]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="1" unique_id=1572817713]
 position = Vector2(0, -45.63)
 sprite_frames = SubResource("SpriteFrames_b07cd")
 animation = &"idle"
 
-[node name="AnimationPlayer" parent="." index="2" unique_id=1344461801]
+[node name="AnimationPlayer" parent="." index="2" unique_id=710612678]
 libraries/ = SubResource("AnimationLibrary_igthf")
 
-[node name="AnimationTree" parent="." index="3" unique_id=1041004894]
+[node name="AnimationTree" type="AnimationTree" parent="." index="3" unique_id=1041004894]
+anim_player = NodePath("../AnimationPlayer")
 tree_root = SubResource("AnimationNodeBlendTree_bu1c3")
 advance_expression_base_node = NodePath("..")
 parameters/loco_timescale/scale = 1.0
 parameters/ctrl_timescale/scale = 1.0
 parameters/control_blend/blend_amount = 0.0
 
-[node name="CollisionShape2D" parent="HurtBoxComponent" parent_id_path=PackedInt32Array(458801128) index="0" unique_id=972932508]
+[node name="CollisionShape2D" parent="HurtBoxComponent" parent_id_path=PackedInt32Array(1245267114) index="0" unique_id=975434091]
 shape = SubResource("RectangleShape2D_23x5x")
 
-[node name="DamageNumbersAnchor" parent="." index="5" unique_id=664598285]
+[node name="DamageNumbersAnchor" parent="." index="5" unique_id=863163428]
 position = Vector2(0, -50)
 
-[node name="HitBoxComponent" parent="." index="6" unique_id=424478430]
+[node name="HitBoxComponent" parent="." index="6" unique_id=1666699896]
 collision_layer = 2
+collision_mask = 8
 
-[node name="HealthBar" parent="." index="11" unique_id=107527890]
+[node name="HealthBar" parent="." index="11" unique_id=664927981]
 offset_left = -20.0
 offset_top = -28.0
 offset_right = 20.0
 offset_bottom = -23.0
 
-[node name="MovementComponent" parent="." index="12" unique_id=1866148992]
+[node name="MovementComponent" type="Node" parent="." unique_id=1866148992]
+script = ExtResource("hh_movement")
 max_speed = 200.0
 max_jump_count = 2
 
-[node name="CombatComponent" parent="." index="13" unique_id=1903333573]
+[node name="CombatComponent" type="Node" parent="." unique_id=1903333573]
+script = ExtResource("hh_combat")
 damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr"), ExtResource("4_special")])
+
+[node name="SkillManager" type="Node" parent="." unique_id=898319711]
+script = ExtResource("hh_skill_mgr")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=299757769]
+
+[node name="PlayerStateMachine" type="Node" parent="." unique_id=802477010 node_paths=PackedStringArray("init_state")]
+script = ExtResource("hh_sm_base")
+init_state = NodePath("Ground")
+
+[node name="Ground" type="Node" parent="PlayerStateMachine" unique_id=1970280776]
+script = ExtResource("hh_sm_ground")
+
+[node name="Air" type="Node" parent="PlayerStateMachine" unique_id=205575343]
+script = ExtResource("hh_sm_air")
+
+[node name="Combat" type="Node" parent="PlayerStateMachine" unique_id=1556612127]
+script = ExtResource("hh_sm_combat")
+priority = 1
+can_be_interrupted = false
+
+[node name="Roll" type="Node" parent="PlayerStateMachine" unique_id=1542119215]
+script = ExtResource("hh_sm_roll")
+priority = 1
+can_be_interrupted = false
+
+[node name="Hit" type="Node" parent="PlayerStateMachine" unique_id=730543560]
+script = ExtResource("hh_sm_hit")
+priority = 2
+can_be_interrupted = false
+
+[node name="SpecialAttack" type="Node" parent="PlayerStateMachine" unique_id=1124944062]
+script = ExtResource("hh_sm_special")
+priority = 1
+can_be_interrupted = false
+
+[node name="FallDeath" type="Node" parent="PlayerStateMachine" unique_id=802477011]
+script = ExtResource("hh_sm_falldeath")
+priority = 2
+can_be_interrupted = false
+
+[node name="Controller" parent="." index="19" unique_id=566218302]
+script = ExtResource("hh_input_ctrl")
