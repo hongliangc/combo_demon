@@ -18,6 +18,19 @@ func configure_from_skill(skill: Skill) -> void:
 	damage_tags = skill.damage_tags
 	attached_buffs = skill.attached_buffs
 
+## 通过技能 id 查找并应用技能伤害配置。用于动画 method track 调用。
+func configure_from_skill_id(id: StringName) -> void:
+	var skill := _resolve_skill(id)
+	if skill:
+		configure_from_skill(skill)
+
+## 从 owner 的 skill_set 中查找技能。owner 不含 skill_set 时静默返回 null。
+func _resolve_skill(id: StringName) -> Skill:
+	var owner_node := get_owner()
+	if owner_node and "skill_set" in owner_node and owner_node.skill_set:
+		return (owner_node.skill_set as SkillSet).get_skill(id)
+	return null
+
 func get_attacker_position() -> Vector2:
 	return global_position
 

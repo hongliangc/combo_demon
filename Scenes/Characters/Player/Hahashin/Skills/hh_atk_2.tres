@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Skill" format=3 uid="uid://l2y2mz1koeipo"]
+
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"atk_2"
+state_name = &"combat"
+cooldown = 0.0
+weight = 1
+min_phase = 0
+tags = Array[StringName]([&"melee"])
+damage_amount = 10.0
+damage_tags = 1
+params = {
+&"animation": &"atk_2"
+}

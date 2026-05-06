@@ -48,6 +48,13 @@ func tick(delta: float) -> void:
 func get_cooldown(skill_id: StringName) -> float:
 	return _cooldowns.get(skill_id, 0.0)
 
+## 按 id 查找技能。未找到时 push_warning 并返回 null。
+func get_skill(id: StringName) -> Skill:
+	var s := _find_skill(id)
+	if s == null:
+		push_warning("SkillSet.get_skill: id '%s' not found" % id)
+	return s
+
 # ---- 内部 ----
 
 func _filter(boss_ref: Node, bb: AIBlackboard, include_zero_weight: bool) -> Array[Skill]:
