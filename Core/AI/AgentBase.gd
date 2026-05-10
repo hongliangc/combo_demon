@@ -26,11 +26,6 @@ const DAMAGE_WINDOW: float = 3.0
 var _hit_clear_timer: float = 0.0
 const HIT_CLEAR_DELAY: float = 0.5
 
-@onready var _floor_cast_l: RayCast2D = get_node_or_null(^"FloorCastL")
-@onready var _floor_cast_r: RayCast2D = get_node_or_null(^"FloorCastR")
-@onready var _wall_cast_l: RayCast2D = get_node_or_null(^"WallCastL")
-@onready var _wall_cast_r: RayCast2D = get_node_or_null(^"WallCastR")
-
 func _ready() -> void:
 	_auto_find_sprite()
 	skill_set = SkillSet.new()
@@ -99,19 +94,6 @@ func _auto_find_sprite() -> void:
 	sprite = get_node_or_null(^"AnimatedSprite2D")
 	if not sprite:
 		sprite = get_node_or_null(^"Sprite2D")
-
-# ---- 平台移动助手 ----
-func can_move_dir(dir: int) -> bool:
-	if dir == 0:
-		return true
-	if dir > 0:
-		var has_floor := _floor_cast_r == null or _floor_cast_r.is_colliding()
-		var hit_wall := _wall_cast_r != null and _wall_cast_r.is_colliding()
-		return has_floor and not hit_wall
-	else:
-		var has_floor := _floor_cast_l == null or _floor_cast_l.is_colliding()
-		var hit_wall := _wall_cast_l != null and _wall_cast_l.is_colliding()
-		return has_floor and not hit_wall
 
 # ---- 事件处理 ----
 func _on_pipeline_react(ctx: DamageContext) -> void:

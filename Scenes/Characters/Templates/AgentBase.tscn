@@ -58,7 +58,7 @@ func on_health_changed(current_health: float, max_health: float) -> void:
 		value = current_health / max_health
 "
 
-[node name="AgentBase" type="CharacterBody2D" unique_id=319170295 groups=["enemy"]]
+[node name="AgentBase" type="CharacterBody2D" unique_id=319170295]
 collision_layer = 8
 collision_mask = 128
 script = ExtResource("1_agent_base")
@@ -99,20 +99,6 @@ script = SubResource("GDScript_healthbar")
 
 [node name="DamageNumbersAnchor" type="Node2D" parent="." unique_id=863163428]
 position = Vector2(0, -32)
-
-[node name="FloorCastL" type="RayCast2D" parent="." unique_id=1100000001]
-position = Vector2(-45, 35)
-target_position = Vector2(0, 15)
-
-[node name="FloorCastR" type="RayCast2D" parent="." unique_id=1100000002]
-position = Vector2(45, 35)
-target_position = Vector2(0, 15)
-
-[node name="WallCastL" type="RayCast2D" parent="." unique_id=1100000003]
-target_position = Vector2(-50, 0)
-
-[node name="WallCastR" type="RayCast2D" parent="." unique_id=1100000004]
-target_position = Vector2(50, 0)
 
 [node name="StateController" type="Node" parent="." unique_id=193203180]
 script = ExtResource("6_state_controller")

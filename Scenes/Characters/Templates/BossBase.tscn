@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://3cpq40uop66w" path="res://Core/Components/HurtBoxComponent.gd" id="2_hurtbox"]
 [ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="3_health"]
 [ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="3_tcew5"]
+[ext_resource type="Script" uid="uid://dlr87hqkwckdm" path="res://Core/Damage/DamagePipeline.gd" id="14_pipeline"]
 [ext_resource type="Script" uid="uid://bghl8phehydn7" path="res://Scenes/Characters/Bosses/Shared/BossAttackManager.gd" id="4_attackmanager"]
 [ext_resource type="Script" uid="uid://do3eyt0kvgbl2" path="res://Scenes/Characters/Bosses/Shared/BossStateMachine.gd" id="5_statemachine"]
 
@@ -234,6 +235,9 @@ max_value = 1.0
 value = 0.5
 show_percentage = false
 script = SubResource("GDScript_boss_healthbar")
+
+[node name="DamagePipeline" type="Node" parent="." unique_id=1999999901]
+script = ExtResource("14_pipeline")
 
 [node name="BossAttackManager" type="Node" parent="." unique_id=1446838887]
 script = ExtResource("4_attackmanager")

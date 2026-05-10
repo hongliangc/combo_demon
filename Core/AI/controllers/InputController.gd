@@ -11,17 +11,19 @@ class_name InputController extends BaseController
 @export var move_right_action: StringName = &"ui_right"
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(attack_action):
+	# Each action is optional — guard with InputMap.has_action so missing entries don't error.
+	if InputMap.has_action(attack_action) and event.is_action_pressed(attack_action):
 		dispatch(AIEvents.EV_INPUT_ATTACK)
-	elif event.is_action_pressed(jump_action):
+	elif InputMap.has_action(jump_action) and event.is_action_pressed(jump_action):
 		dispatch(AIEvents.EV_INPUT_JUMP)
-	elif event.is_action_pressed(dash_action):
+	elif InputMap.has_action(dash_action) and event.is_action_pressed(dash_action):
 		dispatch(AIEvents.EV_INPUT_DASH)
-	elif event.is_action_pressed(special_action):
+	elif InputMap.has_action(special_action) and event.is_action_pressed(special_action):
 		dispatch(AIEvents.EV_INPUT_SPECIAL)
 
 func tick(delta: float) -> void:
 	state_controller.tick(delta)
 	# Movement axis read directly (not event-driven)
-	var dir := Input.get_axis(move_left_action, move_right_action)
-	agent.set_meta("input_dir", dir)
+	if InputMap.has_action(move_left_action) and InputMap.has_action(move_right_action):
+		var dir := Input.get_axis(move_left_action, move_right_action)
+		agent.set_meta("input_dir", dir)

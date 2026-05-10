@@ -1,10 +1,10 @@
 class_name Hahashin extends AgentBase
 
 ## Player character — input-driven state machine on top of AgentBase architecture.
-## 架构: AgentBase → Hahashin
+## 架构: AgentBase → PlayerBase → Hahashin
 ## 状态机由 StateController 节点管理（AIState 子节点）
 
-## 待执行技能 id（Ground/Air 写入，Combat 消费）。D-1: 字段在角色类上，不用黑板。
+## 待执行技能 id（Ground/Air 写入，Combat 消费）。D-1: 字段在角色类上，不用黑板。xx
 var pending_skill_id: StringName = &""
 
 ## MovementComponent 引用（D-4）
