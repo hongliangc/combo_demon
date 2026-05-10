@@ -1,9 +1,10 @@
 class_name HahashinFallDeathState extends AIState
 
-## 坠落死亡状态 — 1.4a 占位桩，暂时停止移动。
-## 1.4a 将替换为 GameOver UI 流程。
+## 坠落死亡状态：停止移动 + 呼出 GameOverUI。
 
 func enter() -> void:
-	push_warning("HahashinFallDeathState: stub — no-op until 1.4a")
-	if agent is CharacterBody2D:
-		(agent as CharacterBody2D).velocity = Vector2.ZERO
+	var hh := agent as Hahashin
+	if hh and hh.movement_component:
+		hh.movement_component.can_move = false
+	agent.velocity = Vector2.ZERO
+	GameManager.game_over()
