@@ -9,8 +9,7 @@
 [ext_resource type="Resource" uid="uid://11j38rkz4tjcb" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_air.tres" id="skill_atk_air"]
 [ext_resource type="Resource" uid="uid://afqyeeo8urcgk" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_sp.tres" id="skill_atk_sp"]
 [ext_resource type="Resource" uid="uid://380ozrj5q3pyg" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_roll.tres" id="skill_roll"]
-[ext_resource type="Script" uid="uid://djmeifitglu7e" path="res://Core/Components/CombatComponent.gd" id="hh_combat"]
-[ext_resource type="Script" uid="uid://cdsgggqiqgpu5" path="res://Core/Components/SkillManager.gd" id="hh_skill_mgr"]
+
 [ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinGroundState.gd" id="hh_state_ground"]
 [ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinAirState.gd" id="hh_state_air"]
 [ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinCombatState.gd" id="hh_state_combat"]
@@ -22,15 +21,15 @@
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
 [ext_resource type="Script" uid="uid://b1ex62f8uy81b" path="res://Scenes/Characters/Player/Hahashin/hahashin.gd" id="1_mom7b"]
 [ext_resource type="Texture2D" uid="uid://ba0pir88bptb0" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_2.png" id="2_d5iwh"]
-[ext_resource type="Script" uid="uid://dhptij5yeksrr" path="res://Core/Resources/Damage.gd" id="2_p3ltc"]
+
 [ext_resource type="Texture2D" uid="uid://cn3wk5j44t4d7" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_2.png" id="2_yb066"]
 [ext_resource type="Texture2D" uid="uid://du2hlv87q7fvn" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_3.png" id="3_2ttqx"]
-[ext_resource type="Resource" uid="uid://o7affn3td02p" path="res://Core/Data/SkillBook/Physical.tres" id="3_vqspa"]
+
 [ext_resource type="Texture2D" uid="uid://dihtk8wqiihjl" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_3.png" id="3_xk8kn"]
-[ext_resource type="Resource" uid="uid://bjhtsxp31ycfw" path="res://Core/Data/SkillBook/KnockUp.tres" id="4_3aexr"]
+
 [ext_resource type="Texture2D" uid="uid://byxwlodyme57h" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_4.png" id="4_g73ga"]
 [ext_resource type="Texture2D" uid="uid://dkdb6ji0xhxph" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_4.png" id="4_q1taa"]
-[ext_resource type="Resource" uid="uid://dgc6rhqmwycag" path="res://Core/Data/SkillBook/SpecialAttack.tres" id="4_special"]
+
 [ext_resource type="Texture2D" uid="uid://by5c28sgtesto" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_5.png" id="5_ktvv7"]
 [ext_resource type="Texture2D" uid="uid://deb0nbib5dksa" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_5.png" id="5_o2kwx"]
 [ext_resource type="Texture2D" uid="uid://bfty6xjyj1ly1" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_6.png" id="6_6s4sr"]
@@ -1357,12 +1356,6 @@ offset_bottom = -23.0
 max_speed = 200.0
 max_jump_count = 2
 
-[node name="CombatComponent" type="Node" parent="." unique_id=1903333573]
-script = ExtResource("hh_combat")
-damage_types = Array[ExtResource("2_p3ltc")]([ExtResource("3_vqspa"), ExtResource("4_3aexr"), ExtResource("4_special")])
-
-[node name="SkillManager" type="Node" parent="." unique_id=898319711]
-script = ExtResource("hh_skill_mgr")
 
 [node name="StateController" parent="." parent_id_path=PackedInt32Array(193203180)]
 initial_state_name = &"ground"
