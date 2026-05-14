@@ -7,6 +7,20 @@ class_name AgentBase extends CharacterBody2D
 ## 美术原图默认朝向：true=朝右，false=朝左
 @export var sprite_faces_right: bool = false
 
+@export_group("Movement")
+@export var max_speed: float = 100.0
+@export var acceleration_time: float = 0.1
+
+@export_group("Jump")
+@export var enable_jump: bool = true
+@export var jump_force: float = -400.0
+@export var max_jump_count: int = 1
+@export var air_jump_force: float = -350.0
+
+signal jump_started
+signal jump_apex_reached
+signal landed
+
 @onready var state_controller: StateController = $StateController
 @onready var controller: BaseController = $Controller
 @onready var health_comp: HealthComponent = $HealthComponent
@@ -27,6 +41,13 @@ const DAMAGE_WINDOW: float = 3.0
 var _hit_clear_timer: float = 0.0
 const HIT_CLEAR_DELAY: float = 0.5
 
+# ---- 跳跃 / 移动能力运行时状态 ----
+var _is_jumping: bool = false
+var _is_falling: bool = false
+var _was_on_floor: bool = false
+var _current_jump_count: int = 0
+var _can_move: bool = true
+
 func _ready() -> void:
 	_auto_find_sprite()
 	if anim:
@@ -40,12 +61,28 @@ func _ready() -> void:
 	_setup_signals()
 
 func _physics_process(delta: float) -> void:
+	# ---- 重力 ----
 	if has_gravity:
 		if not is_on_floor():
 			velocity.y += gravity_force * delta
 		elif velocity.y > 0:
 			velocity.y = 0
+
+	# ---- 跳跃输入(仅 InputController 驱动)----
+	if enable_jump and _can_move and controller is InputController:
+		if (controller as InputController).consume_jump():
+			_try_jump()
+
+	# ---- 水平移动(仅 InputController 驱动)----
+	# AI state 自管 velocity, 不在此被覆盖.
+	if _can_move and controller is InputController:
+		var target_vx: float = (controller as InputController).input_dir * max_speed
+		var accel: float = (1.0 / acceleration_time) * max_speed * delta
+		velocity.x = move_toward(velocity.x, target_vx, accel)
+
 	move_and_slide()
+	_update_jump_state()
+
 	if anim:
 		anim.tick(velocity)
 	if skill_set:
@@ -179,3 +216,34 @@ func _register_rules(rules: Array) -> void:
 			continue
 		var guard := Callable(self, r[3]) if r[3] != "" else Callable()
 		state_controller.add_transition(from, to, StringName(r[2]), guard, r[4])
+
+# ---- 跳跃 ----
+func _try_jump() -> void:
+	var on_floor := is_on_floor()
+	if on_floor:
+		velocity.y = jump_force
+		_current_jump_count = 1
+		_is_jumping = true
+		_is_falling = false
+		jump_started.emit()
+	elif _current_jump_count > 0 and _current_jump_count < max_jump_count:
+		velocity.y = air_jump_force
+		_current_jump_count += 1
+		_is_jumping = true
+		_is_falling = false
+		jump_started.emit()
+
+func _update_jump_state() -> void:
+	var on_floor := is_on_floor()
+	# 顶点检测
+	if _is_jumping and not _is_falling and velocity.y > 0:
+		_is_falling = true
+		_is_jumping = false
+		jump_apex_reached.emit()
+	# 落地检测
+	if not _was_on_floor and on_floor:
+		_is_jumping = false
+		_is_falling = false
+		_current_jump_count = 0
+		landed.emit()
+	_was_on_floor = on_floor

@@ -10,11 +10,16 @@ class_name InputController extends BaseController
 @export var move_left_action: StringName = &"ui_left"
 @export var move_right_action: StringName = &"ui_right"
 
+## Horizontal axis read each tick. AgentBase consumes.
+var input_dir: float = 0.0
+## One-shot jump-press flag. AgentBase consumes via consume_jump().
+var jump_pressed: bool = false
+
 func _unhandled_input(event: InputEvent) -> void:
-	# Each action is optional — guard with InputMap.has_action so missing entries don't error.
 	if InputMap.has_action(attack_action) and event.is_action_pressed(attack_action):
 		dispatch(AIEvents.EV_INPUT_ATTACK)
 	elif InputMap.has_action(jump_action) and event.is_action_pressed(jump_action):
+		jump_pressed = true
 		dispatch(AIEvents.EV_INPUT_JUMP)
 	elif InputMap.has_action(dash_action) and event.is_action_pressed(dash_action):
 		dispatch(AIEvents.EV_INPUT_DASH)
@@ -23,7 +28,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func tick(delta: float) -> void:
 	state_controller.tick(delta)
-	# Movement axis read directly (not event-driven)
 	if InputMap.has_action(move_left_action) and InputMap.has_action(move_right_action):
-		var dir := Input.get_axis(move_left_action, move_right_action)
-		agent.set_meta("input_dir", dir)
+		input_dir = Input.get_axis(move_left_action, move_right_action)
+	else:
+		input_dir = 0.0
+
+## Take and clear the buffered jump press. Returns true if a jump was pending.
+func consume_jump() -> bool:
+	if jump_pressed:
+		jump_pressed = false
+		return true
+	return false
