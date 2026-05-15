@@ -1,94 +1,80 @@
-[gd_scene format=3 uid="uid://dg8ot3heoutwi"]
+[gd_scene load_steps=18 format=3 uid="uid://dg8ot3heoutwi"]
 
-[ext_resource type="PackedScene" uid="uid://cowywrmxqtktr" path="res://Scenes/Characters/Templates/BossBase.tscn" id="1_base"]
-[ext_resource type="Script" uid="uid://c1uwfenub0wav" path="res://Scenes/Characters/Bosses/Cyclops/Cyclops.gd" id="1_boss"]
-[ext_resource type="Texture2D" uid="uid://d2mr0oginn5kf" path="res://Assets/Art/Ninja_Adventure/Actor/Boss/DemonCyclop/Sprite.png" id="2_sprite"]
-[ext_resource type="Script" uid="uid://dc25jccedgkg8" path="res://Scenes/Characters/Bosses/Cyclops/CyclopsAttackManager.gd" id="3_atkmgr"]
-[ext_resource type="Script" uid="uid://mac0uylbwkki" path="res://Scenes/Characters/Bosses/Cyclops/CyclopsStateMachine.gd" id="4_sm"]
-[ext_resource type="PackedScene" uid="uid://bqw7xc3ykn8r1" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossProjectile.tscn" id="5_projectile"]
-[ext_resource type="PackedScene" uid="uid://cvx8p4n2mh1ld" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossLaser.tscn" id="6_laser"]
-[ext_resource type="PackedScene" uid="uid://d0ow3j5sx53nq" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossAoe.tscn" id="7_aoe"]
-[ext_resource type="Resource" uid="uid://blfx5oww3g2r4" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossProjectileDamage.tres" id="8_proj_dmg"]
-[ext_resource type="Resource" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossLaserDamage.tres" id="9_laser_dmg"]
-[ext_resource type="Resource" path="res://Scenes/Characters/Bosses/Cyclops/Resources/BossAoeDamage.tres" id="10_aoe_dmg"]
-[ext_resource type="Script" uid="uid://bmcqbqdytrj1v" path="res://Core/StateMachine/CommonStates/IdleState.gd" id="11_idle"]
-[ext_resource type="Script" uid="uid://b12130rp1xqwu" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsPatrol.gd" id="12_patrol"]
-[ext_resource type="Script" uid="uid://dlp2t5ntytfsp" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsChase.gd" id="13_chase"]
-[ext_resource type="Script" uid="uid://dfinmg32j140l" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsCircle.gd" id="14_circle"]
-[ext_resource type="Script" uid="uid://c2xjiv77mtrlo" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsAttack.gd" id="15_attack"]
-[ext_resource type="Script" uid="uid://j76hygp3qi8v" path="res://Scenes/Characters/Bosses/Cyclops/States/CyclopsRetreat.gd" id="16_retreat"]
-[ext_resource type="Script" uid="uid://d10wvnas7327v" path="res://Core/StateMachine/CommonStates/HitState.gd" id="17_hit"]
+[ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentBase.tscn" id="1_0i1r4"]
+[ext_resource type="Script" uid="uid://c1uwfenub0wav" path="res://Scenes/Characters/Bosses/Cyclops/Cyclops.gd" id="2_cyclops"]
+[ext_resource type="Texture2D" uid="uid://d2mr0oginn5kf" path="res://Assets/Art/Ninja_Adventure/Actor/Boss/DemonCyclop/Sprite.png" id="3_sprite"]
+[ext_resource type="Script" uid="uid://bvvnhbufppo8" path="res://Core/AI/Stock/IdleState.gd" id="4_idle"]
+[ext_resource type="Script" uid="uid://beqjsx7b4cg0n" path="res://Core/AI/Stock/ChaseState.gd" id="5_chase"]
+[ext_resource type="Script" uid="uid://bj8kk8ekxmrfp" path="res://Core/AI/Stock/CirclingState.gd" id="6_circle"]
+[ext_resource type="Script" uid="uid://ddwmjtmp1g8e2" path="res://Core/AI/Stock/AttackDispatcher.gd" id="7_dispatcher"]
+[ext_resource type="Script" uid="uid://bky6akb84sun2" path="res://Core/AI/Stock/GenericAttackState.gd" id="8_generic"]
+[ext_resource type="Script" uid="uid://c00p727wgkv03" path="res://Core/AI/Stock/HitState.gd" id="9_hit"]
+[ext_resource type="Script" uid="uid://c8dyu2kanm807" path="res://Core/AI/Stock/DeathState.gd" id="10_death"]
+[ext_resource type="Script" uid="uid://btj8f04i2wlsl" path="res://Scenes/Characters/Bosses/Cyclops/States/PhaseTransitionState.gd" id="11_phase"]
+[ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="12_skill"]
+[ext_resource type="Resource" uid="uid://cyclops_proj_skill_v1" path="res://Scenes/Characters/Bosses/Cyclops/Skills/cyclops_projectile.tres" id="13_proj"]
+[ext_resource type="Resource" uid="uid://cyclops_laser_skill_v1" path="res://Scenes/Characters/Bosses/Cyclops/Skills/cyclops_laser.tres" id="14_laser"]
+[ext_resource type="Resource" uid="uid://cyclops_aoe_skill_v1" path="res://Scenes/Characters/Bosses/Cyclops/Skills/cyclops_aoe.tres" id="15_aoe"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_j6k8p"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_8s0sm"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_sprite")
+"texture": ExtResource("3_sprite")
 }],
 "loop": true,
 "name": &"Sprite",
 "speed": 5.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_collision"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(38, 35)
 
-[node name="Cyclops" unique_id=1707337885 instance=ExtResource("1_base")]
-script = ExtResource("1_boss")
+[node name="Cyclops" unique_id=319170295 instance=ExtResource("1_0i1r4")]
+script = ExtResource("2_cyclops")
+has_gravity = false
+enable_jump = false
+skill_resources = Array[ExtResource("12_skill")]([ExtResource("13_proj"), ExtResource("14_laser"), ExtResource("15_aoe")])
 base_move_speed = 150.0
 rotation_speed = 5.0
-max_health = 1001
-health = 1001
+detection_radius = 800.0
+attack_range = 300.0
+min_distance = 150.0
 
-[node name="AnimatedSprite2D" parent="." index="0" unique_id=1335177902]
-sprite_frames = SubResource("SpriteFrames_j6k8p")
-animation = &"Sprite"
+[node name="CollisionShape2D" parent="." index="2" unique_id=884594291]
+shape = SubResource("RectangleShape2D_body")
 
-[node name="CollisionShape2D" parent="." index="1" unique_id=726189404]
-shape = SubResource("RectangleShape2D_boss_collision")
+[node name="CollisionShape2D" parent="HurtBoxComponent" parent_id_path=PackedInt32Array(1245267114) index="0" unique_id=975434091]
+shape = SubResource("RectangleShape2D_body")
 
-[node name="DamageNumbersAnchor" parent="." index="2" unique_id=1984785107]
-position = Vector2(0, -22)
-
-[node name="HealthComponent" parent="." index="7" unique_id=1260646126]
+[node name="HealthComponent" parent="." index="5" unique_id=163196815]
 max_health = 1000.0
 health = 1000.0
 
-[node name="HealthBar" parent="." index="8" unique_id=786299893]
-offset_top = -28.0
-offset_bottom = -22.0
+[node name="Idle" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="0" unique_id=2049259205]
+script = ExtResource("4_idle")
 
-[node name="BossAttackManager" parent="." index="9" unique_id=1446838887]
-script = ExtResource("3_atkmgr")
-projectile_scene = ExtResource("5_projectile")
-laser_scene = ExtResource("6_laser")
-aoe_scene = ExtResource("7_aoe")
-projectile_damage = ExtResource("8_proj_dmg")
-laser_damage = ExtResource("9_laser_dmg")
-aoe_damage = ExtResource("10_aoe_dmg")
+[node name="Chase" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="1" unique_id=1491329259]
+script = ExtResource("5_chase")
 
-[node name="StateMachine" parent="." index="10" unique_id=1612206536 node_paths=PackedStringArray("init_state")]
-script = ExtResource("4_sm")
-init_state = NodePath("Idle")
+[node name="Circle" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="2" unique_id=1444381819]
+script = ExtResource("6_circle")
 
-[node name="Idle" type="Node" parent="StateMachine" index="0" unique_id=1900817675]
-script = ExtResource("11_idle")
-min_idle_time = 2.0
+[node name="Dispatcher" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="3" unique_id=1543653675]
+script = ExtResource("7_dispatcher")
 
-[node name="Patrol" type="Node" parent="StateMachine" index="1" unique_id=1743223177]
-script = ExtResource("12_patrol")
+[node name="GenericAttack" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="4" unique_id=650210124]
+script = ExtResource("8_generic")
 
-[node name="Chase" type="Node" parent="StateMachine" index="2" unique_id=1179073112]
-script = ExtResource("13_chase")
+[node name="Hit" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="5" unique_id=1524001625]
+script = ExtResource("9_hit")
 
-[node name="Circle" type="Node" parent="StateMachine" index="3" unique_id=701299608]
-script = ExtResource("14_circle")
+[node name="Death" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="6" unique_id=1932890010]
+script = ExtResource("10_death")
 
-[node name="Attack" type="Node" parent="StateMachine" index="4" unique_id=112510037]
-script = ExtResource("15_attack")
+[node name="PhaseTransition" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="7" unique_id=1803419543]
+script = ExtResource("11_phase")
 
-[node name="Retreat" type="Node" parent="StateMachine" index="5" unique_id=2022250956]
-script = ExtResource("16_retreat")
-
-[node name="Hit" type="Node" parent="StateMachine" index="6" unique_id=767657071]
-script = ExtResource("17_hit")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="13" unique_id=1801209097]
+sprite_frames = SubResource("SpriteFrames_8s0sm")
+animation = &"Sprite"
