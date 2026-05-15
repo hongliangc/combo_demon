@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://dlr87hqkwckdm" path="res://Core/Damage/DamagePipeline.gd" id="14_pipeline"]
 [ext_resource type="Script" uid="uid://dy0ra50yvnnyr" path="res://Core/Buffs/BuffController.gd" id="15_buffctl"]
 [ext_resource type="Script" uid="uid://d3umvhka6l2uv" path="res://Core/Status/StatusController.gd" id="16_status"]
+[ext_resource type="Script" uid="uid://bv7r2xm9n3k5t" path="res://Core/Animation/AnimationDriver.gd" id="17_anim_driver"]
 
 [sub_resource type="Animation" id="Animation_RESET"]
 length = 0.001
@@ -65,6 +66,9 @@ script = ExtResource("1_agent_base")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=710612678]
 libraries/ = SubResource("AnimationLibrary_main")
+
+[node name="AnimationDriver" type="Node" parent="." unique_id=999888777]
+script = ExtResource("17_anim_driver")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=884594291]
 

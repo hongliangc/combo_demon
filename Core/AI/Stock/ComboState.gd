@@ -28,9 +28,10 @@ func physics_update(delta: float) -> void:
 			_play_step()
 
 func exit() -> void:
-	if "anim_player" in owner_node and owner_node.anim_player:
-		if owner_node.anim_player.animation_finished.is_connected(_on_sub_anim_done):
-			owner_node.anim_player.animation_finished.disconnect(_on_sub_anim_done)
+	if agent and agent.anim.action_finished.is_connected(_on_sub_anim_done):
+		agent.anim.action_finished.disconnect(_on_sub_anim_done)
+	if agent:
+		agent.anim.stop_action()
 
 func _play_step() -> void:
 	if _step >= _combo.sequence.size():
@@ -39,22 +40,21 @@ func _play_step() -> void:
 	var sub_skill: Skill = _combo.sequence[_step]
 	if agent and agent.hitbox is HitBoxComponent:
 		(agent.hitbox as HitBoxComponent).configure_from_skill(sub_skill)
-	var anim_name = sub_skill.params.get(&"animation", &"")
-	if anim_name and "anim_player" in owner_node and owner_node.anim_player:
-		owner_node.anim_player.play(anim_name)
-		if not owner_node.anim_player.animation_finished.is_connected(_on_sub_anim_done):
-			owner_node.anim_player.animation_finished.connect(_on_sub_anim_done)
+	var anim_name: StringName = sub_skill.params.get(&"animation", &"")
+	if anim_name != &"" and agent and agent.anim.has_action(anim_name):
+		if not agent.anim.action_finished.is_connected(_on_sub_anim_done):
+			agent.anim.action_finished.connect(_on_sub_anim_done)
+		agent.anim.play_action(anim_name)
 	var spd: float = sub_skill.params.get(&"speed", 0.0)
 	if spd > 0 and owner_node is CharacterBody2D:
 		var dir_key: StringName = sub_skill.params.get(&"direction", &"forward")
 		(owner_node as CharacterBody2D).velocity.x = _resolve_direction(dir_key) * spd
 
-func _on_sub_anim_done(_anim_name: StringName) -> void:
+func _on_sub_anim_done(_action_id: StringName) -> void:
 	_step += 1
 	if _step >= _combo.sequence.size():
-		if "anim_player" in owner_node and owner_node.anim_player:
-			if owner_node.anim_player.animation_finished.is_connected(_on_sub_anim_done):
-				owner_node.anim_player.animation_finished.disconnect(_on_sub_anim_done)
+		if agent and agent.anim.action_finished.is_connected(_on_sub_anim_done):
+			agent.anim.action_finished.disconnect(_on_sub_anim_done)
 		_finish()
 		return
 	if _combo.gap > 0:

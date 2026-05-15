@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinHitState.gd" id="hh_state_hit"]
 [ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinSpecialAttackState.gd" id="hh_state_special"]
 [ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinFallDeathState.gd" id="hh_state_falldeath"]
+[ext_resource type="Script" uid="uid://dqnm3j7x8k4p2" path="res://Core/Animation/AnimationPlayerBackend.gd" id="anim_player_backend"]
 [ext_resource type="Texture2D" uid="uid://ci2uaxeklamvi" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_1.png" id="1_c3kl5"]
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
 [ext_resource type="Script" uid="uid://b1ex62f8uy81b" path="res://Scenes/Characters/Player/Hahashin/hahashin.gd" id="1_mom7b"]
@@ -1335,6 +1336,10 @@ advance_expression_base_node = NodePath("..")
 parameters/loco_timescale/scale = 1.0
 parameters/ctrl_timescale/scale = 1.0
 parameters/control_blend/blend_amount = 0.0
+
+[node name="Backend" type="Node" parent="AnimationDriver" parent_id_path=PackedInt32Array(999888777)]
+script = ExtResource("anim_player_backend")
+walk_anim = &"run"
 
 [node name="CollisionShape2D" parent="HurtBoxComponent" parent_id_path=PackedInt32Array(1245267114) index="0" unique_id=975434091]
 shape = SubResource("RectangleShape2D_23x5x")

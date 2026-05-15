@@ -11,14 +11,11 @@ func enter() -> void:
 		if col:
 			col.set_deferred(&"disabled", true)
 
-	var ap: AnimationPlayer = null
-	if owner_node and "anim_player" in owner_node:
-		ap = owner_node.anim_player
-	if ap and ap.has_animation(&"death"):
-		ap.play(&"death")
-		await ap.animation_finished
+	if agent.anim.has_action(&"death"):
+		agent.anim.play_action(&"death")
+		await agent.anim.action_finished
 	else:
-		_play_fallback_death()
+		await _play_fallback_death()
 
 	if is_instance_valid(owner_node):
 		owner_node.queue_free()
@@ -26,9 +23,9 @@ func enter() -> void:
 
 ## 白闪 fallback
 func _play_fallback_death() -> void:
-	var sprite = get_node_or_null("AnimatedSprite2D")
+	var sprite = owner_node.get_node_or_null(^"AnimatedSprite2D")
 	if not sprite:
-		sprite = get_node_or_null("Sprite2D")
+		sprite = owner_node.get_node_or_null(^"Sprite2D")
 	if not sprite:
 		await get_tree().create_timer(0.5).timeout
 		return

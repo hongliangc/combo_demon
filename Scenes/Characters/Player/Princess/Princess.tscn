@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://s5f3hhdknhre" path="res://Assets/Art/Princess/SeparateAnim/Walk.png" id="2_dxx8v"]
 [ext_resource type="Script" path="res://Scenes/Characters/Player/Princess/Princess.gd" id="3_princess"]
 [ext_resource type="Script" path="res://Core/AI/Stock/DeathState.gd" id="4_death"]
+[ext_resource type="Script" uid="uid://dqnm3j7x8k4p2" path="res://Core/Animation/AnimationPlayerBackend.gd" id="5_anim_backend"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_86e4v"]
 atlas = ExtResource("2_dxx8v")
@@ -305,8 +306,12 @@ animation = &"up_walk"
 libraries/ = SubResource("AnimationLibrary_ibkkm")
 
 [node name="AnimationTree" parent="." index="3" unique_id=1041004894]
+active = false
 tree_root = SubResource("AnimationNodeBlendTree_g7rb3")
 parameters/BlendSpace2D/blend_position = Vector2(0.15175092, 0.36760926)
+
+[node name="Backend" type="Node" parent="AnimationDriver" parent_id_path=PackedInt32Array(999888777)]
+script = ExtResource("5_anim_backend")
 
 [node name="HealthBar" parent="." index="8" unique_id=107527890]
 offset_top = -14.0

@@ -11,20 +11,17 @@ func enter() -> void:
 	if skill_id == &"":
 		dispatch(AIEvents.EV_ATTACK_FINISHED)
 		return
+	if not agent.anim.action_finished.is_connected(_on_anim_done):
+		agent.anim.action_finished.connect(_on_anim_done)
 	_play_skill(skill_id)
-	if not agent.anim_player.animation_finished.is_connected(_on_anim_done):
-		agent.anim_player.animation_finished.connect(_on_anim_done)
-	agent.anim_player.speed_scale = 2.0
 
 func _play_skill(skill_id: StringName) -> void:
-	# 通过 HitBoxComponent 应用技能伤害配置
 	if agent.hitbox is HitBoxComponent:
 		(agent.hitbox as HitBoxComponent).configure_from_skill_id(skill_id)
-	agent.anim_player.play(skill_id)
+	agent.anim.play_action(skill_id, 2.0)
 
 func physics_update(_delta: float) -> void:
 	var hh := agent as Hahashin
-	# 动画期间缓冲下一次攻击输入 (连招)
 	if Input.is_action_just_pressed(&"atk_1"):
 		hh.pending_skill_id = &"atk_1"
 	elif Input.is_action_just_pressed(&"atk_2"):
@@ -32,7 +29,7 @@ func physics_update(_delta: float) -> void:
 	elif Input.is_action_just_pressed(&"atk_3"):
 		hh.pending_skill_id = &"atk_3"
 
-func _on_anim_done(_anim_name: StringName) -> void:
+func _on_anim_done(_action_id: StringName) -> void:
 	var hh := agent as Hahashin
 	if hh.pending_skill_id != &"":
 		var next_id := hh.pending_skill_id
@@ -47,7 +44,6 @@ func exit() -> void:
 		hh.pending_skill_id = &""
 		if hh.movement_component:
 			hh.movement_component.can_move = true
-	if agent.anim_player:
-		agent.anim_player.speed_scale = 1.0
-		if agent.anim_player.animation_finished.is_connected(_on_anim_done):
-			agent.anim_player.animation_finished.disconnect(_on_anim_done)
+	if agent.anim.action_finished.is_connected(_on_anim_done):
+		agent.anim.action_finished.disconnect(_on_anim_done)
+	agent.anim.stop_action()

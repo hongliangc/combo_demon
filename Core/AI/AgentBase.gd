@@ -11,6 +11,7 @@ class_name AgentBase extends CharacterBody2D
 @onready var controller: BaseController = $Controller
 @onready var health_comp: HealthComponent = $HealthComponent
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
+@onready var anim: AnimationDriver = get_node_or_null(^"AnimationDriver")
 @onready var hitbox: Node2D = get_node_or_null(^"HitBoxComponent")
 @onready var pipeline: DamagePipeline = get_node_or_null(^"DamagePipeline")
 @onready var status: StatusController = get_node_or_null(^"StatusController")
@@ -28,6 +29,8 @@ const HIT_CLEAR_DELAY: float = 0.5
 
 func _ready() -> void:
 	_auto_find_sprite()
+	if anim:
+		anim.setup()
 	skill_set = SkillSet.new()
 	skill_set.setup(skill_resources)
 	state_controller.setup(self)
@@ -43,6 +46,8 @@ func _physics_process(delta: float) -> void:
 		elif velocity.y > 0:
 			velocity.y = 0
 	move_and_slide()
+	if anim:
+		anim.tick(velocity)
 	if skill_set:
 		skill_set.tick(delta)
 	if controller:

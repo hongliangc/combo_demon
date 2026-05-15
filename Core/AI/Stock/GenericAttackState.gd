@@ -13,24 +13,23 @@ func enter() -> void:
 		(agent.hitbox as HitBoxComponent).configure_from_skill(skill)
 	if owner_node is CharacterBody2D:
 		(owner_node as CharacterBody2D).velocity = Vector2.ZERO
-	var anim_name = skill.params.get(&"animation", &"")
-	if anim_name and "anim_player" in owner_node and owner_node.anim_player:
-		owner_node.anim_player.play(anim_name)
-		owner_node.anim_player.animation_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
-	else:
+	var anim_name: StringName = skill.params.get(&"animation", &"")
+	if anim_name == &"" or not agent.anim.has_action(anim_name):
 		_finish()
 		return
+	agent.anim.action_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
+	agent.anim.play_action(anim_name)
 	var spd: float = skill.params.get(&"speed", 0.0)
 	if spd > 0 and owner_node is CharacterBody2D:
 		var dir_key: StringName = skill.params.get(&"direction", &"forward")
 		(owner_node as CharacterBody2D).velocity.x = _resolve_direction(dir_key) * spd
 
 func exit() -> void:
-	if "anim_player" in owner_node and owner_node.anim_player:
-		if owner_node.anim_player.animation_finished.is_connected(_on_anim_done):
-			owner_node.anim_player.animation_finished.disconnect(_on_anim_done)
+	if agent.anim.action_finished.is_connected(_on_anim_done):
+		agent.anim.action_finished.disconnect(_on_anim_done)
+	agent.anim.stop_action()
 
-func _on_anim_done(_anim_name: StringName) -> void:
+func _on_anim_done(_action_id: StringName) -> void:
 	_finish()
 
 ## 动画 method call track 调用：生成投射物
