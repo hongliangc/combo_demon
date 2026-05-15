@@ -7,7 +7,8 @@ class_name BossLaser
 @export var fire_duration := 1.5     # 发射持续时间
 @export var rotation_speed := 1.0    # 旋转速度（弧度/秒）
 @export var laser_length := 500.0    # 激光长度
-@export var damage_config: Damage    # 伤害配置
+@export var damage_min: float = 20.0 # 内联最小伤害
+@export var damage_max: float = 30.0 # 内联最大伤害
 
 const FLICKER_SPEED := 10.0
 const FLICKER_MIN_ALPHA := 0.3
@@ -105,15 +106,9 @@ func _on_area_entered(area: Area2D) -> void:
 	if area is HurtBoxComponent and area not in damaged_targets:
 		damaged_targets.append(area)
 
-		# 造成伤害
-		if damage_config:
-			var damage_copy = damage_config.duplicate(true)
-			damage_copy.randomize_damage()
-			area.take_damage(damage_copy)
-		else:
-			# 默认伤害
-			var default_damage = Damage.new()
-			default_damage.min_amount = 20
-			default_damage.max_amount = 30
-			default_damage.randomize_damage()
-			area.take_damage(default_damage)
+		# 内联伤害（不再使用 Damage Resource @export）
+		var damage := Damage.new()
+		damage.min_amount = damage_min
+		damage.max_amount = damage_max
+		damage.randomize_damage()
+		area.take_damage(damage)

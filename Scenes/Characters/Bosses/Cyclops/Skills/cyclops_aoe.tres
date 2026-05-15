@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://cyclops_aoe_skill_v1"]
+
+[ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://d0ow3j5sx53nq" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossAoe.tscn" id="2_aoe"]
+
+[resource]
+script = ExtResource("1")
+id = &"cyclops_aoe"
+state_name = &"genericattack"
+cooldown = 1.5
+weight = 1
+min_phase = 1
+max_phase = -1
+min_range = 0.0
+max_range = 200.0
+tags = Array[StringName]([&"offensive", &"aoe"])
+damage_amount = 40.0
+damage_tags = 1
+attached_buffs = []
+precondition_method = &""
+interruptible = true
+params = {
+&"animation": &"attack_aoe",
+&"projectile_scene": ExtResource("2_aoe"),
+&"spawn_offset": Vector2(0, 0)
+}

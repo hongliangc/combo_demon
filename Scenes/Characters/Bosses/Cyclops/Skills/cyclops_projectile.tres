@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://cyclops_proj_skill_v1"]
+
+[ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bqw7xc3ykn8r1" path="res://Scenes/Characters/Bosses/Cyclops/Attacks/BossProjectile.tscn" id="2_proj"]
+
+[resource]
+script = ExtResource("1")
+id = &"cyclops_projectile"
+state_name = &"genericattack"
+cooldown = 1.5
+weight = 2
+min_phase = 1
+max_phase = -1
+min_range = 200.0
+max_range = 800.0
+tags = Array[StringName]([&"offensive", &"ranged"])
+damage_amount = 15.0
+damage_tags = 1
+attached_buffs = []
+precondition_method = &""
+interruptible = true
+params = {
+&"animation": &"attack_proj",
+&"projectile_scene": ExtResource("2_proj"),
+&"spawn_offset": Vector2(60, 0)
+}
