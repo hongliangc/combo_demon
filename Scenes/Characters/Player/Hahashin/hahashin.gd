@@ -7,9 +7,6 @@ class_name Hahashin extends AgentBase
 ## 待执行技能 id（Ground/Air 写入，Combat 消费）。D-1: 字段在角色类上，不用黑板。xx
 var pending_skill_id: StringName = &""
 
-## MovementComponent 引用（D-4）
-@onready var movement_component: MovementComponent = $MovementComponent
-
 func _ready() -> void:
 	super._ready()
 	# InputController does not call enter_initial (AIController does); do it here.

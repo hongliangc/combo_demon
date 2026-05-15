@@ -46,7 +46,8 @@ var _is_jumping: bool = false
 var _is_falling: bool = false
 var _was_on_floor: bool = false
 var _current_jump_count: int = 0
-var _can_move: bool = true
+## 是否允许 InputController 驱动水平移动 + 跳跃 (受击 / 攻击 / 翻滚 期间置 false)
+var can_move: bool = true
 
 func _ready() -> void:
 	_auto_find_sprite()
@@ -69,13 +70,13 @@ func _physics_process(delta: float) -> void:
 			velocity.y = 0
 
 	# ---- 跳跃输入(仅 InputController 驱动)----
-	if enable_jump and _can_move and controller is InputController:
+	if enable_jump and can_move and controller is InputController:
 		if (controller as InputController).consume_jump():
-			_try_jump()
+			try_jump()
 
 	# ---- 水平移动(仅 InputController 驱动)----
 	# AI state 自管 velocity, 不在此被覆盖.
-	if _can_move and controller is InputController:
+	if can_move and controller is InputController:
 		var target_vx: float = (controller as InputController).input_dir * max_speed
 		var accel: float = (1.0 / acceleration_time) * max_speed * delta
 		velocity.x = move_toward(velocity.x, target_vx, accel)
@@ -217,8 +218,9 @@ func _register_rules(rules: Array) -> void:
 		var guard := Callable(self, r[3]) if r[3] != "" else Callable()
 		state_controller.add_transition(from, to, StringName(r[2]), guard, r[4])
 
-# ---- 跳跃 ----
-func _try_jump() -> void:
+# ---- 跳跃 / 公共能力 API ----
+## 尝试跳跃 (地面跳 or 空中跳). 由 _physics_process / State 调用.
+func try_jump() -> void:
 	var on_floor := is_on_floor()
 	if on_floor:
 		velocity.y = jump_force
@@ -232,6 +234,27 @@ func _try_jump() -> void:
 		_is_jumping = true
 		_is_falling = false
 		jump_started.emit()
+
+## 当前剩余的空中跳跃次数检查 (例如二段跳还可用).
+func can_air_jump() -> bool:
+	return enable_jump and _current_jump_count > 0 and _current_jump_count < max_jump_count
+
+## 当前已使用的跳跃次数 getter.
+func get_jump_count() -> int:
+	return _current_jump_count
+
+## 当前朝向符号: +1 = 朝右, -1 = 朝左.
+## 由 sprite.flip_h 推导, 与 sprite_faces_right 配合 (与 _update_facing 一致).
+func get_facing_sign() -> int:
+	if not sprite or not "flip_h" in sprite:
+		return 1
+	if sprite_faces_right:
+		return -1 if sprite.flip_h else 1
+	return 1 if sprite.flip_h else -1
+
+## 应用冲刺/翻滚速度: 沿当前朝向给 velocity.x 一个固定值.
+func apply_dash_speed(speed: float) -> void:
+	velocity.x = float(get_facing_sign()) * speed
 
 func _update_jump_state() -> void:
 	var on_floor := is_on_floor()

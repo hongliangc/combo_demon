@@ -4,8 +4,8 @@ class_name HahashinCombatState extends AIState
 
 func enter() -> void:
 	var hh := agent as Hahashin
-	if hh and hh.movement_component:
-		hh.movement_component.can_move = false
+	if hh:
+		hh.can_move = false
 	var skill_id := hh.pending_skill_id
 	hh.pending_skill_id = &""
 	if skill_id == &"":
@@ -42,8 +42,7 @@ func exit() -> void:
 	var hh := agent as Hahashin
 	if hh:
 		hh.pending_skill_id = &""
-		if hh.movement_component:
-			hh.movement_component.can_move = true
+		hh.can_move = true
 	if agent.anim.action_finished.is_connected(_on_anim_done):
 		agent.anim.action_finished.disconnect(_on_anim_done)
 	agent.anim.stop_action()

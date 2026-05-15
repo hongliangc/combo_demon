@@ -1313,6 +1313,8 @@ floor_constant_speed = true
 floor_snap_length = 16.0
 script = ExtResource("1_mom7b")
 has_gravity = true
+max_speed = 200.0
+max_jump_count = 2
 max_health = 10000
 health = 10000
 skill_resources = Array[ExtResource("skill_type")]([ExtResource("skill_atk_1"), ExtResource("skill_atk_2"), ExtResource("skill_atk_3"), ExtResource("skill_atk_3_kup"), ExtResource("skill_atk_air"), ExtResource("skill_atk_sp"), ExtResource("skill_roll")])
@@ -1356,11 +1358,6 @@ offset_left = -20.0
 offset_top = -28.0
 offset_right = 20.0
 offset_bottom = -23.0
-
-[node name="MovementComponent" parent="." unique_id=1866148992]
-max_speed = 200.0
-max_jump_count = 2
-
 
 [node name="StateController" parent="." parent_id_path=PackedInt32Array(193203180)]
 initial_state_name = &"ground"

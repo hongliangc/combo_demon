@@ -5,8 +5,8 @@ class_name HahashinGroundState extends AIState
 
 func enter() -> void:
 	var hh := agent as Hahashin
-	if hh and hh.movement_component:
-		hh.movement_component.can_move = true
+	if hh:
+		hh.can_move = true
 
 func physics_update(_delta: float) -> void:
 	var hh := agent as Hahashin

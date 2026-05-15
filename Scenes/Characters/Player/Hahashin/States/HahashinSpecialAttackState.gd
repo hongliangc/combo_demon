@@ -4,8 +4,8 @@ class_name HahashinSpecialAttackState extends AIState
 
 func enter() -> void:
 	var hh := agent as Hahashin
-	if hh and hh.movement_component:
-		hh.movement_component.can_move = false
+	if hh:
+		hh.can_move = false
 	if agent.hitbox is HitBoxComponent:
 		(agent.hitbox as HitBoxComponent).configure_from_skill_id(&"atk_sp")
 	agent.anim.action_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
@@ -16,7 +16,7 @@ func _on_anim_done(_action_id: StringName) -> void:
 
 func exit() -> void:
 	var hh := agent as Hahashin
-	if hh and hh.movement_component:
-		hh.movement_component.can_move = true
+	if hh:
+		hh.can_move = true
 	if agent.anim.action_finished.is_connected(_on_anim_done):
 		agent.anim.action_finished.disconnect(_on_anim_done)
