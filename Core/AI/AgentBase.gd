@@ -235,14 +235,6 @@ func try_jump() -> void:
 		_is_falling = false
 		jump_started.emit()
 
-## 当前剩余的空中跳跃次数检查 (例如二段跳还可用).
-func can_air_jump() -> bool:
-	return enable_jump and _current_jump_count > 0 and _current_jump_count < max_jump_count
-
-## 当前已使用的跳跃次数 getter.
-func get_jump_count() -> int:
-	return _current_jump_count
-
 ## 当前朝向符号: +1 = 朝右, -1 = 朝左.
 ## 由 sprite.flip_h 推导, 与 sprite_faces_right 配合 (与 _update_facing 一致).
 func get_facing_sign() -> int:
