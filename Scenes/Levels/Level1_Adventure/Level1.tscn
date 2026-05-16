@@ -17,13 +17,8 @@
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/SkullBlue/SkullBlue.tscn" id="20_skullblue"]
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Cyclope/Cyclope.tscn" id="21_cyclope"]
 [ext_resource type="PackedScene" uid="uid://dbpf2ynq77ulh" path="res://Scenes/Characters/Enemies/Bear/Bear.tscn" id="22_bear"]
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Spirit/Spirit.tscn" id="23_spirit"]
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/BlueBat/BlueBat.tscn" id="24_bluebat"]
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Dragon/Dragon.tscn" id="25_dragon"]
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Mouse/Mouse.tscn" id="26_mouse"]
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Flam/Flam.tscn" id="27_flam"]
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Slime/Slime.tscn" id="28_slime"]
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Lizard/Lizard.tscn" id="29_lizard"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_48n4d"]
 texture = ExtResource("2_tiles")
@@ -3515,26 +3510,11 @@ position = Vector2(802, 490)
 [node name="Bear" parent="Enemies" unique_id=2084697328 instance=ExtResource("22_bear")]
 position = Vector2(1291, 426)
 
-[node name="Spirit" parent="Enemies" unique_id=775898609 instance=ExtResource("23_spirit")]
-position = Vector2(1583, 426)
-
-[node name="BlueBat" parent="Enemies" unique_id=1974295926 instance=ExtResource("24_bluebat")]
-position = Vector2(1774, 540)
-
 [node name="Dragon" parent="Enemies" unique_id=580999754 instance=ExtResource("25_dragon")]
 position = Vector2(2125, 449)
 
-[node name="Mouse" parent="Enemies" unique_id=1257851503 instance=ExtResource("26_mouse")]
-position = Vector2(2378, 445)
-
-[node name="Flam" parent="Enemies" unique_id=569195535 instance=ExtResource("27_flam")]
-position = Vector2(2649, 445)
-
 [node name="Slime" parent="Enemies" unique_id=992497310 instance=ExtResource("28_slime")]
 position = Vector2(3007, 443)
-
-[node name="Lizard" parent="Enemies" unique_id=646848529 instance=ExtResource("29_lizard")]
-position = Vector2(3215, 439)
 
 [node name="Portal" parent="." unique_id=798825915 instance=ExtResource("7_portal")]
 position = Vector2(3429, 361)
