@@ -41,14 +41,23 @@ func spawn_projectile() -> void:
 	if not scene:
 		return
 	var proj := scene.instantiate()
-	owner_node.get_tree().root.add_child(proj)
-	proj.global_position = (owner_node as Node2D).global_position + skill.params.get(&"spawn_offset", Vector2.ZERO)
+	var offset: Vector2 = skill.params.get(&"spawn_offset", Vector2.ZERO)
+	var origin: Vector2 = (owner_node as Node2D).global_position
+	# attach_to_agent: 持续型攻击(激光等)挂在 agent 下,跟随移动不脱节
+	if skill.params.get(&"attach_to_agent", false):
+		owner_node.add_child(proj)
+		if proj is Node2D:
+			(proj as Node2D).position = offset
+	else:
+		owner_node.get_tree().root.add_child(proj)
+		if proj is Node2D:
+			(proj as Node2D).global_position = origin + offset
 	var proj_hitbox: HitBoxComponent = proj.get_node_or_null(^"HitBoxComponent")
 	if proj_hitbox:
 		proj_hitbox.configure_from_skill(skill)
-	var target_pos: Vector2 = bb.get_var(&"target_position", (owner_node as Node2D).global_position)
+	var target_pos: Vector2 = bb.get_var(&"target_position", origin)
 	if proj.has_method(&"set_direction"):
-		proj.set_direction((target_pos - proj.global_position).normalized())
+		proj.set_direction((target_pos - origin).normalized())
 
 ## 动画 method call track 调用：生成实体（陷阱、特效等）
 func spawn_entity() -> void:

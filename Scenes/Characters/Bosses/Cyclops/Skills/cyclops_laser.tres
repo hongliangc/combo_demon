@@ -22,5 +22,6 @@ interruptible = true
 params = {
 &"animation": &"attack_laser",
 &"projectile_scene": ExtResource("2_laser"),
-&"spawn_offset": Vector2(0, 0)
+&"spawn_offset": Vector2(0, 0),
+&"attach_to_agent": true
 }

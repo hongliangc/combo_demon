@@ -54,6 +54,10 @@ func _exit_tree() -> void:
 	if collision_shape:
 		collision_shape.shape = null
 
+## 由 GenericAttackState.spawn_projectile 在生成时调用,设定激光初始朝向。
+func set_direction(dir: Vector2) -> void:
+	rotation = dir.angle()
+
 func _process(delta: float) -> void:
 	match state:
 		"charging":
