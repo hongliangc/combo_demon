@@ -8,7 +8,6 @@ class_name AnimationPlayerBackend extends AnimationBackend
 @export var idle_speed_threshold: float = 5.0
 
 var player: AnimationPlayer
-var owner_node: Node
 
 ## 上一次请求的 locomotion 动画 — 用它而非 player.current_animation 判定,
 ## 避免单次动画(j_up/j_down)播完后 current_animation 清空导致重复 replay。
@@ -18,7 +17,6 @@ func _ready() -> void:
 	player = get_node_or_null(player_path) as AnimationPlayer
 	if player:
 		player.animation_finished.connect(_on_anim_finished)
-	owner_node = get_owner()
 
 func update_locomotion(velocity: Vector2, on_floor: bool) -> void:
 	if _current_action != &"" or player == null:

@@ -6,6 +6,7 @@ func enter() -> void:
 	var hh := agent as Hahashin
 	if hh:
 		hh.can_move = false
+		hh.velocity.x = 0.0  # 攻击期间锁住水平移动,不让跑动惯性带着滑
 	var skill_id := hh.pending_skill_id
 	hh.pending_skill_id = &""
 	if skill_id == &"":

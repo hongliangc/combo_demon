@@ -6,6 +6,7 @@ func enter() -> void:
 	var hh := agent as Hahashin
 	if hh:
 		hh.can_move = false
+		hh.velocity.x = 0.0  # 技能期间锁住水平移动
 	if agent.hitbox is HitBoxComponent:
 		(agent.hitbox as HitBoxComponent).configure_from_skill_id(&"atk_sp")
 	agent.anim.action_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
