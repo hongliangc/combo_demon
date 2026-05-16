@@ -17,7 +17,7 @@ func test_tick_without_backend_does_not_crash() -> void:
 	var driver := AnimationDriver.new()
 	add_child_autofree(driver)
 	driver.setup()
-	driver.tick(Vector2(100, 0))   # no backend — must not crash
+	driver.tick(Vector2(100, 0), true)   # no backend — must not crash
 	assert_true(true, "no crash — null-safe tick guard works")
 
 func test_action_finished_propagates_from_backend() -> void:
@@ -46,7 +46,7 @@ func test_has_action_returns_false_without_backend() -> void:
 	assert_false(driver.has_action(&"attack"))
 
 func test_tick_delegates_velocity_to_backend() -> void:
-	## Verify Driver.tick(velocity) calls backend.update_locomotion(velocity).
+	## Verify Driver.tick(velocity, on_floor) calls backend.update_locomotion(...).
 	## Uses AnimationPlayerBackend (already tested) as concrete stub.
 	var driver := AnimationDriver.new()
 	var ap := AnimationPlayer.new()
@@ -63,7 +63,7 @@ func test_tick_delegates_velocity_to_backend() -> void:
 	driver.add_child(b)
 	add_child_autofree(driver)
 	driver.setup()
-	driver.tick(Vector2(100, 0))
+	driver.tick(Vector2(100, 0), true)
 	assert_eq(ap.current_animation, "walk", "tick(walk velocity) → walk anim")
-	driver.tick(Vector2.ZERO)
+	driver.tick(Vector2.ZERO, true)
 	assert_eq(ap.current_animation, "idle", "tick(zero velocity) → idle anim")

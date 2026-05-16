@@ -51,12 +51,12 @@ func _make_player_backend() -> AnimationPlayerBackend:
 
 func test_player_backend_plays_idle_when_stopped() -> void:
 	var b := _make_player_backend()
-	b.update_locomotion(Vector2.ZERO)
+	b.update_locomotion(Vector2.ZERO, true)
 	assert_eq(b.player.current_animation, "idle")
 
 func test_player_backend_plays_walk_when_moving() -> void:
 	var b := _make_player_backend()
-	b.update_locomotion(Vector2(100, 0))
+	b.update_locomotion(Vector2(100, 0), true)
 	assert_eq(b.player.current_animation, "walk")
 
 func test_player_backend_sets_current_action_on_play() -> void:
@@ -67,7 +67,7 @@ func test_player_backend_sets_current_action_on_play() -> void:
 func test_player_backend_skips_locomotion_during_action() -> void:
 	var b := _make_player_backend()
 	b.play_action(&"attack")
-	b.update_locomotion(Vector2.ZERO)
+	b.update_locomotion(Vector2.ZERO, true)
 	assert_eq(b.player.current_animation, "attack",
 		"locomotion must not override an active action")
 
