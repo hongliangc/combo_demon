@@ -1,3 +1,6 @@
+## DEPRECATED — slated for deletion in Phase 6.
+## New code MUST use Skill.damage_amount / damage_tags / attached_buffs and HitBoxComponent inline fields.
+## Do not add new callsites.
 extends Resource
 class_name Damage
 

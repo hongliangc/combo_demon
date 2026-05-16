@@ -9,9 +9,8 @@ var _timer: Timer
 func enter() -> void:
 	if owner_node is CharacterBody2D:
 		(owner_node as CharacterBody2D).velocity = Vector2.ZERO
-	if "anim_player" in owner_node and owner_node.anim_player:
-		if owner_node.anim_player.has_animation(&"stunned"):
-			owner_node.anim_player.play(&"stunned")
+	if agent and agent.anim.has_action(&"stunned"):
+		agent.anim.play_action(&"stunned")
 	_ensure_timer()
 	_timer.wait_time = default_duration
 	_timer.start()

@@ -17,5 +17,5 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	for body in _push_zone.get_overlapping_bodies():
-		if body is PlayerBase:
+		if body.is_in_group(&"player"):
 			body.velocity += push_direction.normalized() * push_force * _delta

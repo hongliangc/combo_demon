@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cv33upoe3fq1b" path="res://Core/Components/HealthComponent.gd" id="3_health"]
 [ext_resource type="Script" uid="uid://ddn5uriyxwwl8" path="res://Core/StateMachine/EnemyStateMachine.gd" id="4_state_machine"]
 [ext_resource type="Script" uid="uid://cu68vwy5tvkr4" path="res://Core/Components/HitBoxComponent.gd" id="5_hitbox"]
+[ext_resource type="Script" uid="uid://dlr87hqkwckdm" path="res://Core/Damage/DamagePipeline.gd" id="14_pipeline"]
 [ext_resource type="Script" uid="uid://bmcqbqdytrj1v" path="res://Core/StateMachine/CommonStates/IdleState.gd" id="6_idle"]
 [ext_resource type="Script" uid="uid://dge6kddf2t82i" path="res://Core/StateMachine/CommonStates/WanderState.gd" id="7_wander"]
 [ext_resource type="Script" uid="uid://b83ysewfnyeco" path="res://Core/StateMachine/CommonStates/ChaseState.gd" id="8_chase"]
@@ -285,5 +286,8 @@ script = SubResource("GDScript_healthbar")
 position = Vector2(0, -11)
 
 [node name="AttackAnchor" type="Node2D" parent="." unique_id=1584420404]
+
+[node name="DamagePipeline" type="Node" parent="." unique_id=1584420405]
+script = ExtResource("14_pipeline")
 
 [connection signal="health_changed" from="HealthComponent" to="HealthBar" method="on_health_changed"]

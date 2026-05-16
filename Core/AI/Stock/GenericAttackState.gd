@@ -9,26 +9,27 @@ func enter() -> void:
 	if not skill:
 		_finish()
 		return
+	if skill and agent and agent.hitbox is HitBoxComponent:
+		(agent.hitbox as HitBoxComponent).configure_from_skill(skill)
 	if owner_node is CharacterBody2D:
 		(owner_node as CharacterBody2D).velocity = Vector2.ZERO
-	var anim_name = skill.params.get(&"animation", &"")
-	if anim_name and "anim_player" in owner_node and owner_node.anim_player:
-		owner_node.anim_player.play(anim_name)
-		owner_node.anim_player.animation_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
-	else:
+	var anim_name: StringName = skill.params.get(&"animation", &"")
+	if anim_name == &"" or not agent.anim.has_action(anim_name):
 		_finish()
 		return
+	agent.anim.action_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
+	agent.anim.play_action(anim_name)
 	var spd: float = skill.params.get(&"speed", 0.0)
 	if spd > 0 and owner_node is CharacterBody2D:
 		var dir_key: StringName = skill.params.get(&"direction", &"forward")
 		(owner_node as CharacterBody2D).velocity.x = _resolve_direction(dir_key) * spd
 
 func exit() -> void:
-	if "anim_player" in owner_node and owner_node.anim_player:
-		if owner_node.anim_player.animation_finished.is_connected(_on_anim_done):
-			owner_node.anim_player.animation_finished.disconnect(_on_anim_done)
+	if agent.anim.action_finished.is_connected(_on_anim_done):
+		agent.anim.action_finished.disconnect(_on_anim_done)
+	agent.anim.stop_action()
 
-func _on_anim_done(_anim_name: StringName) -> void:
+func _on_anim_done(_action_id: StringName) -> void:
 	_finish()
 
 ## 动画 method call track 调用：生成投射物
@@ -40,11 +41,23 @@ func spawn_projectile() -> void:
 	if not scene:
 		return
 	var proj := scene.instantiate()
-	owner_node.get_tree().root.add_child(proj)
-	proj.global_position = (owner_node as Node2D).global_position + skill.params.get(&"spawn_offset", Vector2.ZERO)
-	var target_pos: Vector2 = bb.get_var(&"target_position", (owner_node as Node2D).global_position)
+	var offset: Vector2 = skill.params.get(&"spawn_offset", Vector2.ZERO)
+	var origin: Vector2 = (owner_node as Node2D).global_position
+	# attach_to_agent: 持续型攻击(激光等)挂在 agent 下,跟随移动不脱节
+	if skill.params.get(&"attach_to_agent", false):
+		owner_node.add_child(proj)
+		if proj is Node2D:
+			(proj as Node2D).position = offset
+	else:
+		owner_node.get_tree().root.add_child(proj)
+		if proj is Node2D:
+			(proj as Node2D).global_position = origin + offset
+	var proj_hitbox: HitBoxComponent = proj.get_node_or_null(^"HitBoxComponent")
+	if proj_hitbox:
+		proj_hitbox.configure_from_skill(skill)
+	var target_pos: Vector2 = bb.get_var(&"target_position", origin)
 	if proj.has_method(&"set_direction"):
-		proj.set_direction((target_pos - proj.global_position).normalized())
+		proj.set_direction((target_pos - origin).normalized())
 
 ## 动画 method call track 调用：生成实体（陷阱、特效等）
 func spawn_entity() -> void:
@@ -57,6 +70,9 @@ func spawn_entity() -> void:
 	var entity := scene.instantiate()
 	owner_node.get_tree().root.add_child(entity)
 	entity.global_position = (owner_node as Node2D).global_position + skill.params.get(&"spawn_offset", Vector2.ZERO)
+	var entity_hitbox: HitBoxComponent = entity.get_node_or_null(^"HitBoxComponent")
+	if entity_hitbox:
+		entity_hitbox.configure_from_skill(skill)
 
 ## 动画 method call track 调用：调用 owner_node 上的方法
 ## 用于 BuffEntity 框架到位前的过渡方案

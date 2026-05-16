@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bp52vndrtujng" path="res://Core/AI/ComboSkill.gd" id="1"]
 [ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="2"]
+[ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="3_buff"]
+[ext_resource type="Resource" path="res://Core/Buffs/library/stun_short.tres" id="4_stun"]
 
 [sub_resource type="Resource" id="sub_1"]
 script = ExtResource("2")
@@ -9,6 +11,9 @@ id = &"combo_step1"
 params = {
 &"animation": &"cleave"
 }
+damage_amount = 10.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 
 [sub_resource type="Resource" id="sub_2"]
 script = ExtResource("2")
@@ -16,6 +21,9 @@ id = &"combo_step2"
 params = {
 &"animation": &"cleave"
 }
+damage_amount = 10.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 
 [resource]
 script = ExtResource("1")

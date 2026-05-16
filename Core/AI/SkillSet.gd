@@ -38,7 +38,7 @@ func start_cooldown(skill_id: StringName) -> void:
 	if s:
 		_cooldowns[s.id] = s.cooldown
 
-## 每帧扣减冷却（由 AgentAIBase._physics_process 调用）
+## 每帧扣减冷却（由 AgentBase._physics_process 调用）
 func tick(delta: float) -> void:
 	for id in _cooldowns:
 		if _cooldowns[id] > 0:
@@ -47,6 +47,13 @@ func tick(delta: float) -> void:
 ## 读取某技能当前剩余冷却
 func get_cooldown(skill_id: StringName) -> float:
 	return _cooldowns.get(skill_id, 0.0)
+
+## 按 id 查找技能。未找到时 push_warning 并返回 null。
+func get_skill(id: StringName) -> Skill:
+	var s := _find_skill(id)
+	if s == null:
+		push_warning("SkillSet.get_skill: id '%s' not found" % id)
+	return s
 
 # ---- 内部 ----
 

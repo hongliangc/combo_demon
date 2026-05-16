@@ -2,6 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://dhm2ajbsbff8e" path="res://Scenes/Characters/Templates/PlayerBase.tscn" id="1_le18f"]
 [ext_resource type="Texture2D" uid="uid://s5f3hhdknhre" path="res://Assets/Art/Princess/SeparateAnim/Walk.png" id="2_dxx8v"]
+[ext_resource type="Script" path="res://Scenes/Characters/Player/Princess/Princess.gd" id="3_princess"]
+[ext_resource type="Script" path="res://Core/AI/Stock/DeathState.gd" id="4_death"]
+[ext_resource type="Script" uid="uid://dqnm3j7x8k4p2" path="res://Core/Animation/AnimationPlayerBackend.gd" id="5_anim_backend"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_86e4v"]
 atlas = ExtResource("2_dxx8v")
@@ -250,6 +253,10 @@ tracks/1/keys = {
 "values": ["up_walk"]
 }
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 8.0
+height = 16.0
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ibkkm"]
 _data = {
 &"down_walk": SubResource("Animation_dxx8v"),
@@ -289,6 +296,7 @@ nodes/BlendSpace2D/position = Vector2(-60, 140)
 node_connections = [&"output", 0, &"BlendSpace2D"]
 
 [node name="Princess" unique_id=1179767488 instance=ExtResource("1_le18f")]
+script = ExtResource("3_princess")
 
 [node name="AnimatedSprite2D" parent="." index="1" unique_id=1572817713]
 sprite_frames = SubResource("SpriteFrames_38gkd")
@@ -298,12 +306,19 @@ animation = &"up_walk"
 libraries/ = SubResource("AnimationLibrary_ibkkm")
 
 [node name="AnimationTree" parent="." index="3" unique_id=1041004894]
+active = false
 tree_root = SubResource("AnimationNodeBlendTree_g7rb3")
 parameters/BlendSpace2D/blend_position = Vector2(0.15175092, 0.36760926)
+
+[node name="Backend" type="Node" parent="AnimationDriver" parent_id_path=PackedInt32Array(999888777)]
+script = ExtResource("5_anim_backend")
 
 [node name="HealthBar" parent="." index="8" unique_id=107527890]
 offset_top = -14.0
 offset_bottom = -10.0
 
-[node name="MovementComponent" parent="." index="9" unique_id=1866148992]
-hitbox_node_path = NodePath("../HitBoxComponent")
+[node name="CollisionShape2D" parent="." unique_id=884594291]
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="Death" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+script = ExtResource("4_death")

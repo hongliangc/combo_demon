@@ -5,3 +5,6 @@
 *.import
 Assets
 addons
+
+# Claude Code runtime artifacts
+.claude/scheduled_tasks.lock

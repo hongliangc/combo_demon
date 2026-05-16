@@ -6,7 +6,8 @@ class_name BossAOE
 @export var expand_time := 0.8        # 扩散时间
 @export var hold_time := 0.5          # 保持时间
 @export var max_radius := 200.0       # 最大半径
-@export var damage_config: Damage     # 伤害配置
+@export var damage_min: float = 30.0  # 内联最小伤害
+@export var damage_max: float = 50.0  # 内联最大伤害
 
 const SPRITE_BASE_SIZE := 50.0
 
@@ -83,15 +84,9 @@ func _on_area_entered(entered_area: Area2D) -> void:
 	if entered_area is HurtBoxComponent and entered_area not in damaged_targets:
 		damaged_targets.append(entered_area)
 
-		# 造成伤害
-		if damage_config:
-			var damage_copy = damage_config.duplicate(true)
-			damage_copy.randomize_damage()
-			entered_area.take_damage(damage_copy)
-		else:
-			# 默认伤害
-			var default_damage = Damage.new()
-			default_damage.min_amount = 30
-			default_damage.max_amount = 50
-			default_damage.randomize_damage()
-			entered_area.take_damage(default_damage)
+		# 内联伤害（不再使用 Damage Resource @export）
+		var damage := Damage.new()
+		damage.min_amount = damage_min
+		damage.max_amount = damage_max
+		damage.randomize_damage()
+		entered_area.take_damage(damage)

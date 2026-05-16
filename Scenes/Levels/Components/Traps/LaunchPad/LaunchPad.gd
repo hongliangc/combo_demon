@@ -22,7 +22,7 @@ func _on_trap_ready() -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if not is_active or _cooldown_timer > 0.0:
 		return
-	if body is PlayerBase:
+	if body.is_in_group(&"player"):
 		_cooldown_timer = damage_cooldown
 		var dir := launch_direction.normalized()
 		body.velocity = dir * launch_force

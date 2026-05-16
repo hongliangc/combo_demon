@@ -19,7 +19,7 @@ func before_each() -> void:
 	_victim_bc = _victim.get_node(^"BuffController")
 
 func test_on_damaged_pushes_attacker() -> void:
-	var kb := KnockBackEffectBuff.new()
+	var kb := KnockBackBuffEffect.new()
 	kb.force = 300.0
 	kb.effect_on = BuffEffect.EffectOn.ON_DAMAGED
 	_victim_bc.apply(H.create_buff_entity(&"thorns", 0.0, [kb]), null, _victim.global_position)

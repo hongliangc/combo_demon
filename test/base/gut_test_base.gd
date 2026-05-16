@@ -23,7 +23,7 @@ func create_stun_damage(_amount: float = 10.0, _stun_duration: float = 1.5) -> D
 	return create_damage(_amount)
 
 
-## Pending: rewrite via KnockBackEffectBuff in Cyclops/DS2 migration.
+## Pending: rewrite via KnockBackBuffEffect in Cyclops/DS2 migration.
 func create_knockback_damage(_amount: float = 10.0, _force: float = 300.0) -> Damage:
 	return create_damage(_amount)
 

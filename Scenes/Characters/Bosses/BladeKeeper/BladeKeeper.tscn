@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bics1mnpd7xx4"]
 
-[ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentAIBase.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentBase.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://cxftsuikhh8cy" path="res://Scenes/Characters/Bosses/BladeKeeper/BladeKeeper.gd" id="2_bk"]
 [ext_resource type="Texture2D" uid="uid://c3p8ryejbadlq" path="res://Assets/Art/BLADE_KEEPER/PNG animations/07_1_atk/07_1_atk_1.png" id="3_5jd21"]
 [ext_resource type="Script" uid="uid://canuj30luhst1" path="res://Core/AI/Stock/ApproachState.gd" id="3_approach"]
@@ -145,6 +145,13 @@
 [ext_resource type="Resource" uid="uid://5l5b1x71gsgj" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_atk_heavy.tres" id="skill_heavy"]
 [ext_resource type="Resource" uid="uid://b87j0dgmk7h7q" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_throw_sword.tres" id="skill_throw"]
 [ext_resource type="Resource" uid="uid://bgnrbkgrl14ux" path="res://Scenes/Characters/Bosses/BladeKeeper/skills/bk_place_trap.tres" id="skill_trap"]
+[ext_resource type="Script" uid="uid://bvvnhbufppo8" path="res://Core/AI/Stock/IdleState.gd" id="stock_idle"]
+[ext_resource type="Script" uid="uid://beqjsx7b4cg0n" path="res://Core/AI/Stock/ChaseState.gd" id="stock_chase"]
+[ext_resource type="Script" uid="uid://c00p727wgkv03" path="res://Core/AI/Stock/HitState.gd" id="stock_hit"]
+[ext_resource type="Script" uid="uid://c8dyu2kanm807" path="res://Core/AI/Stock/DeathState.gd" id="stock_death"]
+[ext_resource type="Script" uid="uid://ddwmjtmp1g8e2" path="res://Core/AI/Stock/AttackDispatcher.gd" id="stock_dispatcher"]
+[ext_resource type="Script" uid="uid://bky6akb84sun2" path="res://Core/AI/Stock/GenericAttackState.gd" id="stock_generic_attack"]
+[ext_resource type="Script" uid="uid://dok0elg2cedvk" path="res://Core/AI/Stock/ComboState.gd" id="stock_combo"]
 
 [sub_resource type="Animation" id="Animation_52y2t"]
 length = 0.001
@@ -528,7 +535,7 @@ tracks/1/keys = {
 tracks/2/type = "method"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("AIController/StateMachine/GenericAttack")
+tracks/2/path = NodePath("StateController/GenericAttack")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -678,7 +685,7 @@ tracks/1/keys = {
 tracks/2/type = "method"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("AIController/StateMachine/GenericAttack")
+tracks/2/path = NodePath("StateController/GenericAttack")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -809,7 +816,7 @@ tracks/1/keys = {
 tracks/2/type = "method"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("AIController/StateMachine/GenericAttack")
+tracks/2/path = NodePath("StateController/GenericAttack")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -1394,11 +1401,29 @@ target_position = Vector2(-25, 0)
 [node name="WallCastR" parent="." index="10" unique_id=1100000004]
 target_position = Vector2(25, 0)
 
-[node name="Chase" parent="AIController/StateMachine" parent_id_path=PackedInt32Array(193203180) index="1" unique_id=942496324]
+[node name="Chase" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="1" unique_id=942496324]
 stop_distance = 20.0
 
-[node name="Approach" type="Node" parent="AIController/StateMachine" parent_id_path=PackedInt32Array(193203180) index="7" unique_id=1924881132]
+[node name="Approach" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="7" unique_id=1924881132]
 script = ExtResource("3_approach")
+
+[node name="Idle" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="0" unique_id=2065975853]
+script = ExtResource("stock_idle")
+
+[node name="Hit" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="2" unique_id=158595046]
+script = ExtResource("stock_hit")
+
+[node name="Death" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="3" unique_id=551432475]
+script = ExtResource("stock_death")
+
+[node name="Dispatcher" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="4" unique_id=573801613]
+script = ExtResource("stock_dispatcher")
+
+[node name="GenericAttack" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="5" unique_id=1943725742]
+script = ExtResource("stock_generic_attack")
+
+[node name="Combo" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="6" unique_id=1022768555]
+script = ExtResource("stock_combo")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="12" unique_id=743241760]
 position = Vector2(0, -42)

@@ -126,7 +126,7 @@ func _create_default_character() -> void:
 	default_char.id = "hahashin"
 	default_char.display_name = "哈哈辛"
 	default_char.description = "一位敏捷的战士，擅长近战连击攻击。"
-	default_char.scene_path = "res://Scenes/Characters/Player/Hahashin.tscn"
+	default_char.scene_path = "res://Scenes/Characters/Player/Hahashin/Hahashin.tscn"
 	default_char.base_health = 100.0
 	default_char.base_speed = 100.0
 	default_char.base_damage = 10.0

@@ -22,7 +22,7 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 
 func _on_body_entered(body: Node2D) -> void:
-	if body is PlayerBase:
+	if body.is_in_group(&"player"):
 		var hurt_box: HurtBoxComponent = body.get_node_or_null("HurtBoxComponent")
 		if hurt_box and damage:
 			hurt_box.take_damage(damage, global_position)

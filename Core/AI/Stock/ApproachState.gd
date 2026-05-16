@@ -14,10 +14,10 @@ func enter() -> void:
 	if not skill:
 		_finish()
 		return
-	var anim_name = skill.params.get(&"animation", &"")
-	if anim_name and "anim_player" in owner_node and owner_node.anim_player:
-		owner_node.anim_player.play(anim_name)
-		owner_node.anim_player.animation_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
+	var anim_name: StringName = skill.params.get(&"animation", &"")
+	if anim_name != &"" and agent and agent.anim.has_action(anim_name):
+		agent.anim.action_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
+		agent.anim.play_action(anim_name)
 
 func physics_update(_delta: float) -> void:
 	var skill: Skill = ai.current_skill
@@ -31,9 +31,8 @@ func physics_update(_delta: float) -> void:
 		_finish()
 
 func exit() -> void:
-	if "anim_player" in owner_node and owner_node.anim_player:
-		if owner_node.anim_player.animation_finished.is_connected(_on_anim_done):
-			owner_node.anim_player.animation_finished.disconnect(_on_anim_done)
+	if agent and agent.anim.action_finished.is_connected(_on_anim_done):
+		agent.anim.action_finished.disconnect(_on_anim_done)
 
-func _on_anim_done(_anim_name: StringName) -> void:
+func _on_anim_done(_action_id: StringName) -> void:
 	_finish()

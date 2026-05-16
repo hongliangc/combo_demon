@@ -36,19 +36,12 @@ func enter() -> void:
 
 ## 动画解析顺序: buff 指定 → 通用 "hit" → 白闪
 func _play_anim_or_fallback(anim_key: StringName) -> void:
-	if not ("anim_player" in owner_node) or not owner_node.anim_player:
+	if agent.anim.has_action(anim_key):
+		agent.anim.play_action(anim_key)
+	elif anim_key != &"hit" and agent.anim.has_action(&"hit"):
+		agent.anim.play_action(&"hit")
+	else:
 		HitFlashHelperRef.flash(owner_node)
-		return
-	var ap = owner_node.anim_player
-	if ap.has_animation(anim_key):
-		ap.play(anim_key)
-		ap.seek(0.0, true)
-		return
-	if anim_key != &"hit" and ap.has_animation(&"hit"):
-		ap.play(&"hit")
-		ap.seek(0.0, true)
-		return
-	HitFlashHelperRef.flash(owner_node)
 
 
 func physics_update(delta: float) -> void:

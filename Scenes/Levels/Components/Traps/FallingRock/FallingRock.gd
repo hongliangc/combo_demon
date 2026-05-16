@@ -39,7 +39,7 @@ func _process(delta: float) -> void:
 			_land()
 
 func _on_trigger_entered(body: Node2D) -> void:
-	if body is PlayerBase and not _is_falling and not _has_landed:
+	if body.is_in_group(&"player") and not _is_falling and not _has_landed:
 		_start_warning()
 
 func _on_rock_hit(body: Node2D) -> void:

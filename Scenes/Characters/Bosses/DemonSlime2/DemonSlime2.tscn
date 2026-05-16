@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://30x40w2knf12"]
 
-[ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentAIBase.tscn" id="1_base"]
+[ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentBase.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://djpbwvbtaj8l2" path="res://Scenes/Characters/Bosses/DemonSlime2/DemonSlime2.gd" id="2_ds2"]
+[ext_resource type="Script" uid="uid://dqnm3j7x8k4p2" path="res://Core/Animation/AnimationPlayerBackend.gd" id="anim_backend_ds2"]
 [ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="3_f7x63"]
 [ext_resource type="Texture2D" uid="uid://rk3jw00vr7qe" path="res://Assets/Art/BOSS_SLIME/individual sprites/01_demon_idle/demon_idle_1.png" id="3_jv4bq"]
 [ext_resource type="Texture2D" uid="uid://dgfrneu7vdxct" path="res://Assets/Art/BOSS_SLIME/individual sprites/03_demon_cleave/demon_cleave_1.png" id="3_nnifj"]
@@ -66,6 +67,13 @@
 [ext_resource type="Texture2D" uid="uid://bxyfscfpirpwl" path="res://Assets/Art/BOSS_SLIME/individual sprites/02_demon_walk/demon_walk_10.png" id="60_bu1g4"]
 [ext_resource type="Texture2D" uid="uid://hfi3s4kwg62a" path="res://Assets/Art/BOSS_SLIME/individual sprites/02_demon_walk/demon_walk_11.png" id="61_un4o3"]
 [ext_resource type="Texture2D" uid="uid://binqttryphabc" path="res://Assets/Art/BOSS_SLIME/individual sprites/02_demon_walk/demon_walk_12.png" id="62_qhjjp"]
+[ext_resource type="Script" uid="uid://bvvnhbufppo8" path="res://Core/AI/Stock/IdleState.gd" id="stock_idle"]
+[ext_resource type="Script" uid="uid://beqjsx7b4cg0n" path="res://Core/AI/Stock/ChaseState.gd" id="stock_chase"]
+[ext_resource type="Script" uid="uid://c00p727wgkv03" path="res://Core/AI/Stock/HitState.gd" id="stock_hit"]
+[ext_resource type="Script" uid="uid://c8dyu2kanm807" path="res://Core/AI/Stock/DeathState.gd" id="stock_death"]
+[ext_resource type="Script" uid="uid://ddwmjtmp1g8e2" path="res://Core/AI/Stock/AttackDispatcher.gd" id="stock_dispatcher"]
+[ext_resource type="Script" uid="uid://bky6akb84sun2" path="res://Core/AI/Stock/GenericAttackState.gd" id="stock_generic_attack"]
+[ext_resource type="Script" uid="uid://dok0elg2cedvk" path="res://Core/AI/Stock/ComboState.gd" id="stock_combo"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_yys3b"]
 animations = [{
@@ -527,6 +535,9 @@ animation = &"hit"
 [node name="AnimationPlayer" parent="." index="1" unique_id=710612678]
 libraries/ = SubResource("AnimationLibrary_jwtmc")
 
+[node name="Backend" type="Node" parent="AnimationDriver" parent_id_path=PackedInt32Array(999888777)]
+script = ExtResource("anim_backend_ds2")
+
 [node name="CollisionShape2D" parent="." index="2" unique_id=884594291]
 position = Vector2(-1, 39)
 shape = SubResource("CapsuleShape2D_nnifj")
@@ -561,3 +572,23 @@ target_position = Vector2(0, 50)
 
 [node name="FloorCastR" parent="." index="9" unique_id=1100000002]
 target_position = Vector2(0, 50)
+[node name="Idle" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="0" unique_id=2065975853]
+script = ExtResource("stock_idle")
+
+[node name="Chase" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="1" unique_id=942496324]
+script = ExtResource("stock_chase")
+
+[node name="Hit" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="2" unique_id=158595046]
+script = ExtResource("stock_hit")
+
+[node name="Death" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="3" unique_id=551432475]
+script = ExtResource("stock_death")
+
+[node name="Dispatcher" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="4" unique_id=573801613]
+script = ExtResource("stock_dispatcher")
+
+[node name="GenericAttack" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="5" unique_id=1943725742]
+script = ExtResource("stock_generic_attack")
+
+[node name="Combo" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180) index="6" unique_id=1022768555]
+script = ExtResource("stock_combo")

@@ -5,7 +5,6 @@ class_name BossProjectile
 
 @export var speed := 300.0
 @export var lifetime := 5.0
-@export var damage_config: Damage  # 可以在编辑器中配置伤害
 
 var direction := Vector2.RIGHT
 var velocity := Vector2.ZERO
@@ -20,10 +19,6 @@ func _ready() -> void:
 	# 设置自动销毁
 	var timer = get_tree().create_timer(lifetime)
 	timer.timeout.connect(_on_lifetime_expired)
-
-	# 如果有配置的伤害，应用到 HitBoxComponent
-	if damage_config and hitbox:
-		hitbox.damage = damage_config
 
 func _physics_process(delta: float) -> void:
 	velocity = direction * speed

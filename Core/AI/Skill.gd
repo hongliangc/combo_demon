@@ -31,3 +31,11 @@ class_name Skill extends Resource
 # ==== 执行层（State 读取）====
 ## 状态专属参数字典
 @export var params: Dictionary = {}
+
+# ==== 伤害层（HitBox 在 Skill fire 时读入）====
+## HitBox 命中时基础伤害值（实际命中走 DamagePipeline.amount）
+@export var damage_amount: float = 0.0
+## DamageTags bitmask（Physical/Magical/DOT/Crit/True 等）
+@export_flags("Physical:1","Magical:2","DOT:4","Crit:8","True:16") var damage_tags: int = 0
+## 命中时挂在受击者身上的 BuffEntity 列表
+@export var attached_buffs: Array[BuffEntity] = []

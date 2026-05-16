@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=4 format=3 uid="uid://afqyeeo8urcgk"]
+
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="1"]
+[ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="2_buff"]
+[ext_resource type="Resource" path="res://Core/Buffs/library/force_stun.tres" id="3_fs"]
+
+[resource]
+script = ExtResource("1")
+id = &"atk_sp"
+state_name = &"specialattack"
+cooldown = 0.0
+weight = 1
+min_phase = 0
+tags = Array[StringName]([&"melee", &"special"])
+damage_amount = 25.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("2_buff")]([ExtResource("3_fs")])
+params = {
+&"animation": &"atk_sp"
+}

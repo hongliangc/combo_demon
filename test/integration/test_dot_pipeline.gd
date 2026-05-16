@@ -25,7 +25,7 @@ func before_each() -> void:
 			_react_called = true)
 
 func _make_poison() -> BuffEntity:
-	var e := DamageEffectBuff.new()
+	var e := DamageBuffEffect.new()
 	e.amount = 5.0
 	e.tick_interval = 0.5
 	e.damage_tags = DamageTags.MAGICAL
@@ -52,7 +52,7 @@ func test_dot_skips_react_for_hit_state() -> void:
 	assert_false(_react_called, "DoT should not invoke react listener that filters non-DOT")
 
 func test_dot_benefits_from_defense_buff() -> void:
-	var def := StatModEffect.new()
+	var def := StatModBuffEffect.new()
 	def.stat_id = StatIds.INCOMING_DAMAGE
 	def.multiplier = 0.5
 	_bc.apply(H.create_buff_entity(&"def", 10.0, [def]), null, _actor.global_position)

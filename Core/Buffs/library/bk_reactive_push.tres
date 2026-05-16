@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
 [ext_resource type="Script" uid="uid://b1nwuwgh80wpm" path="res://Core/Buffs/BuffEffect.gd" id="1_oqcql"]
-[ext_resource type="Script" uid="uid://1rkyibv0m1h5" path="res://Core/Buffs/effects/KnockBackEffectBuff.gd" id="2_kb"]
+[ext_resource type="Script" uid="uid://g6oyawsut5ff" path="res://Core/Buffs/effects/KnockBackBuffEffect.gd" id="2_kb"]
 
 [sub_resource type="Resource" id="KB_push"]
 script = ExtResource("2_kb")

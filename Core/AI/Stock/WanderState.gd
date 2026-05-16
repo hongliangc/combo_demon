@@ -11,9 +11,6 @@ var _timer: Timer
 
 func enter() -> void:
 	_dir = 1 if randf() < 0.5 else -1
-	if "anim_player" in owner_node and owner_node.anim_player:
-		if owner_node.anim_player.has_animation(&"walk"):
-			owner_node.anim_player.play(&"walk")
 	_ensure_timer()
 	_timer.wait_time = randf_range(min_time, max_time)
 	_timer.start()
