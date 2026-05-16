@@ -16,17 +16,22 @@ func setup() -> void:
 			break
 	if _backend:
 		_backend.action_finished.connect(_on_backend_finished)
+	else:
+		push_warning("AnimationDriver on '%s' has no AnimationBackend child — animations disabled." % [get_parent().name if get_parent() else name])
 
 ## Called by AgentBase._physics_process after move_and_slide(). Drives locomotion.
 ## Driver does not register its own _physics_process — keeps ownership explicit.
-func tick(velocity: Vector2) -> void:
+func tick(velocity: Vector2, on_floor: bool) -> void:
 	if _backend:
-		_backend.update_locomotion(velocity)
+		_backend.update_locomotion(velocity, on_floor)
 
 ## speed_scale: pass 2.0 for Hahashin combo attacks, 1.0 (default) otherwise.
 func play_action(action_id: StringName, speed_scale: float = 1.0) -> void:
 	if _backend:
 		_backend.play_action(action_id, speed_scale)
+	else:
+		# 无 backend 时仍兑现 action_finished 契约,避免等待它的状态卡死。
+		action_finished.emit.call_deferred(action_id)
 
 func stop_action() -> void:
 	if _backend:

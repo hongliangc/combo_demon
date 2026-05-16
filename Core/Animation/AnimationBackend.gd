@@ -4,8 +4,8 @@ signal action_finished(action_id: StringName)
 
 var _current_action: StringName = &""
 
-## Called each physics frame by AnimationDriver with agent velocity.
-func update_locomotion(_velocity: Vector2) -> void:
+## Called each physics frame by AnimationDriver with agent velocity + ground state.
+func update_locomotion(_velocity: Vector2, _on_floor: bool) -> void:
 	pass
 
 ## Execute a one-shot action animation.

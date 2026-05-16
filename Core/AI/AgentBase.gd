@@ -85,7 +85,7 @@ func _physics_process(delta: float) -> void:
 	_update_jump_state()
 
 	if anim:
-		anim.tick(velocity)
+		anim.tick(velocity, is_on_floor())
 	if skill_set:
 		skill_set.tick(delta)
 	if controller:

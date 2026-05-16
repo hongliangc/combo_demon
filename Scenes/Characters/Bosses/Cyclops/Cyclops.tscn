@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://dg8ot3heoutwi"]
+[gd_scene load_steps=19 format=3 uid="uid://dg8ot3heoutwi"]
 
 [ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentBase.tscn" id="1_0i1r4"]
 [ext_resource type="Script" uid="uid://c1uwfenub0wav" path="res://Scenes/Characters/Bosses/Cyclops/Cyclops.gd" id="2_cyclops"]
@@ -15,6 +15,7 @@
 [ext_resource type="Resource" uid="uid://cyclops_proj_skill_v1" path="res://Scenes/Characters/Bosses/Cyclops/Skills/cyclops_projectile.tres" id="13_proj"]
 [ext_resource type="Resource" uid="uid://cyclops_laser_skill_v1" path="res://Scenes/Characters/Bosses/Cyclops/Skills/cyclops_laser.tres" id="14_laser"]
 [ext_resource type="Resource" uid="uid://cyclops_aoe_skill_v1" path="res://Scenes/Characters/Bosses/Cyclops/Skills/cyclops_aoe.tres" id="15_aoe"]
+[ext_resource type="Script" uid="uid://dqnm3j7x8k4p2" path="res://Core/Animation/AnimationPlayerBackend.gd" id="16_anim_backend"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_8s0sm"]
 animations = [{
@@ -78,3 +79,6 @@ script = ExtResource("11_phase")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="13" unique_id=1801209097]
 sprite_frames = SubResource("SpriteFrames_8s0sm")
 animation = &"Sprite"
+
+[node name="Backend" type="Node" parent="AnimationDriver" parent_id_path=PackedInt32Array(999888777)]
+script = ExtResource("16_anim_backend")
