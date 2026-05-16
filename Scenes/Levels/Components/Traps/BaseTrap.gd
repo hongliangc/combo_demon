@@ -47,11 +47,11 @@ func _on_trap_ready() -> void:
 	pass
 
 ## 对目标造成伤害（子类在碰撞回调中调用）
-## @param body: 碰撞到的 CharacterBody2D（通常是 PlayerBase）
+## @param body: 碰撞到的 CharacterBody2D（通常是玩家，"player" 组）
 func _apply_damage_to(body: Node2D) -> void:
 	if not is_active or _cooldown_timer > 0.0:
 		return
-	if not body is PlayerBase:
+	if not body.is_in_group(&"player"):
 		return
 	var hurt_box: HurtBoxComponent = body.get_node_or_null("HurtBoxComponent")
 	if hurt_box == null:

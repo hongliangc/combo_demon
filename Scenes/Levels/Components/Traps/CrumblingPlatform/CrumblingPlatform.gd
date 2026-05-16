@@ -27,7 +27,7 @@ func _ready() -> void:
 	_detect_zone.body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body: Node2D) -> void:
-	if body is PlayerBase and _state == State.SOLID:
+	if body.is_in_group(&"player") and _state == State.SOLID:
 		_start_shake()
 
 func _start_shake() -> void:

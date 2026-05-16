@@ -5,7 +5,7 @@ class_name PlayerHitbox
 ## 只需重写钩子方法，通用逻辑由基类处理
 ## 注意：不覆盖 _ready()，完全依赖基类的信号连接和初始化
 
-@onready var player: PlayerBase = get_owner()
+@onready var player: AgentBase = get_owner()
 
 ## Phase 0 stub — base class no longer exposes `damage`. Hahashin migration in
 ## Phase 1 replaces this whole file with skill-driven configure_from_skill.
