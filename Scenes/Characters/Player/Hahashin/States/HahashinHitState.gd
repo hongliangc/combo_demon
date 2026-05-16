@@ -9,6 +9,10 @@ func enter() -> void:
 	var hh := agent as Hahashin
 	if hh:
 		hh.can_move = false
+		# 受击锁住水平移动,不让跑动惯性滑;knockback buff 标记保留速度时例外。
+		var bc: BuffController = hh.buff_controller
+		if bc == null or not bc.should_preserve_velocity():
+			hh.velocity.x = 0.0
 	agent.anim.action_finished.connect(_on_anim_done, CONNECT_ONE_SHOT)
 	agent.anim.play_action(&"take_hit")
 
