@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://forestbee_sting_v1"]
+
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"forestbee_sting"
+state_name = &"genericattack"
+cooldown = 1.5
+weight = 1
+max_range = 30.0
+tags = Array[StringName]([&"melee"])
+damage_amount = 10.0
+damage_tags = 1
+params = {
+&"animation": &"attack",
+&"global_cooldown": 0.4
+}
