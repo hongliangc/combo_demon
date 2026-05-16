@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cdy8ewoi3k2yc" path="res://Core/Buffs/BuffEntity.gd" id="1_buff"]
 [ext_resource type="Script" uid="uid://b1nwuwgh80wpm" path="res://Core/Buffs/BuffEffect.gd" id="1_lue6k"]
-[ext_resource type="Script" uid="uid://b7d3w52jp3e3u" path="res://Core/Buffs/effects/HealBuffEffect.gd" id="2_heal"]
+[ext_resource type="Script" uid="uid://bj5p28e3m4s42" path="res://Core/Buffs/effects/HealBuffEffect.gd" id="2_heal"]
 
 [sub_resource type="Resource" id="Heal_pulse"]
 script = ExtResource("2_heal")

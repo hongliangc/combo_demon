@@ -1,25 +1,31 @@
-[gd_scene load_steps=3 format=3 uid="uid://dhm2ajbsbff8e"]
+[gd_scene format=3 uid="uid://dhm2ajbsbff8e"]
 
 [ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentBase.tscn" id="1_agent_base"]
 [ext_resource type="Script" uid="uid://cc36djs3pjrxs" path="res://Core/AI/controllers/InputController.gd" id="3_input_ctrl"]
 
-[node name="PlayerBase" groups=["player"] instance=ExtResource("1_agent_base")]
+[node name="PlayerBase" unique_id=586669044 groups=["player"] instance=ExtResource("1_agent_base")]
 collision_layer = 2
 collision_mask = 129
 floor_constant_speed = true
 floor_snap_length = 16.0
 has_gravity = true
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1572817713]
-
-[node name="HurtBoxComponent" parent="." unique_id=1245267114]
+[node name="HurtBoxComponent" parent="." index="3" unique_id=1245267114]
 collision_layer = 2
 
-[node name="HitBoxComponent" parent="." unique_id=1666699896]
+[node name="HitBoxComponent" parent="." index="4" unique_id=1666699896]
 collision_layer = 2
 collision_mask = 8
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=299757769]
-
-[node name="Controller" parent="." unique_id=566218302]
+[node name="Controller" parent="." index="9" unique_id=566218302]
 script = ExtResource("3_input_ctrl")
+attack_action = &"attack"
+jump_action = &"jump"
+dash_action = &"dash"
+special_action = &"special"
+move_left_action = &"ui_left"
+move_right_action = &"ui_right"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." index="13" unique_id=1572817713]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." index="14" unique_id=299757769]

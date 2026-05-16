@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ComboSkill" load_steps=6 format=3 uid="uid://chokvp3rfo6wc"]
+[gd_resource type="Resource" script_class="ComboSkill" format=3 uid="uid://chokvp3rfo6wc"]
 
 [ext_resource type="Script" uid="uid://bp52vndrtujng" path="res://Core/AI/ComboSkill.gd" id="1"]
 [ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="2"]
@@ -8,22 +8,22 @@
 [sub_resource type="Resource" id="sub_1"]
 script = ExtResource("2")
 id = &"combo_step1"
-damage_amount = 10.0
-damage_tags = 1
-attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 params = {
 &"animation": &"cleave"
 }
+damage_amount = 10.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 
 [sub_resource type="Resource" id="sub_2"]
 script = ExtResource("2")
 id = &"combo_step2"
-damage_amount = 10.0
-damage_tags = 1
-attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 params = {
 &"animation": &"cleave"
 }
+damage_amount = 10.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 
 [resource]
 script = ExtResource("1")

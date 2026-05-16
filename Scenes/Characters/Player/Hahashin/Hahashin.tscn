@@ -1,36 +1,15 @@
 [gd_scene format=3 uid="uid://d1sj82yqwu01u"]
 
 [ext_resource type="PackedScene" uid="uid://dhm2ajbsbff8e" path="res://Scenes/Characters/Templates/PlayerBase.tscn" id="1_base"]
-[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="skill_type"]
-[ext_resource type="Resource" uid="uid://eq5rc0sel7syg" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_1.tres" id="skill_atk_1"]
-[ext_resource type="Resource" uid="uid://l2y2mz1koeipo" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_2.tres" id="skill_atk_2"]
-[ext_resource type="Resource" uid="uid://75398h61dcs6m" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_3.tres" id="skill_atk_3"]
-[ext_resource type="Resource" uid="uid://1l35s9g3rl77t" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_3_kup.tres" id="skill_atk_3_kup"]
-[ext_resource type="Resource" uid="uid://11j38rkz4tjcb" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_air.tres" id="skill_atk_air"]
-[ext_resource type="Resource" uid="uid://afqyeeo8urcgk" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_sp.tres" id="skill_atk_sp"]
-[ext_resource type="Resource" uid="uid://380ozrj5q3pyg" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_roll.tres" id="skill_roll"]
-
-[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinGroundState.gd" id="hh_state_ground"]
-[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinAirState.gd" id="hh_state_air"]
-[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinCombatState.gd" id="hh_state_combat"]
-[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinRollState.gd" id="hh_state_roll"]
-[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinHitState.gd" id="hh_state_hit"]
-[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinSpecialAttackState.gd" id="hh_state_special"]
-[ext_resource type="Script" path="res://Scenes/Characters/Player/Hahashin/States/HahashinFallDeathState.gd" id="hh_state_falldeath"]
-[ext_resource type="Script" uid="uid://dqnm3j7x8k4p2" path="res://Core/Animation/AnimationPlayerBackend.gd" id="anim_player_backend"]
 [ext_resource type="Texture2D" uid="uid://ci2uaxeklamvi" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_1.png" id="1_c3kl5"]
 [ext_resource type="Texture2D" uid="uid://bwv6fwkjj5csk" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_1.png" id="1_hrca3"]
 [ext_resource type="Script" uid="uid://b1ex62f8uy81b" path="res://Scenes/Characters/Player/Hahashin/hahashin.gd" id="1_mom7b"]
 [ext_resource type="Texture2D" uid="uid://ba0pir88bptb0" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_2.png" id="2_d5iwh"]
-
 [ext_resource type="Texture2D" uid="uid://cn3wk5j44t4d7" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_2.png" id="2_yb066"]
 [ext_resource type="Texture2D" uid="uid://du2hlv87q7fvn" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_3.png" id="3_2ttqx"]
-
 [ext_resource type="Texture2D" uid="uid://dihtk8wqiihjl" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_3.png" id="3_xk8kn"]
-
 [ext_resource type="Texture2D" uid="uid://byxwlodyme57h" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_4.png" id="4_g73ga"]
 [ext_resource type="Texture2D" uid="uid://dkdb6ji0xhxph" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_4.png" id="4_q1taa"]
-
 [ext_resource type="Texture2D" uid="uid://by5c28sgtesto" path="res://Assets/Art/Wind_Hashashin/PNG/idle/idle_5.png" id="5_ktvv7"]
 [ext_resource type="Texture2D" uid="uid://deb0nbib5dksa" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_5.png" id="5_o2kwx"]
 [ext_resource type="Texture2D" uid="uid://bfty6xjyj1ly1" path="res://Assets/Art/Wind_Hashashin/PNG/1_atk/1_atk_6.png" id="6_6s4sr"]
@@ -148,436 +127,22 @@
 [ext_resource type="Texture2D" uid="uid://ciri7wyy2lkyd" path="res://Assets/Art/Wind_Hashashin/PNG/j_up/j_up_3.png" id="105_7bg3a"]
 [ext_resource type="AudioStream" uid="uid://darf54p1hw7ug" path="res://Assets/Sound/sword_slash.mp3" id="112_mydql"]
 [ext_resource type="AudioStream" uid="uid://dbmjdalwoup22" path="res://Assets/Sound/running-in-grass.mp3" id="113_fp3de"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_a57dt"]
-size = Vector2(24, 35)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_b07cd"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("1_c3kl5")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_d5iwh")
-}, {
-"duration": 1.0,
-"texture": ExtResource("3_2ttqx")
-}, {
-"duration": 1.0,
-"texture": ExtResource("4_q1taa")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_o2kwx")
-}, {
-"duration": 1.0,
-"texture": ExtResource("6_6s4sr")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_sjagy")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_i3m2l")
-}],
-"loop": false,
-"name": &"atk_1",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("9_c61cn")
-}, {
-"duration": 1.0,
-"texture": ExtResource("10_mom7b")
-}, {
-"duration": 1.0,
-"texture": ExtResource("11_os05d")
-}, {
-"duration": 1.0,
-"texture": ExtResource("12_8k4ci")
-}, {
-"duration": 1.0,
-"texture": ExtResource("13_2s434")
-}, {
-"duration": 1.0,
-"texture": ExtResource("14_mnt5w")
-}, {
-"duration": 1.0,
-"texture": ExtResource("15_ltrpv")
-}, {
-"duration": 1.0,
-"texture": ExtResource("16_246et")
-}, {
-"duration": 1.0,
-"texture": ExtResource("17_fqjf3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("18_s1j0u")
-}, {
-"duration": 1.0,
-"texture": ExtResource("19_tvs2g")
-}, {
-"duration": 1.0,
-"texture": ExtResource("20_mshhv")
-}, {
-"duration": 1.0,
-"texture": ExtResource("21_sohtc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("22_r2evy")
-}, {
-"duration": 1.0,
-"texture": ExtResource("23_yyfb6")
-}, {
-"duration": 1.0,
-"texture": ExtResource("24_bkg1o")
-}, {
-"duration": 1.0,
-"texture": ExtResource("25_02t1x")
-}, {
-"duration": 1.0,
-"texture": ExtResource("26_mu28m")
-}],
-"loop": false,
-"name": &"atk_2",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("27_mhb5x")
-}, {
-"duration": 1.0,
-"texture": ExtResource("28_xvgtj")
-}, {
-"duration": 1.0,
-"texture": ExtResource("29_3t28i")
-}, {
-"duration": 1.0,
-"texture": ExtResource("30_7d5ho")
-}, {
-"duration": 1.0,
-"texture": ExtResource("31_dm5fg")
-}, {
-"duration": 1.0,
-"texture": ExtResource("32_x17dt")
-}, {
-"duration": 1.0,
-"texture": ExtResource("33_hecy1")
-}, {
-"duration": 1.0,
-"texture": ExtResource("34_t7kgx")
-}, {
-"duration": 1.0,
-"texture": ExtResource("35_bcx54")
-}, {
-"duration": 1.0,
-"texture": ExtResource("36_kcmj6")
-}, {
-"duration": 1.0,
-"texture": ExtResource("37_0p2wa")
-}, {
-"duration": 1.0,
-"texture": ExtResource("38_ktfou")
-}, {
-"duration": 1.0,
-"texture": ExtResource("39_0by6d")
-}, {
-"duration": 1.0,
-"texture": ExtResource("40_xqtpy")
-}, {
-"duration": 1.0,
-"texture": ExtResource("41_yqrv6")
-}, {
-"duration": 1.0,
-"texture": ExtResource("42_fjpxo")
-}, {
-"duration": 1.0,
-"texture": ExtResource("43_evnd5")
-}, {
-"duration": 1.0,
-"texture": ExtResource("44_uehik")
-}, {
-"duration": 1.0,
-"texture": ExtResource("45_rrisc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("46_og8r3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("47_mx4bc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("48_1bpt5")
-}, {
-"duration": 1.0,
-"texture": ExtResource("49_ftk08")
-}, {
-"duration": 1.0,
-"texture": ExtResource("50_ndk4s")
-}, {
-"duration": 1.0,
-"texture": ExtResource("51_or3jp")
-}, {
-"duration": 1.0,
-"texture": ExtResource("52_4e777")
-}],
-"loop": false,
-"name": &"atk_3",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("55_dqq80")
-}, {
-"duration": 1.0,
-"texture": ExtResource("56_ns5ih")
-}, {
-"duration": 1.0,
-"texture": ExtResource("57_qpgal")
-}, {
-"duration": 1.0,
-"texture": ExtResource("58_cfn3t")
-}, {
-"duration": 1.0,
-"texture": ExtResource("59_1qqfv")
-}, {
-"duration": 1.0,
-"texture": ExtResource("60_m0di8")
-}, {
-"duration": 1.0,
-"texture": ExtResource("61_kxll6")
-}],
-"loop": false,
-"name": &"atk_air",
-"speed": 15.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("53_qgge0")
-}, {
-"duration": 1.0,
-"texture": ExtResource("54_okrnx")
-}, {
-"duration": 1.0,
-"texture": ExtResource("55_l7dhb")
-}, {
-"duration": 1.0,
-"texture": ExtResource("56_55so5")
-}, {
-"duration": 1.0,
-"texture": ExtResource("57_3lo1q")
-}, {
-"duration": 1.0,
-"texture": ExtResource("58_ckdas")
-}, {
-"duration": 1.0,
-"texture": ExtResource("59_xs7pc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("60_54m3w")
-}, {
-"duration": 1.0,
-"texture": ExtResource("61_3m1ex")
-}, {
-"duration": 1.0,
-"texture": ExtResource("62_7qac3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("63_u3a3e")
-}, {
-"duration": 1.0,
-"texture": ExtResource("64_wqsp3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("65_2tktp")
-}, {
-"duration": 1.0,
-"texture": ExtResource("66_r4lu2")
-}, {
-"duration": 1.0,
-"texture": ExtResource("67_2rpgd")
-}, {
-"duration": 1.0,
-"texture": ExtResource("68_uxqax")
-}, {
-"duration": 1.0,
-"texture": ExtResource("69_oyvid")
-}, {
-"duration": 1.0,
-"texture": ExtResource("70_xiiii")
-}, {
-"duration": 1.0,
-"texture": ExtResource("71_27idb")
-}, {
-"duration": 1.0,
-"texture": ExtResource("72_ay5v0")
-}, {
-"duration": 1.0,
-"texture": ExtResource("73_sws0f")
-}, {
-"duration": 1.0,
-"texture": ExtResource("74_kb747")
-}, {
-"duration": 1.0,
-"texture": ExtResource("75_6qixg")
-}, {
-"duration": 1.0,
-"texture": ExtResource("76_l26r3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("77_78vlb")
-}, {
-"duration": 1.0,
-"texture": ExtResource("78_f5ef3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("79_70bdh")
-}, {
-"duration": 1.0,
-"texture": ExtResource("80_88gr8")
-}, {
-"duration": 1.0,
-"texture": ExtResource("81_vucnw")
-}, {
-"duration": 1.0,
-"texture": ExtResource("82_xsvmx")
-}],
-"loop": false,
-"name": &"atk_sp",
-"speed": 15.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("1_hrca3")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_yb066")
-}, {
-"duration": 1.0,
-"texture": ExtResource("3_xk8kn")
-}, {
-"duration": 1.0,
-"texture": ExtResource("4_g73ga")
-}, {
-"duration": 1.0,
-"texture": ExtResource("5_ktvv7")
-}, {
-"duration": 1.0,
-"texture": ExtResource("6_ejrhw")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_xiytc")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_05lvs")
-}],
-"loop": false,
-"name": &"idle",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("100_emkfr")
-}, {
-"duration": 1.0,
-"texture": ExtResource("101_2lk3c")
-}, {
-"duration": 1.0,
-"texture": ExtResource("102_xpbhy")
-}],
-"loop": true,
-"name": &"j_down",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("103_msr38")
-}, {
-"duration": 1.0,
-"texture": ExtResource("104_0g1hs")
-}, {
-"duration": 1.0,
-"texture": ExtResource("105_7bg3a")
-}],
-"loop": false,
-"name": &"j_up",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("91_nvdbl")
-}, {
-"duration": 1.0,
-"texture": ExtResource("92_t54o8")
-}, {
-"duration": 1.0,
-"texture": ExtResource("93_33qc1")
-}, {
-"duration": 1.0,
-"texture": ExtResource("94_13mcm")
-}, {
-"duration": 1.0,
-"texture": ExtResource("95_xgmtw")
-}, {
-"duration": 1.0,
-"texture": ExtResource("96_l1cp4")
-}],
-"loop": false,
-"name": &"roll",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("97_c61cn")
-}, {
-"duration": 1.0,
-"texture": ExtResource("98_mom7b")
-}, {
-"duration": 1.0,
-"texture": ExtResource("99_os05d")
-}, {
-"duration": 1.0,
-"texture": ExtResource("100_8k4ci")
-}, {
-"duration": 1.0,
-"texture": ExtResource("101_2s434")
-}, {
-"duration": 1.0,
-"texture": ExtResource("102_mnt5w")
-}, {
-"duration": 1.0,
-"texture": ExtResource("103_ltrpv")
-}, {
-"duration": 1.0,
-"texture": ExtResource("104_246et")
-}],
-"loop": true,
-"name": &"run",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("97_vtu2l")
-}, {
-"duration": 1.0,
-"texture": ExtResource("98_ayrf0")
-}, {
-"duration": 1.0,
-"texture": ExtResource("99_spk6p")
-}, {
-"duration": 1.0,
-"texture": ExtResource("100_fc5wv")
-}, {
-"duration": 1.0,
-"texture": ExtResource("101_2iw3m")
-}, {
-"duration": 1.0,
-"texture": ExtResource("102_edmnu")
-}],
-"loop": true,
-"name": &"take_hit",
-"speed": 10.0
-}]
+[ext_resource type="Script" uid="uid://dqnm3j7x8k4p2" path="res://Core/Animation/AnimationPlayerBackend.gd" id="anim_player_backend"]
+[ext_resource type="Script" uid="uid://dqmgggdrcwqij" path="res://Scenes/Characters/Player/Hahashin/States/HahashinAirState.gd" id="hh_state_air"]
+[ext_resource type="Script" uid="uid://bdrfq1symxopd" path="res://Scenes/Characters/Player/Hahashin/States/HahashinCombatState.gd" id="hh_state_combat"]
+[ext_resource type="Script" uid="uid://byb6gfw83fbl7" path="res://Scenes/Characters/Player/Hahashin/States/HahashinFallDeathState.gd" id="hh_state_falldeath"]
+[ext_resource type="Script" uid="uid://bnxe0i7xhgdwa" path="res://Scenes/Characters/Player/Hahashin/States/HahashinGroundState.gd" id="hh_state_ground"]
+[ext_resource type="Script" uid="uid://b5mm5ucrxjglb" path="res://Scenes/Characters/Player/Hahashin/States/HahashinHitState.gd" id="hh_state_hit"]
+[ext_resource type="Script" uid="uid://cn63c3mol1jbn" path="res://Scenes/Characters/Player/Hahashin/States/HahashinRollState.gd" id="hh_state_roll"]
+[ext_resource type="Script" uid="uid://bfm8n1tbqqhhb" path="res://Scenes/Characters/Player/Hahashin/States/HahashinSpecialAttackState.gd" id="hh_state_special"]
+[ext_resource type="Resource" uid="uid://vqvqxu410w7o" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_1.tres" id="skill_atk_1"]
+[ext_resource type="Resource" uid="uid://hrguuasyrvge" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_2.tres" id="skill_atk_2"]
+[ext_resource type="Resource" uid="uid://b8uci1t0tps4i" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_3.tres" id="skill_atk_3"]
+[ext_resource type="Resource" uid="uid://dfnxawxleeyn8" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_3_kup.tres" id="skill_atk_3_kup"]
+[ext_resource type="Resource" uid="uid://dt3vpf2iqmarp" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_air.tres" id="skill_atk_air"]
+[ext_resource type="Resource" uid="uid://fqyeeo8urcgk" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_atk_sp.tres" id="skill_atk_sp"]
+[ext_resource type="Resource" uid="uid://b65lvd4esoln3" path="res://Scenes/Characters/Player/Hahashin/Skills/hh_roll.tres" id="skill_roll"]
+[ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="skill_type"]
 
 [sub_resource type="Animation" id="Animation_2s434"]
 resource_name = "RESET"
@@ -1125,7 +690,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "clips": [{
-"end_offset": 1.0593,
+"end_offset": 1.0927517,
 "start_offset": 0.1267,
 "stream": ExtResource("113_fp3de")
 }],
@@ -1175,6 +740,9 @@ _data = {
 &"run": SubResource("Animation_yyfb6"),
 &"take_hit": SubResource("Animation_bkg1o")
 }
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a57dt"]
+size = Vector2(24, 35)
 
 [sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_control"]
 
@@ -1305,80 +873,497 @@ node_connections = [&"output", 0, &"control_blend", &"loco_timescale", 0, &"loco
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_23x5x"]
 size = Vector2(24, 35)
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_b07cd"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_c3kl5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_d5iwh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_2ttqx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_q1taa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_o2kwx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_6s4sr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_sjagy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_i3m2l")
+}],
+"loop": false,
+"name": &"atk_1",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_c61cn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_mom7b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_os05d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_8k4ci")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_2s434")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_mnt5w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_ltrpv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_246et")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_fqjf3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_s1j0u")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_tvs2g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_mshhv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_sohtc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_r2evy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_yyfb6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_bkg1o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_02t1x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_mu28m")
+}],
+"loop": false,
+"name": &"atk_2",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("27_mhb5x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_xvgtj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_3t28i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_7d5ho")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_dm5fg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_x17dt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_hecy1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_t7kgx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_bcx54")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_kcmj6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_0p2wa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_ktfou")
+}, {
+"duration": 1.0,
+"texture": ExtResource("39_0by6d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_xqtpy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("41_yqrv6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_fjpxo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_evnd5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_uehik")
+}, {
+"duration": 1.0,
+"texture": ExtResource("45_rrisc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_og8r3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_mx4bc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("48_1bpt5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("49_ftk08")
+}, {
+"duration": 1.0,
+"texture": ExtResource("50_ndk4s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_or3jp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("52_4e777")
+}],
+"loop": false,
+"name": &"atk_3",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("55_dqq80")
+}, {
+"duration": 1.0,
+"texture": ExtResource("56_ns5ih")
+}, {
+"duration": 1.0,
+"texture": ExtResource("57_qpgal")
+}, {
+"duration": 1.0,
+"texture": ExtResource("58_cfn3t")
+}, {
+"duration": 1.0,
+"texture": ExtResource("59_1qqfv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("60_m0di8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("61_kxll6")
+}],
+"loop": false,
+"name": &"atk_air",
+"speed": 15.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("53_qgge0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("54_okrnx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("55_l7dhb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("56_55so5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("57_3lo1q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("58_ckdas")
+}, {
+"duration": 1.0,
+"texture": ExtResource("59_xs7pc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("60_54m3w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("61_3m1ex")
+}, {
+"duration": 1.0,
+"texture": ExtResource("62_7qac3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("63_u3a3e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("64_wqsp3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("65_2tktp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("66_r4lu2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("67_2rpgd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("68_uxqax")
+}, {
+"duration": 1.0,
+"texture": ExtResource("69_oyvid")
+}, {
+"duration": 1.0,
+"texture": ExtResource("70_xiiii")
+}, {
+"duration": 1.0,
+"texture": ExtResource("71_27idb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("72_ay5v0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("73_sws0f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("74_kb747")
+}, {
+"duration": 1.0,
+"texture": ExtResource("75_6qixg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("76_l26r3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("77_78vlb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("78_f5ef3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("79_70bdh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("80_88gr8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("81_vucnw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("82_xsvmx")
+}],
+"loop": false,
+"name": &"atk_sp",
+"speed": 15.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_hrca3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_yb066")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_xk8kn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_g73ga")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ktvv7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_ejrhw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_xiytc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_05lvs")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("100_emkfr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("101_2lk3c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("102_xpbhy")
+}],
+"loop": true,
+"name": &"j_down",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("103_msr38")
+}, {
+"duration": 1.0,
+"texture": ExtResource("104_0g1hs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("105_7bg3a")
+}],
+"loop": false,
+"name": &"j_up",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("91_nvdbl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("92_t54o8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("93_33qc1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("94_13mcm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("95_xgmtw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("96_l1cp4")
+}],
+"loop": false,
+"name": &"roll",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("97_c61cn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("98_mom7b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("99_os05d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("100_8k4ci")
+}, {
+"duration": 1.0,
+"texture": ExtResource("101_2s434")
+}, {
+"duration": 1.0,
+"texture": ExtResource("102_mnt5w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("103_ltrpv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("104_246et")
+}],
+"loop": true,
+"name": &"run",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("97_vtu2l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("98_ayrf0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("99_spk6p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("100_fc5wv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("101_2iw3m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("102_edmnu")
+}],
+"loop": true,
+"name": &"take_hit",
+"speed": 10.0
+}]
+
 [node name="Hahashin" unique_id=1329962730 instance=ExtResource("1_base")]
-groups = ["player"]
-collision_layer = 2
-collision_mask = 129
-floor_constant_speed = true
-floor_snap_length = 16.0
 script = ExtResource("1_mom7b")
-has_gravity = true
+sprite_faces_right = true
 max_speed = 200.0
 max_jump_count = 2
-max_health = 10000
-health = 10000
 skill_resources = Array[ExtResource("skill_type")]([ExtResource("skill_atk_1"), ExtResource("skill_atk_2"), ExtResource("skill_atk_3"), ExtResource("skill_atk_3_kup"), ExtResource("skill_atk_air"), ExtResource("skill_atk_sp"), ExtResource("skill_roll")])
 
-[node name="CollisionShape2D" parent="." index="0" unique_id=884594291]
-shape = SubResource("RectangleShape2D_a57dt")
-
-[node name="AnimatedSprite2D" parent="." unique_id=1572817713]
-position = Vector2(0, -45.63)
-sprite_frames = SubResource("SpriteFrames_b07cd")
-animation = &"idle"
-
-[node name="AnimationPlayer" parent="." index="2" unique_id=710612678]
+[node name="AnimationPlayer" parent="." index="0" unique_id=710612678]
 libraries/ = SubResource("AnimationLibrary_igthf")
+
+[node name="Backend" type="Node" parent="AnimationDriver" parent_id_path=PackedInt32Array(999888777) index="0" unique_id=1759950205]
+script = ExtResource("anim_player_backend")
+walk_anim = &"run"
+
+[node name="CollisionShape2D" parent="." index="2" unique_id=884594291]
+shape = SubResource("RectangleShape2D_a57dt")
 
 [node name="AnimationTree" type="AnimationTree" parent="." index="3" unique_id=1041004894]
 active = false
-anim_player = NodePath("../AnimationPlayer")
 tree_root = SubResource("AnimationNodeBlendTree_bu1c3")
 advance_expression_base_node = NodePath("..")
+anim_player = NodePath("../AnimationPlayer")
 parameters/loco_timescale/scale = 1.0
 parameters/ctrl_timescale/scale = 1.0
 parameters/control_blend/blend_amount = 0.0
 
-[node name="Backend" type="Node" parent="AnimationDriver" parent_id_path=PackedInt32Array(999888777)]
-script = ExtResource("anim_player_backend")
-walk_anim = &"run"
-
 [node name="CollisionShape2D" parent="HurtBoxComponent" parent_id_path=PackedInt32Array(1245267114) index="0" unique_id=975434091]
 shape = SubResource("RectangleShape2D_23x5x")
 
-[node name="DamageNumbersAnchor" parent="." index="5" unique_id=863163428]
-position = Vector2(0, -50)
+[node name="CollisionShape2D" parent="HitBoxComponent" parent_id_path=PackedInt32Array(1666699896) index="0" unique_id=1873200456]
+disabled = true
 
-[node name="HitBoxComponent" parent="." index="6" unique_id=1666699896]
-collision_layer = 2
-collision_mask = 8
-
-[node name="HealthBar" parent="." index="11" unique_id=664927981]
-offset_left = -20.0
+[node name="HealthBar" parent="." index="7" unique_id=664927981]
 offset_top = -28.0
-offset_right = 20.0
 offset_bottom = -23.0
 
-[node name="StateController" parent="." parent_id_path=PackedInt32Array(193203180)]
+[node name="DamageNumbersAnchor" parent="." index="8" unique_id=863163428]
+position = Vector2(0, -50)
+
+[node name="StateController" parent="." index="9" unique_id=193203180]
 initial_state_name = &"ground"
 
-[node name="Ground" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+[node name="Ground" type="Node" parent="StateController" index="0" unique_id=153552359]
 script = ExtResource("hh_state_ground")
 
-[node name="Air" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+[node name="Air" type="Node" parent="StateController" index="1" unique_id=268090069]
 script = ExtResource("hh_state_air")
 
-[node name="Combat" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+[node name="Combat" type="Node" parent="StateController" index="2" unique_id=326509164]
 script = ExtResource("hh_state_combat")
 
-[node name="Roll" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+[node name="Roll" type="Node" parent="StateController" index="3" unique_id=686889789]
 script = ExtResource("hh_state_roll")
 
-[node name="Hit" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+[node name="Hit" type="Node" parent="StateController" index="4" unique_id=1426949465]
 script = ExtResource("hh_state_hit")
 
-[node name="SpecialAttack" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+[node name="SpecialAttack" type="Node" parent="StateController" index="5" unique_id=509220640]
 script = ExtResource("hh_state_special")
 
-[node name="FallDeath" type="Node" parent="StateController" parent_id_path=PackedInt32Array(193203180)]
+[node name="FallDeath" type="Node" parent="StateController" index="6" unique_id=768627920]
 script = ExtResource("hh_state_falldeath")
+
+[node name="AnimatedSprite2D" parent="." index="14" unique_id=1572817713]
+position = Vector2(0, -45.63)
+sprite_frames = SubResource("SpriteFrames_b07cd")
+animation = &"idle"

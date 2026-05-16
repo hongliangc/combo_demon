@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ComboSkill" load_steps=8 format=3 uid="uid://d4mtfdoi3i7am"]
+[gd_resource type="Resource" script_class="ComboSkill" format=3 uid="uid://d4mtfdoi3i7am"]
 
 [ext_resource type="Script" uid="uid://bp52vndrtujng" path="res://Core/AI/ComboSkill.gd" id="1"]
 [ext_resource type="Script" uid="uid://b4hyjs8fldiv3" path="res://Core/AI/Skill.gd" id="2"]
@@ -8,42 +8,42 @@
 [sub_resource type="Resource" id="sub_1"]
 script = ExtResource("2")
 id = &"bk_combo_finisher_p2_step1"
-damage_amount = 10.0
-damage_tags = 1
-attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 params = {
 &"animation": &"atk_1"
 }
+damage_amount = 10.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 
 [sub_resource type="Resource" id="sub_2"]
 script = ExtResource("2")
 id = &"bk_combo_finisher_p2_step2"
-damage_amount = 10.0
-damage_tags = 1
-attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 params = {
 &"animation": &"atk_2"
 }
+damage_amount = 10.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 
 [sub_resource type="Resource" id="sub_3"]
 script = ExtResource("2")
 id = &"bk_combo_finisher_p2_step3"
-damage_amount = 10.0
-damage_tags = 1
-attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 params = {
 &"animation": &"atk_3"
 }
+damage_amount = 10.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 
 [sub_resource type="Resource" id="sub_4"]
 script = ExtResource("2")
 id = &"bk_combo_finisher_p2_step4"
-damage_amount = 10.0
-damage_tags = 1
-attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 params = {
 &"animation": &"sp_atk"
 }
+damage_amount = 10.0
+damage_tags = 1
+attached_buffs = Array[ExtResource("3_buff")]([ExtResource("4_stun")])
 
 [resource]
 script = ExtResource("1")
