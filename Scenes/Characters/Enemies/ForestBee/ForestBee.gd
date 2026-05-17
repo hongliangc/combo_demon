@@ -17,7 +17,7 @@ func _setup_blackboard() -> void:
 func _setup_transitions() -> void:
 	_register_rules([
 		# from         to            event                         guard                   priority
-		["idle",       "wander",     "",                           "_guard_idle_done",           0],
+		["idle",       "wander",     AIEvents.EV_ATTACK_FINISHED,  "",                            1],
 		["wander",     "idle",       AIEvents.EV_ATTACK_FINISHED,  "",                            0],
 		["idle",       "chase",      "",                           "_guard_detected",            10],
 		["wander",     "chase",      "",                           "_guard_detected",            10],
@@ -30,11 +30,6 @@ func _setup_transitions() -> void:
 		["hit",        "chase",      AIEvents.EV_HIT_RECOVERED,    "_guard_target_alive",        10],
 		["hit",        "idle",       AIEvents.EV_HIT_RECOVERED,    "",                            0],
 	])
-
-## Idle has no built-in timer — transition to wander on next safety tick (every 0.2s).
-## This keeps the bee active and matches the always-wander pattern.
-func _guard_idle_done() -> bool:
-	return true
 
 func _guard_detected() -> bool:
 	var bb := _get_blackboard()
