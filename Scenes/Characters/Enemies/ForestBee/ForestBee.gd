@@ -18,7 +18,7 @@ func _setup_transitions() -> void:
 	_register_rules([
 		# from         to            event                         guard                   priority
 		["idle",       "wander",     AIEvents.EV_ATTACK_FINISHED,  "",                            1],
-		["wander",     "idle",       AIEvents.EV_ATTACK_FINISHED,  "",                            0],
+		["wander",     "idle",       AIEvents.EV_ATTACK_FINISHED,  "",                            1],
 		["idle",       "chase",      "",                           "_guard_detected",            10],
 		["wander",     "chase",      "",                           "_guard_detected",            10],
 		["chase",      "idle",       "",                           "_guard_target_lost",          0],
