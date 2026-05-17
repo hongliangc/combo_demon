@@ -3,7 +3,6 @@
 *.uid
 *.tmp
 *.import
-Assets
 addons
 
 # Claude Code runtime artifacts
