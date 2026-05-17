@@ -43,7 +43,10 @@
       "Bash(cp \"E:/workspace/4.godot/combo_demon/docs/superpowers/specs/2026-04-16-skill-system-design.md\" \"E:/workspace/knowledge-wiki/.raw/agent-ai-skill-system-spec-2026-04-16.md\")",
       "Bash(cp \"E:/workspace/4.godot/combo_demon/.claude/skills/feature-development/references/agent-ai-guide.md\" \"E:/workspace/knowledge-wiki/.raw/agent-ai-guide.md\")",
       "Read(//e/workspace/knowledge-wiki/.raw/**)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Skill(superpowers:brainstorming)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:subagent-driven-development)"
     ],
     "deny": [
       "Bash(git rm:*)",
