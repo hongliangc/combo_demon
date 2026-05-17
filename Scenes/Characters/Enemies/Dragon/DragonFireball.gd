@@ -40,11 +40,23 @@ func _physics_process(delta: float) -> void:
 func _on_area_entered(area: Area2D) -> void:
 	if _hit:
 		return
-	if area is HurtBoxComponent:
-		_hit = true
-		var dmg := Damage.new()
-		dmg.amount = damage_amount
-		dmg.min_amount = damage_amount
-		dmg.max_amount = damage_amount
-		area.take_damage(dmg, global_position)
-		queue_free()
+	if not (area is HurtBoxComponent):
+		return
+	# v2 伤害路径: 解析受击者的 DamagePipeline (旧 HurtBox.take_damage 在
+	# Phase 5 已被废弃, damaged 信号无人监听) —— 见 BaseCharacter._setup_health_signals。
+	var victim: Node = area.get_owner()
+	if victim == null:
+		return
+	var pipe: DamagePipeline = victim.get_node_or_null(^"DamagePipeline")
+	if pipe == null:
+		return
+	_hit = true
+	var ctx := DamageContext.new()
+	ctx.source = self
+	ctx.target = victim
+	ctx.raw_amount = damage_amount
+	ctx.amount = damage_amount
+	ctx.tags = DamageTags.PHYSICAL
+	ctx.source_pos = global_position
+	pipe.process(ctx)
+	queue_free()
