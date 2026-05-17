@@ -1,10 +1,28 @@
 [gd_scene format=3 uid="uid://dbpf2ynq77ulh"]
 
-[ext_resource type="PackedScene" uid="uid://bbpsfxynbhnpn" path="res://Scenes/Characters/Templates/EnemyBase.tscn" id="1_base"]
-[ext_resource type="Texture2D" uid="uid://ug1ea3rvyytg" path="res://Assets/Art/Ninja_Adventure/Actor/Monsters/Bear/SpriteSheet.png" id="2_texture"]
-[ext_resource type="Script" uid="uid://bnemmbsahm51m" path="res://Scenes/Characters/Enemies/Bear/BearAttackState.gd" id="3_attack"]
+[ext_resource type="PackedScene" uid="uid://rllitgnkf211" path="res://Scenes/Characters/Templates/AgentBase.tscn" id="1_base"]
+[ext_resource type="Script" path="res://Scenes/Characters/Enemies/Bear/Bear.gd" id="1_bear"]
+[ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="skill_type"]
+[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Bear/Skills/bear_attack.tres" id="skill_bear_attack"]
+[ext_resource type="Texture2D" uid="uid://ug1ea3rvyytg" path="res://Assets/Art/Ninja_Adventure/Actor/Monsters/Bear/SpriteSheet.png" id="tex_bear"]
+[ext_resource type="Script" uid="uid://bnemmbsahm51m" path="res://Scenes/Characters/Enemies/Bear/BearAttackState.gd" id="state_bearattack"]
+[ext_resource type="Script" path="res://Core/AI/Stock/IdleState.gd" id="state_idle"]
+[ext_resource type="Script" path="res://Core/AI/Stock/ChaseState.gd" id="state_chase"]
+[ext_resource type="Script" path="res://Core/AI/Stock/AttackDispatcher.gd" id="state_dispatcher"]
+[ext_resource type="Script" path="res://Core/AI/Stock/HitState.gd" id="state_hit"]
+[ext_resource type="Script" path="res://Core/AI/Stock/DeathState.gd" id="state_death"]
+[ext_resource type="Script" uid="uid://dqnm3j7x8k4p2" path="res://Core/Animation/AnimationPlayerBackend.gd" id="anim_backend"]
 
-[sub_resource type="Animation" id="Animation_reset"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hit"]
+radius = 8.0
+
+[sub_resource type="Animation" id="Animation_RESET"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -33,26 +51,26 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:rotation")
+tracks/2/path = NodePath("Sprite2D:position")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [0.0]
+"values": [Vector2(0, 0)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Sprite2D:position")
+tracks/3/path = NodePath("Sprite2D:rotation")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, 0)]
+"values": [0.0]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -78,6 +96,54 @@ tracks/5/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("HitBoxComponent/CollisionShape2D:disabled")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 0.4
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 4, 8, 4]
+}
+
+[sub_resource type="Animation" id="Animation_walk"]
+resource_name = "walk"
+length = 0.4
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [2, 6, 10, 14]
+}
 
 [sub_resource type="Animation" id="Animation_attack"]
 resource_name = "attack"
@@ -94,6 +160,35 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 4, 8, 12]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("HitBoxComponent/CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.1, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+
+[sub_resource type="Animation" id="Animation_hit"]
+resource_name = "hit"
+length = 0.3
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [0, 4, 0]
 }
 
 [sub_resource type="Animation" id="Animation_death"]
@@ -171,214 +266,71 @@ tracks/5/keys = {
 "update": 0,
 "values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
-tracks/6/type = "method"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath(".")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
-"times": PackedFloat32Array(1),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [],
-"method": &"queue_free"
-}]
-}
 
-[sub_resource type="Animation" id="Animation_hit"]
-resource_name = "hit"
-length = 0.3
-step = 0.05
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
-"values": [0, 4, 0]
-}
-
-[sub_resource type="Animation" id="Animation_idle"]
-resource_name = "idle"
-length = 0.4
-loop_mode = 1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [0, 4, 8, 4]
-}
-
-[sub_resource type="Animation" id="Animation_left_run"]
-resource_name = "left_run"
-length = 0.25
-loop_mode = 1
-step = 0.05
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.06, 0.12, 0.18),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [2, 6, 10, 14]
-}
-
-[sub_resource type="Animation" id="Animation_left_walk"]
-resource_name = "left_walk"
-length = 0.4
-loop_mode = 1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [2, 6, 10, 14]
-}
-
-[sub_resource type="Animation" id="Animation_right_run"]
-resource_name = "right_run"
-length = 0.25
-loop_mode = 1
-step = 0.05
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.06, 0.12, 0.18),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [3, 7, 11, 15]
-}
-
-[sub_resource type="Animation" id="Animation_right_walk"]
-resource_name = "right_walk"
-length = 0.4
-loop_mode = 1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [3, 7, 11, 15]
-}
-
-[sub_resource type="Animation" id="Animation_stunned"]
-resource_name = "stunned"
-length = 0.5
-loop_mode = 1
-step = 0.1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 1,
-"values": [0, 4, 8, 4, 0]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_bear"]
+[sub_resource type="AnimationLibrary" id="AnimLib_bear"]
 _data = {
-&"RESET": SubResource("Animation_reset"),
+&"RESET": SubResource("Animation_RESET"),
 &"attack": SubResource("Animation_attack"),
 &"death": SubResource("Animation_death"),
 &"hit": SubResource("Animation_hit"),
 &"idle": SubResource("Animation_idle"),
-&"left_run": SubResource("Animation_left_run"),
-&"left_walk": SubResource("Animation_left_walk"),
-&"right_run": SubResource("Animation_right_run"),
-&"right_walk": SubResource("Animation_right_walk"),
-&"stunned": SubResource("Animation_stunned")
+&"walk": SubResource("Animation_walk")
 }
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
-radius = 8.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_floor"]
-radius = 8.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 8.0
-
-[node name="Bear" unique_id=680662468 instance=ExtResource("1_base")]
+[node name="Bear" unique_id=1543874825 instance=ExtResource("1_base")]
 scale = Vector2(2, 2)
 collision_mask = 129
-min_wander_time = 3.0
-max_wander_time = 8.0
-wander_speed = 25.0
+groups = ["enemy"]
+script = ExtResource("1_bear")
+has_gravity = false
 detection_radius = 130.0
-chase_speed = 55
+chase_speed = 55.0
+skill_resources = Array[ExtResource("skill_type")]([ExtResource("skill_bear_attack")])
 
-[node name="AnimationPlayer" parent="." index="1" unique_id=1378411187]
-libraries/ = SubResource("AnimationLibrary_bear")
+[node name="CollisionShape2D" parent="." index="0"]
+shape = SubResource("CircleShape2D_body")
 
-[node name="HurtBoxComponent" parent="." index="3" unique_id=1540730912]
+[node name="Sprite2D" type="Sprite2D" parent="." index="1"]
+texture = ExtResource("tex_bear")
+hframes = 4
+vframes = 4
+
+[node name="AnimationPlayer" parent="." index="2"]
+libraries/ = SubResource("AnimLib_bear")
+autoplay = &"idle"
+
+[node name="Backend" type="Node" parent="AnimationDriver" index="0"]
+script = ExtResource("anim_backend")
+
+[node name="CollisionShape2D" parent="HurtBoxComponent" index="0"]
+position = Vector2(0, 8)
+shape = SubResource("CircleShape2D_hurt")
+
+[node name="HitBoxComponent" parent="." index="5"]
 position = Vector2(0, 8)
 
-[node name="CollisionShape2D" parent="HurtBoxComponent" index="0" unique_id=318857879]
-position = Vector2(0, -8)
-shape = SubResource("CircleShape2D_hurtbox")
+[node name="CollisionShape2D" parent="HitBoxComponent" index="0"]
+shape = SubResource("CircleShape2D_hit")
+disabled = true
 
-[node name="FloorCollision" parent="." index="4" unique_id=458168996]
-shape = SubResource("CircleShape2D_floor")
+[node name="Idle" type="Node" parent="StateController" index="0"]
+script = ExtResource("state_idle")
 
-[node name="Attack" parent="EnemyStateMachine" parent_id_path=PackedInt32Array(1432708593) index="3" unique_id=1291631262]
-script = ExtResource("3_attack")
-skill_probability = 0.2
+[node name="Chase" type="Node" parent="StateController" index="1"]
+script = ExtResource("state_chase")
+
+[node name="BearAttack" type="Node" parent="StateController" index="2"]
+script = ExtResource("state_bearattack")
+slam_probability = 0.2
 slam_radius = 80.0
 slam_damage = 18.0
 slam_knockback = 280.0
 
-[node name="HitBoxComponent" parent="." index="7" unique_id=764109139]
-position = Vector2(0, 8)
+[node name="Dispatcher" type="Node" parent="StateController" index="3"]
+script = ExtResource("state_dispatcher")
 
-[node name="CollisionShape2D" parent="HitBoxComponent" index="0" unique_id=733792945]
-position = Vector2(0, -8)
-shape = SubResource("CircleShape2D_hitbox")
+[node name="Hit" type="Node" parent="StateController" index="4"]
+script = ExtResource("state_hit")
 
-[node name="HealthBar" parent="." index="8" unique_id=553338694]
-offset_top = -14.0
-offset_bottom = -10.0
-metadata/_edit_use_anchors_ = true
-
-[node name="DamageNumbersAnchor" parent="." index="9" unique_id=578664619]
-position = Vector2(0, -3)
-
-[node name="Sprite2D" parent="." index="0"]
-texture = ExtResource("2_texture")
-hframes = 4
-vframes = 4
+[node name="Death" type="Node" parent="StateController" index="5"]
+script = ExtResource("state_death")

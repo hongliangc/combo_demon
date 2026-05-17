@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=2 format=3 uid="uid://bear_attack_v1"]
+
+[ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bear_attack"
+state_name = &"bearattack"
+cooldown = 3.0
+weight = 1
+max_range = 50.0
+tags = Array[StringName]([&"melee"])
+damage_amount = 1.0
+damage_tags = 1
+params = {
+&"animation": &"attack",
+&"global_cooldown": 0.4
+}
