@@ -42,8 +42,7 @@ func _on_area_entered(area: Area2D) -> void:
 		return
 	if not (area is HurtBoxComponent):
 		return
-	# v2 伤害路径: 解析受击者的 DamagePipeline (旧 HurtBox.take_damage 在
-	# Phase 5 已被废弃, damaged 信号无人监听) —— 见 BaseCharacter._setup_health_signals。
+	# v2 伤害路径: 解析受击者的 DamagePipeline (v1 HurtBox.take_damage 已移除)
 	var victim: Node = area.get_owner()
 	if victim == null:
 		return

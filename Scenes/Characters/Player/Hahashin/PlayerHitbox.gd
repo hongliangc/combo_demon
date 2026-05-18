@@ -1,8 +1,7 @@
 extends HitBoxComponent
 class_name PlayerHitbox
 
-## 玩家专用 HitBoxComponent - 从 CombatComponent 动态获取伤害类型
-## 只需重写钩子方法，通用逻辑由基类处理
+## 玩家专用 HitBoxComponent —— 仅重写攻击者位置钩子，伤害配置由 Skill 驱动
 ## 注意：不覆盖 _ready()，完全依赖基类的信号连接和初始化
 
 @onready var player: AgentBase = get_owner()

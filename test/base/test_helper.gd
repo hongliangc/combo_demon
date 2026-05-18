@@ -2,33 +2,9 @@ extends RefCounted
 
 ## 测试工具类 — 提供 mock 工厂方法
 ## 用法: const H = preload("res://test/base/test_helper.gd")
-##       var dmg = H.create_damage(50.0)
+##       var ctx = H.create_damage_ctx(target, 50.0)
 
 # ============ Mock 工厂方法 ============
-
-## Phase 5: legacy AttackEffect-based factories. Damage v2 retyped effects to
-## Array[BuffEntity]; the typed Array[AttackEffect] signature is incompatible
-## and only kept for source-compat with pending legacy tests. Untyped Array
-## avoids engine-level assignment errors when these helpers are loaded.
-static func create_damage(amount: float = 10.0, effects: Array = []) -> Damage:
-	var dmg = Damage.new()
-	dmg.amount = amount
-	dmg.min_amount = amount * 0.5
-	dmg.max_amount = amount * 1.5
-	# effects intentionally not assigned — Damage v2 wants Array[BuffEntity];
-	# legacy callers passed Array[AttackEffect] which is dead code post-Phase 5.
-	return dmg
-
-
-static func create_stun_damage(_amount: float = 10.0, _stun_duration: float = 1.5) -> Damage:
-	# Pending: rewrite via BuffEntity stun in Cyclops/DS2 migration.
-	return create_damage(_amount)
-
-
-static func create_knockback_damage(_amount: float = 10.0, _force: float = 300.0) -> Damage:
-	# Pending: rewrite via KnockBackBuffEffect in Cyclops/DS2 migration.
-	return create_damage(_amount)
-
 
 static func create_behavior_config(overrides: Dictionary = {}) -> BehaviorConfig:
 	var config = BehaviorConfig.new()

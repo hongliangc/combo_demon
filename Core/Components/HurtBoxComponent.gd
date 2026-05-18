@@ -2,18 +2,8 @@ extends Area2D
 class_name HurtBoxComponent
 
 ############################################################
-# HurtBoxComponent component - this gets hit by the bullet's hitbox.
-# Only used by enemies by default, but can be referenced by
-# health components to receive damage
+# HurtBoxComponent — 受击碰撞标记区域。
+# 攻击方 HitBoxComponent 通过 `target is HurtBoxComponent` 识别可命中目标，
+# 伤害经受击者的 DamagePipeline 结算（见 HitBoxComponent / DamagePipeline）。
+# v1 的 take_damage() / damaged 信号路径已在 sub-spec-6 移除。
 ############################################################
-
-# 受到伤害时发出的信号
-# @param damage: 伤害数据
-# @param attacker_position: 攻击者位置（用于计算击飞/击退方向）
-signal damaged(damage: Damage, attacker_position: Vector2)
-
-# 接收伤害并发出信号
-# @param damage: 伤害数据
-# @param attacker_position: 攻击者位置（可选，默认为Vector2.ZERO）
-func take_damage(damage: Damage, attacker_position: Vector2 = Vector2.ZERO):
-	damaged.emit(damage, attacker_position)

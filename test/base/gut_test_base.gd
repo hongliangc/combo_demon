@@ -8,26 +8,6 @@ const _SignalTracker = preload("res://test/base/signal_tracker.gd")
 
 # ============ Mock 工厂方法 ============
 
-## Phase 5: legacy AttackEffect-based factories. Damage v2 retyped effects to
-## Array[BuffEntity]; untyped Array avoids engine-level type-assignment errors.
-func create_damage(amount: float = 10.0, _effects: Array = []) -> Damage:
-	var dmg = Damage.new()
-	dmg.amount = amount
-	dmg.min_amount = amount * 0.5
-	dmg.max_amount = amount * 1.5
-	return dmg
-
-
-## Pending: rewrite via BuffEntity stun in Cyclops/DS2 migration.
-func create_stun_damage(_amount: float = 10.0, _stun_duration: float = 1.5) -> Damage:
-	return create_damage(_amount)
-
-
-## Pending: rewrite via KnockBackBuffEffect in Cyclops/DS2 migration.
-func create_knockback_damage(_amount: float = 10.0, _force: float = 300.0) -> Damage:
-	return create_damage(_amount)
-
-
 ## 创建一个 BehaviorConfig Resource
 func create_behavior_config(overrides: Dictionary = {}) -> BehaviorConfig:
 	var config = BehaviorConfig.new()
