@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://enemy_skullfrost01"]
+
+[ext_resource type="PackedScene" uid="uid://ct7bkafuwgae0" path="res://Scenes/Characters/Enemies/Skull/Skull.tscn" id="1_skull"]
+[ext_resource type="Script" uid="uid://npplbyy6ax46e" path="res://Core/AI/Skill.gd" id="skill_type"]
+[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Skull/Skills/skull_strike.tres" id="skill_strike"]
+[ext_resource type="Resource" path="res://Scenes/Characters/Enemies/Skull/Skills/skull_frost.tres" id="skill_frost"]
+
+[node name="SkullFrost" instance=ExtResource("1_skull")]
+skill_resources = Array[ExtResource("skill_type")]([ExtResource("skill_strike"), ExtResource("skill_frost")])

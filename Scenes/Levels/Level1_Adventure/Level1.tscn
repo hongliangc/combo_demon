@@ -14,7 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://d4fp6s833uuea" path="res://Scenes/Characters/Enemies/ForestSnail/ForestSnail.tscn" id="11_snail"]
 [ext_resource type="Script" uid="uid://toj2ebm3ira6" path="res://Core/Components/FollowCamera.gd" id="12_camera"]
 [ext_resource type="PackedScene" uid="uid://ckill0one001" path="res://Scenes/Levels/Components/KillZone.tscn" id="13_killzone"]
-[ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/SkullBlue/SkullBlue.tscn" id="20_skullblue"]
+[ext_resource type="PackedScene" uid="uid://enemy_skullfrost01" path="res://Scenes/Characters/Enemies/Skull/SkullFrost.tscn" id="20_skullfrost"]
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Cyclope/Cyclope.tscn" id="21_cyclope"]
 [ext_resource type="PackedScene" uid="uid://dbpf2ynq77ulh" path="res://Scenes/Characters/Enemies/Bear/Bear.tscn" id="22_bear"]
 [ext_resource type="PackedScene" path="res://Scenes/Characters/Enemies/Dragon/Dragon.tscn" id="25_dragon"]
@@ -3501,7 +3501,7 @@ position = Vector2(2770, 437.00003)
 [node name="Skull2" parent="Enemies" unique_id=2069610604 instance=ExtResource("11_cc8v7")]
 position = Vector2(1021, 492)
 
-[node name="SkullBlue" parent="Enemies" unique_id=994680866 instance=ExtResource("20_skullblue")]
+[node name="SkullFrost" parent="Enemies" unique_id=994680866 instance=ExtResource("20_skullfrost")]
 position = Vector2(503, 489)
 
 [node name="Cyclope" parent="Enemies" unique_id=324761817 instance=ExtResource("21_cyclope")]
