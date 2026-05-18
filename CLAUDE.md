@@ -30,7 +30,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | Layer | Path |
 |---|---|
-| Framework | `Core/StateMachine/`, `Core/Components/`, `Core/Resources/`, `Core/Effects/` |
+| Framework | `Core/AI/`, `Core/Damage/`, `Core/Buffs/`, `Core/Animation/`, `Core/Components/`, `Core/Resources/`, `Core/Effects/` |
 | Services | `Core/Autoloads/` |
 | Business | `Scenes/Characters/`, `Scenes/Levels/` |
 | Presentation | `Assets/`, `Scenes/UI/` |
