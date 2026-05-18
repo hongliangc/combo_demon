@@ -26,11 +26,8 @@ class_name BaseTrap
 var is_active: bool = true
 ## 冷却计时器
 var _cooldown_timer: float = 0.0
-## 预构建的 Damage 资源
-var _damage: Damage = null
 
 func _ready() -> void:
-	_build_damage()
 	if activation_delay > 0.0:
 		is_active = false
 		get_tree().create_timer(activation_delay).timeout.connect(
@@ -53,16 +50,17 @@ func _apply_damage_to(body: Node2D) -> void:
 		return
 	if not body.is_in_group(&"player"):
 		return
-	var hurt_box: HurtBoxComponent = body.get_node_or_null("HurtBoxComponent")
-	if hurt_box == null:
+	# v2 伤害路径: 经受击者的 DamagePipeline (旧 HurtBox.take_damage 已废弃)
+	var pipe: DamagePipeline = body.get_node_or_null(^"DamagePipeline")
+	if pipe == null:
 		return
 	_cooldown_timer = damage_cooldown
-	hurt_box.take_damage(_damage, global_position)
-
-## 构建 Damage 资源
-func _build_damage() -> void:
-	_damage = Damage.new()
-	_damage.amount = damage_amount
-	_damage.min_amount = damage_amount
-	_damage.max_amount = damage_amount
-	_damage.effects = effects
+	var ctx := DamageContext.new()
+	ctx.source = self
+	ctx.target = body
+	ctx.raw_amount = damage_amount
+	ctx.amount = damage_amount
+	ctx.tags = DamageTags.PHYSICAL
+	ctx.source_pos = global_position
+	ctx.attached_buffs = effects
+	pipe.process(ctx)

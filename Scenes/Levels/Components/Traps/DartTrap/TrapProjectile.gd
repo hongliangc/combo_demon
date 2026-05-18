@@ -5,7 +5,8 @@ class_name TrapProjectile
 
 var direction: Vector2 = Vector2.LEFT
 var speed: float = 300.0
-var damage: Damage = null
+var damage_amount: float = 0.0
+var attached_buffs: Array[BuffEntity] = []
 var lifetime: float = 5.0
 
 var _timer: float = 0.0
@@ -23,7 +24,16 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group(&"player"):
-		var hurt_box: HurtBoxComponent = body.get_node_or_null("HurtBoxComponent")
-		if hurt_box and damage:
-			hurt_box.take_damage(damage, global_position)
+		# v2 伤害路径: 经受击者的 DamagePipeline (旧 HurtBox.take_damage 已废弃)
+		var pipe: DamagePipeline = body.get_node_or_null(^"DamagePipeline")
+		if pipe:
+			var ctx := DamageContext.new()
+			ctx.source = self
+			ctx.target = body
+			ctx.raw_amount = damage_amount
+			ctx.amount = damage_amount
+			ctx.tags = DamageTags.PHYSICAL
+			ctx.source_pos = global_position
+			ctx.attached_buffs = attached_buffs
+			pipe.process(ctx)
 	queue_free()

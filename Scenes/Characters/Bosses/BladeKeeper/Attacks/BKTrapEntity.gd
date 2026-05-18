@@ -1,11 +1,15 @@
 extends Area2D
 class_name BKTrapEntity
 
-## 地面陷阱 — 落地待机，接触触发爆炸动画 + ForceStun
+## 地面陷阱 — 落地待机，接触触发爆炸动画 (+ 可选伤害 / 眩晕 buff)
+## 默认 damage_amount=0 / stun_buff=null —— 纯视觉陷阱
+## (与 v1 damage_config 未配置时行为一致；v1 的 Damage/ForceStunEffect 路径已移除)
 
 @export var trap_lifetime := 8.0
-@export var damage_config: Damage
-@export var stun_duration := 0.5
+## 命中伤害 (0 = 纯视觉陷阱)
+@export var damage_amount: float = 0.0
+## 命中附加的 buff (眩晕等，可空)
+@export var stun_buff: BuffEntity
 
 var _triggered := false
 
@@ -40,16 +44,22 @@ func _trigger(body: Node2D) -> void:
 	_sprite.play("detonate")
 	_sprite.animation_finished.connect(func(): queue_free())
 
-	# 应用伤害
-	if damage_config:
-		var dmg := damage_config.duplicate(true) as Damage
-		var stun_effect := ForceStunEffect.new()
-		stun_effect.duration = stun_duration
-		dmg.effects.append(stun_effect)
-		for child in body.get_children():
-			if child.has_method("take_damage"):
-				child.take_damage(dmg, global_position)
-				break
+	# v2 伤害路径: 经受击者的 DamagePipeline (旧 HurtBox.take_damage 已移除)
+	if damage_amount <= 0.0:
+		return
+	var pipe: DamagePipeline = body.get_node_or_null(^"DamagePipeline")
+	if pipe == null:
+		return
+	var ctx := DamageContext.new()
+	ctx.source = self
+	ctx.target = body
+	ctx.raw_amount = damage_amount
+	ctx.amount = damage_amount
+	ctx.tags = DamageTags.PHYSICAL
+	ctx.source_pos = global_position
+	if stun_buff:
+		ctx.attached_buffs = [stun_buff]
+	pipe.process(ctx)
 
 func _expire() -> void:
 	if _triggered:

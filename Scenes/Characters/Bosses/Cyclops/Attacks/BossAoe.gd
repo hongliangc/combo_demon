@@ -84,9 +84,19 @@ func _on_area_entered(entered_area: Area2D) -> void:
 	if entered_area is HurtBoxComponent and entered_area not in damaged_targets:
 		damaged_targets.append(entered_area)
 
-		# 内联伤害（不再使用 Damage Resource @export）
-		var damage := Damage.new()
-		damage.min_amount = damage_min
-		damage.max_amount = damage_max
-		damage.randomize_damage()
-		entered_area.take_damage(damage)
+		# v2 伤害路径: 经受击者的 DamagePipeline (旧 HurtBox.take_damage 已废弃)
+		var victim: Node = entered_area.get_owner()
+		if victim == null:
+			return
+		var pipe: DamagePipeline = victim.get_node_or_null(^"DamagePipeline")
+		if pipe == null:
+			return
+		var amount := randf_range(damage_min, damage_max)
+		var ctx := DamageContext.new()
+		ctx.source = self
+		ctx.target = victim
+		ctx.raw_amount = amount
+		ctx.amount = amount
+		ctx.tags = DamageTags.PHYSICAL
+		ctx.source_pos = global_position
+		pipe.process(ctx)

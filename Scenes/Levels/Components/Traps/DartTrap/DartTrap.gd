@@ -33,7 +33,8 @@ func _fire() -> void:
 	var projectile: TrapProjectile = _projectile_scene.instantiate()
 	projectile.direction = fire_direction.normalized()
 	projectile.speed = projectile_speed
-	projectile.damage = _damage
+	projectile.damage_amount = damage_amount
+	projectile.attached_buffs = effects
 	projectile.lifetime = projectile_lifetime
 	projectile.global_position = global_position
 	# 根据方向旋转视觉

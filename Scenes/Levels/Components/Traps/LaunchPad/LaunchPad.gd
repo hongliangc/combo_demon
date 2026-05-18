@@ -16,7 +16,6 @@ class_name LaunchPad
 func _on_trap_ready() -> void:
 	# 弹射器无伤害
 	damage_amount = 0.0
-	_build_damage()
 	_damage_zone.body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body: Node2D) -> void:
